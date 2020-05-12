@@ -1,24 +1,59 @@
-import requests
-import time
+import json
+import websocket
 
 
-def getdata() -> int:
-    """Ottieni valore di Ripple da Bitstamp
+def avvio():
+    try:
+        # questo mostra piu informazioni se True
+        websocket.enableTrace(False)
+        ws = websocket.WebSocketApp("wss://ws.bitstamp.net",
+                                    on_message=on_message,
+                                    on_error=on_error,
+                                    on_close=on_close)
+        ws.on_open = on_open
+        ws.run_forever()
+    except KeyboardInterrupt as identifier:
+        ws.close()
 
-        Returns:
-                int -- valore di Ripple
+
+def on_open(ws):
+    """Funzione all'aggancio del WebSocket
+
+        Arguments:
+                ws {tipo_boh} -- sono dei caratteri apparentemente inutili
         """
-    r = requests.get('https://www.bitstamp.net/api/v2/ticker_hour/xrpeur/')
-    if r.status_code == 200:
-        jsonObj = r.json()
-        print(jsonObj)
-        return jsonObj['last']
-    else:
-        # todo- cosa fare se la URL da errore per qualche motivo?
-        print('no..')
+    jsonString = json.dumps({
+        "event": "bts:subscribe",
+        "data": {
+            "channel": "live_trades_xrpeur"
+        }
+    })
+    ws.send(jsonString)
+    print('Luce verde')
+    #thread.start_new_thread(run, ())
 
 
-def seComprare(parameter_list) -> bool:
+def on_message(ws, message: str):
+    messageDict = json.loads(message)
+    if messageDict['data'] != {}:
+        attuale = messageDict['data']['price']
+        print(attuale)
+    """
+		esito = seComprareOVendere(datiDaMessage) -> {azione: compra, quantiXRP: 24} || {}
+        	if esito != {}
+                compra(esito)
+        """
+
+
+def on_error(ws, error: str):
+    print(error)
+
+
+def on_close(ws):
+    print("### WebSocketclosed ###")
+
+
+def seComprareOVendere(parameter_list):
     pass
 
 
@@ -26,12 +61,8 @@ def compra(parameter_list):
     pass
 
 
-def avvio():
-    while True:
-        attuale = getdata()
-        time.sleep(1)
-        print(attuale)
-        """ print('valore {attuale} il {time.localtime()}') """
+def vendi(parameter_list):
+    pass
 
 
 avvio()
