@@ -2,6 +2,8 @@ import json
 import websocket
 from sorgenti.operazioni import seComprareOVendere
 
+# ciccio
+
 
 def avvio():
     try:
