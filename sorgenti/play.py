@@ -1,5 +1,6 @@
 import json
 import websocket
+from sorgenti.operazioni import seComprareOVendere
 
 
 def avvio():
@@ -30,12 +31,14 @@ def on_open(ws):
     })
     ws.send(jsonString)
     print('Luce verde')
-    #thread.start_new_thread(run, ())
 
 
 def on_message(ws, message: str):
+    # la stringa message ha la stesso formato di un json quindi possiamo passarlo come tale per ottenere il Dict
     messageDict = json.loads(message)
+    # PARE che appena si aggancia il socket manda un messaggio vuoto che fa crashare il bot
     if messageDict['data'] != {}:
+        # questo print serve solo a noi per lavorare
         attuale = messageDict['data']['price']
         print(attuale)
     """
@@ -51,18 +54,6 @@ def on_error(ws, error: str):
 
 def on_close(ws):
     print("### WebSocketclosed ###")
-
-
-def seComprareOVendere(parameter_list):
-    pass
-
-
-def compra(parameter_list):
-    pass
-
-
-def vendi(parameter_list):
-    pass
 
 
 avvio()

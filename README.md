@@ -11,7 +11,7 @@
 ___
 ## Lista piani
 
-  1. API REST
-  2. WebSocket
+  1. WebSocket
+  2. ⚠ piano ciambella 🦺⛱: WebScraping della pagina bitstamp per valore al minuto
 
-  ⚠ piano ciambella 🦺⛱: WebScraping della pagina bitstamp per valore al minuto
+
