@@ -1,8 +1,24 @@
 import json
 
 
-def seComprareOVendere(parameter_list):
-    pass
+def seComprareOVendere(attuale):
+    # ATTUALE: valoro che assume la vaiabile all'evento
+    # RIFERIMENTO: valore assunto al precedente evento
+    # ACQUISTO: valore di acquisto
+
+    acquisto = 0.180  # sarà un valore assegnato dalla funzione acquisto
+
+    if attuale > acquisto:
+        print("valore maggiore dell'acquisto")
+           if AT-RF > 0:
+                print("sta crescendo")
+            else:
+                print("sta scendendo")
+    else:
+        print("valore minore dell'acquisto")
+
+    # assegno al valore di riferimento l'ultimo valore assundo. in modo da confrontarlo con il prossimo
+    riferimento = attuale
 
 
 def compra(parameter_list):
@@ -21,8 +37,8 @@ def aggiornaPortafoglio(xrp, eur):
         eur {int} -- il valore da sommare di EUR
     """
     with open('portafoglio.json', 'w') as file:
-        fileData = file.read()
-        portafoglioDict = json.loads(fileData)
+        portafoglioLetto = file.read()
+        portafoglioDict = json.loads(portafoglioLetto)
         # accedi alle chiavi ad esempio con:
         # portafoglioDict['xrp']
 
