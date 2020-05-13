@@ -9,16 +9,16 @@ def quandoVendere(attuale):
     print("sono entrato nel compra e vendi")
 
     # carico i valori dal json
-    #valori = json.load(open("valori.json"))
+    # valori = json.load(open("valori.json"))
 
     with open("valori.json", "r") as jsonFile:
         data = json.load(jsonFile)
 
-    rif = data['riferimento']
-    acq = data['acquisto']
-    print('questo è il valore di riferimento e acqusto')
-    print(rif)
-    print(acq)
+        rif = data['riferimento']
+        acq = data['acquisto']
+        print('questo è il valore di riferimento e acqusto')
+        print(rif)
+        print(acq)
 
     if attuale > acq:
         print("valore maggiore dell'acquisto")
@@ -73,7 +73,6 @@ def QuandoComprare(attuale):
 
 
 def compra(parameter_list):
-    pass
     print("ho aquistato a questo prezzo"+parameter_list)
 
 
@@ -85,8 +84,8 @@ def aggiornaPortafoglio(xrp, eur):
     """Scrivi su file o in variabili i cambiamenti di XRP e EUR
 
     Arguments:
-        xrp {int} -- il valore da sommare di XRP
-        eur {int} -- il valore da sommare di EUR
+            xrp {int} -- il valore da sommare di XRP
+            eur {int} -- il valore da sommare di EUR
     """
     with open('portafoglio.json', 'w') as file:
         portafoglioLetto = file.read()

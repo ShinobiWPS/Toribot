@@ -30,6 +30,7 @@ def on_open(ws):
             "channel": "live_trades_xrpeur"
         }
     })
+    # manda a bitstamp la richiesta di iscriversi al canale di eventi 'live_trades_xrpeur'
     ws.send(jsonString)
     print('Luce verde')
 
