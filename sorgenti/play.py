@@ -1,7 +1,7 @@
 import json
 import websocket
 # il file .env con il vscode workspace.json sono necessari solo temporaneamente per ovviare al bug di intelliCode (a volte mostra import irrisolti, ma sono falsi negativi) perche usa una preview di Microsoft Python Language Analisys, come per esempio e' successo per importare "operazioni"
-from operazioni import quandoVendere
+from operazioni import seVendereOComprare
 
 
 def avvio():
@@ -21,9 +21,9 @@ def avvio():
 def on_open(ws):
     """Funzione all'aggancio del WebSocket
 
-        Arguments:
-                ws {tipo_boh} -- sono dei caratteri apparentemente inutili
-        """
+            Arguments:
+                            ws {tipo_boh} -- sono dei caratteri apparentemente inutili
+            """
     jsonString = json.dumps({
         "event": "bts:subscribe",
         "data": {
@@ -43,14 +43,15 @@ def on_message(ws, message: str):
         # questo print serve solo a noi per lavorare
         attuale = messageDict['data']['price']
         print(attuale)
-        quandoVendere(attuale)
+        seVendereOComprare(attuale)
+
         print("sono passato oltre")
 
     """
 		esito = seComprareOVendere(datiDaMessage) -> {azione: compra, quantiXRP: 24} || {}
-        	if esito != {}
-                compra(esito)
-        """
+			if esito != {}
+				compra(esito)
+		"""
 
 
 def on_error(ws, error: str):

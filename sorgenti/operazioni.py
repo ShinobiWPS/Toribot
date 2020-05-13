@@ -1,19 +1,35 @@
 import json
-# ATTUALE: valoro che assume la vaiabile all'evento
-# RIFERIMENTO: valore assunto al precedente evento
-# ACQUISTO: valore di acquisto
+from costanti.valori_percorso import VALORI_PERCORSO
+from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
+
+
+def seVendereOComprare(attuale: int):
+    """Puoi vendere o comprare?
+
+        Arguments:
+                attuale {int} -- nuovo prezzo del ripple
+        """
+    with open(PORTAFOGLIO_PERCORSO, "r") as jsonFile:
+        data = json.load(jsonFile)
+        eur = data['xrp']
+        xrp = data['eur']
+
+    if eur > 0:
+        quandoComprare(attuale)
+    elif xrp > 0:
+        quandoVendere(attuale)
 
 
 def quandoVendere(attuale):
-
+    # ATTUALE: valoro che assume la vaiabile all'evento
+    # RIFERIMENTO: valore assunto al precedente evento
+    # ACQUISTO: valore di acquisto
     print("sono entrato nel compra e vendi")
 
     # carico i valori dal json
-    # valori = json.load(open("valori.json"))
-
-    with open("valori.json", "r") as jsonFile:
+    # valori = json.load(open(VALORI_PERCORSO))
+    with open(VALORI_PERCORSO, "r") as jsonFile:
         data = json.load(jsonFile)
-
         rif = data['riferimento']
         acq = data['acquisto']
         print('questo è il valore di riferimento e acqusto')
@@ -30,7 +46,7 @@ def quandoVendere(attuale):
 
             calcologuad(attuale)
             # bisognerà valutare il minimo di crescita
-            QuandoComprare(attuale)
+            quandoComprare(attuale)
 
     else:
         print("valore minore dell'acquisto")
@@ -38,14 +54,14 @@ def quandoVendere(attuale):
     # aggiorno dati json(non so come aggirnare solo un dato, l'acquesto non è necessario)
     # ATTENZIONEEEEEEEE-------------------------------non mi aggirna il file json----
     data["riferimento"] = attuale
-    with open("valori.json", "w") as outfile:
+    with open(VALORI_PERCORSO, "w") as outfile:
         json.dump(data, outfile)
 
 
-def QuandoComprare(attuale):
+def quandoComprare(attuale):
     print("ora decido quando comprare")
     # trasformo il valore attuale in valore d'a
-    with open("valori.json", "r") as jsonFile:
+    with open(VALORI_PERCORSO, "r") as jsonFile:
         data = json.load(jsonFile)
 
     rif = data['riferimento']
@@ -68,7 +84,7 @@ def QuandoComprare(attuale):
 
         # imposto il nuovo valore d'acquisto
         data["acquisto"] = attuale
-        with open("valori.json", "w") as outfile:
+        with open(VALORI_PERCORSO, "w") as outfile:
             json.dump(data, outfile)
 
 
@@ -84,10 +100,10 @@ def aggiornaPortafoglio(xrp, eur):
     """Scrivi su file o in variabili i cambiamenti di XRP e EUR
 
     Arguments:
-            xrp {int} -- il valore da sommare di XRP
-            eur {int} -- il valore da sommare di EUR
+                    xrp {int} -- il valore da sommare di XRP
+                    eur {int} -- il valore da sommare di EUR
     """
-    with open('portafoglio.json', 'w') as file:
+    with open(PORTAFOGLIO_PERCORSO, 'w') as file:
         portafoglioLetto = file.read()
         portafoglioDict = json.loads(portafoglioLetto)
         # accedi alle chiavi ad esempio con:
