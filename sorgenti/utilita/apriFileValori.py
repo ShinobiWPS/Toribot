@@ -3,16 +3,16 @@ import json
 from costanti.valori_percorso import VALORI_PERCORSO
 
 
-def apriFileValori(modalita, nuovo_json={}):
+def apriFileValori(modalita, nuovoJson={}):
     """Se passi modalita R ottieni una lista,Se passi una W devi passare anche un JSON,ottinie l esito dell operazione
 
         Arguments:
 
-                modalita STR -- [description]
+                modalita {str} -- [description]
 
         Keyword Arguments:
 
-                nuovo_json DICT -- [description] (default: {{}})
+                nuovoJson {dict} -- [description] (default: {{}})
 
         Returns:
 
@@ -31,12 +31,12 @@ def apriFileValori(modalita, nuovo_json={}):
             acq = data['acquisto']
             return [rif, acq]
         else:  # sara una 'w'
-            # potresti passare R ma con un nuovo_json vuoto, il che svuoterebbe il nostro json,
-            # per prevenirlo, controllo se nuovo_json e' vuoto,
+            # potresti passare R ma con un nuovoJson vuoto, il che svuoterebbe il nostro json,
+            # per prevenirlo, controllo se nuovoJson e' vuoto,
             # se si, gli passo i stessi dati originali del json
             # altrimenti , beh e' corretto e lo passo
             try:
-                json.dump(data if nuovo_json == {} else nuovo_json, jsonFile)
+                json.dump(data if nuovoJson == {} else nuovoJson, jsonFile)
                 return True
             except Exception:
                 return False

@@ -5,16 +5,17 @@ from utilita.apriFileValori import apriFileValori
 
 
 def seVendereOComprare(attuale: int):
+    """Puoi vendere o comprare?
+
+        Arguments:
+
+                attuale {int} -- nuovo prezzo del ripple
+            """
     # ATTUALE: valoro che assume la vaiabile all'evento
     # RIFERIMENTO: valore assunto al precedente evento
     # ACQUISTO: valore di acquisto
     print("sono entrato nel compra e vendi")
 
-    """Puoi vendere o comprare?
-
-        Arguments:
-                attuale {int} -- nuovo prezzo del ripple
-        """
     with open(PORTAFOGLIO_PERCORSO, "r") as jsonFile:
         data = json.load(jsonFile)
         eur = data['xrp']
@@ -33,7 +34,7 @@ def quandoVendere(attuale):
 
     rif, acq = apriFileValori('r')
     """ rif = data['riferimento']
-    acq = data['acquisto'] """
+	acq = data['acquisto'] """
     print('questo è il valore di riferimento e acqusto')
     print(rif)
     print(acq)
@@ -102,8 +103,8 @@ def aggiornaPortafoglio(xrp, eur):
     """Scrivi su file o in variabili i cambiamenti di XRP e EUR
 
     Arguments:
-                    xrp {int} -- il valore da sommare di XRP
-                    eur {int} -- il valore da sommare di EUR
+                                    xrp {int} -- il valore da sommare di XRP
+                                    eur {int} -- il valore da sommare di EUR
     """
     with open(PORTAFOGLIO_PERCORSO, 'w') as file:
         portafoglioLetto = file.read()
