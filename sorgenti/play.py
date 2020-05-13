@@ -44,6 +44,8 @@ def on_message(ws, message: str):
         attuale = messageDict['data']['price']
         print(attuale)
         seComprareOVendere(attuale)
+        print("sono passato oltre")
+
     """
 		esito = seComprareOVendere(datiDaMessage) -> {azione: compra, quantiXRP: 24} || {}
         	if esito != {}

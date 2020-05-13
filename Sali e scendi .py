@@ -1,42 +1,39 @@
-
-# valore d'acquisto = AC
-# valore attuale = AT
-# valore di riferimento = RF
-
-import requests
 import json
 
+attuale = 0.17
+print("sono entrato nel compra e vendi")
 
-# api xpl per valori della valuta
-val1 = ('https://data.ripple.com/v2/exchanges/USD+rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q/XRP?descending=true&limit=3&result=tesSUCCESS&type=OfferCreate')
-val2 = ('http://echo.jsontest.com/key/value/one/two')
-
-r = requests.get(val1)
-js = r.json()
-
-print(js)
-jslist = js['exchanges']
+"""
+with open("valoriprova.json", "r") as jsonFile:
+    data = json.load(jsonFile)
+"""
+data = json.load(open("valoriprova.json"))
 
 
-o = json.JSONDecoder().decode(js)
-
-print(type(jslist))
-
-
-data = json.loads(jslist)
+rif = data['riferimento']
+acq = data['acquisto']
 
 
-for element in data['drinks']:
-    print(element)
+print('questo è il valore di riferimento')
+print(rif)
+print(acq)
 
-AC = 0.33
-AT = 0.35
+if attuale > acq:
+    print("valore maggiore dell'acquisto")
+    if attuale-rif > 0:
+        print("sta crescendo")
+    else:
+        print("sta scendendo")
 
-if AT > AC:
-    RF = AT
-    while True:
-        if AT-RF > 0:
-            print("sta crescendo")
-        else:
-            print("sta scendendo")
-            break
+
+else:
+    print("valore minore dell'acquisto")
+"""
+data = {'riferimento': attuale, 'acquisto': acq}
+
+with open("valori.json", "w") as outfile:
+    json.dump(data, outfile)
+"""
+data["riferimento"] = attuale
+with open("valoriprova.json", "w+") as outfile:
+    json.dump(data, outfile)

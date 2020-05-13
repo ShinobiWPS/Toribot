@@ -6,23 +6,39 @@ def seComprareOVendere(attuale):
     # RIFERIMENTO: valore assunto al precedente evento
     # ACQUISTO: valore di acquisto
 
-    acquisto = 0.180  # sarà un valore assegnato dalla funzione acquisto
+    print("sono entrato nel compra e vendi")
 
-    if attuale > acquisto:
+    # carico i valori dal json
+    #valori = json.load(open("valori.json"))
+
+    with open("valori.json", "r") as jsonFile:
+        data = json.load(jsonFile)
+
+    rif = data['riferimento']
+    acq = data['acquisto']
+    print('questo è il valore di riferimento e acqusto')
+    print(rif)
+    print(acq)
+
+    if attuale > acq:
         print("valore maggiore dell'acquisto")
-           if AT-RF > 0:
-                print("sta crescendo")
-            else:
-                print("sta scendendo")
+        if attuale-rif > 0:
+            print("sta crescendo")
+        else:
+            print("sta scendendo")
+
     else:
         print("valore minore dell'acquisto")
 
-    # assegno al valore di riferimento l'ultimo valore assundo. in modo da confrontarlo con il prossimo
-    riferimento = attuale
+    # aggiorno dati json(non so come aggirnare solo un dato, l'acquesto non è necessario)
+    data["riferimento"] = attuale
+    with open("valori.json", "w") as outfile:
+        json.dump(data, outfile)
 
 
 def compra(parameter_list):
     pass
+    print("ho aquistato a questo prezzo"+parameter_list)
 
 
 def vendi(parameter_list):
