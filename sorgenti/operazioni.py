@@ -4,7 +4,7 @@ import json
 # ACQUISTO: valore di acquisto
 
 
-def QuandoVendere(attuale):
+def quandoVendere(attuale):
 
     print("sono entrato nel compra e vendi")
 
