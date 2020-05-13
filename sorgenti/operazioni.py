@@ -27,6 +27,8 @@ def QuandoVendere(attuale):
         else:
             print("sta scendendo")
             print("HO VENDUTO")
+
+            calcologuad(attuale)
             # bisognerà valutare il minimo di crescita
             QuandoComprare(attuale)
 
@@ -63,10 +65,11 @@ def QuandoComprare(attuale):
         # significa che sta scendendo aspettiamo che arrviamo al minimo
 
         # devo mettere qualcosa che controlli quando smette di essere inferiore ad attuale
+
         # imposto il nuovo valore d'acquisto
-    data["acquisto"] = attuale
-    with open("valori.json", "w") as outfile:
-        json.dump(data, outfile)
+        data["acquisto"] = attuale
+        with open("valori.json", "w") as outfile:
+            json.dump(data, outfile)
 
 
 def compra(parameter_list):
@@ -95,3 +98,26 @@ def aggiornaPortafoglio(xrp, eur):
         # bisogna sottrarre quando vendiamo XRP e sommare quando compriamo, viceversa per gli EUR
         # suggerimento- se python supporta i numeri negativi possiamo sommare sempre e ci togliamo il pensiero
         # perche se abbiamo venduto  12 XRP e ne avevamo 20, basta fare 20 + -12
+
+
+def calcologuad(valVend):
+    pass
+    # bisognerà azzerare i ripple, e calcolare i soldi guadagnati
+    # valvend saà il valore a cui sono stai venduti i ripple
+    # bisogna scrivere sul json con quanti soldi si hanno
+    with open("portafolio.json", "r") as jsonFile:
+        data = json.load(jsonFile)
+
+    # sul json ci saranno quanti ripple sono stai acquistati l'ultima volta
+    xpr = data['xpr']
+    # calcoliamo quanto abbiamo guadagnato dalla vendita
+    eur = xpr*valVend
+
+    # ANTENZIONEEEE------ bisogna ricareicare i soldi guadagnati sul file json
+
+
+def calcolocompr(valcompr):
+    pass
+    # valcompr saà il valore a cui sono stai acquistati i ripple
+    # bisogna scrivere sul json con quanti ripple sono stati acquistati
+    # bisognerà azzerare i soldi e impostare i ripple che si hanno
