@@ -1,9 +1,15 @@
 import json
 from costanti.valori_percorso import VALORI_PERCORSO
 from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
+from utilita.apriFileValori import apriFileValori
 
 
 def seVendereOComprare(attuale: int):
+    # ATTUALE: valoro che assume la vaiabile all'evento
+    # RIFERIMENTO: valore assunto al precedente evento
+    # ACQUISTO: valore di acquisto
+    print("sono entrato nel compra e vendi")
+
     """Puoi vendere o comprare?
 
         Arguments:
@@ -21,20 +27,16 @@ def seVendereOComprare(attuale: int):
 
 
 def quandoVendere(attuale):
-    # ATTUALE: valoro che assume la vaiabile all'evento
-    # RIFERIMENTO: valore assunto al precedente evento
-    # ACQUISTO: valore di acquisto
-    print("sono entrato nel compra e vendi")
 
     # carico i valori dal json
     # valori = json.load(open(VALORI_PERCORSO))
-    with open(VALORI_PERCORSO, "r") as jsonFile:
-        data = json.load(jsonFile)
-        rif = data['riferimento']
-        acq = data['acquisto']
-        print('questo è il valore di riferimento e acqusto')
-        print(rif)
-        print(acq)
+
+    rif, acq = apriFileValori('r')
+    """ rif = data['riferimento']
+    acq = data['acquisto'] """
+    print('questo è il valore di riferimento e acqusto')
+    print(rif)
+    print(acq)
 
     if attuale > acq:
         print("valore maggiore dell'acquisto")
