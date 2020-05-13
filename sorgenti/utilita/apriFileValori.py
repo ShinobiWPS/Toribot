@@ -4,17 +4,21 @@ from costanti.valori_percorso import VALORI_PERCORSO
 
 
 def apriFileValori(modalita, nuovo_json={}):
-    """[summary]
+    """Se passi modalita R ottieni una lista,Se passi una W devi passare anche un JSON,ottinie l esito dell operazione
 
-                Arguments:
-                        modalita {str} -- [description]
+        Arguments:
 
-                Keyword Arguments:
-                        nuovo_json {dict} -- [description] (default: {{}})
+                modalita STR -- [description]
 
-                Returns:
-                        dict -- in modalita 'r' restituisce un dict con i valori
-                        bool -- e' riuscito a scrivere o no?
+        Keyword Arguments:
+
+                nuovo_json DICT -- [description] (default: {{}})
+
+        Returns:
+
+                DICT -- in modalita 'r' restituisce un dict con i valori
+
+                BOOL -- e riuscito a scrivere o no?
 
             """
     with open(VALORI_PERCORSO, modalita) as jsonFile:
