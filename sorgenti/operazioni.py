@@ -1,10 +1,10 @@
 import json
+# ATTUALE: valoro che assume la vaiabile all'evento
+# RIFERIMENTO: valore assunto al precedente evento
+# ACQUISTO: valore di acquisto
 
 
-def seComprareOVendere(attuale):
-    # ATTUALE: valoro che assume la vaiabile all'evento
-    # RIFERIMENTO: valore assunto al precedente evento
-    # ACQUISTO: valore di acquisto
+def QuandoVendere(attuale):
 
     print("sono entrato nel compra e vendi")
 
@@ -26,12 +26,45 @@ def seComprareOVendere(attuale):
             print("sta crescendo")
         else:
             print("sta scendendo")
+            print("HO VENDUTO")
+            # bisognerà valutare il minimo di crescita
+            QuandoComprare(attuale)
 
     else:
         print("valore minore dell'acquisto")
 
     # aggiorno dati json(non so come aggirnare solo un dato, l'acquesto non è necessario)
+    # ATTENZIONEEEEEEEE-------------------------------non mi aggirna il file json----
     data["riferimento"] = attuale
+    with open("valori.json", "w") as outfile:
+        json.dump(data, outfile)
+
+
+def QuandoComprare(attuale):
+    print("ora decido quando comprare")
+    # trasformo il valore attuale in valore d'a
+    with open("valori.json", "r") as jsonFile:
+        data = json.load(jsonFile)
+
+    rif = data['riferimento']
+    print('questo è il valore di riferimento')
+    print(rif)
+
+    # ora stabiliamo se sta scendendo o salendo
+    # se sale aspettiamo che scenda
+    # se scende, comriamo quando ricomincia a salire
+
+    if attuale > rif:
+        # in questo casa sinifica che sta salendo. e non faccio nulla
+        print("aspetto a comprare perchè sta salendo")
+
+    # ----------------------ATTENZIONEEEEE lo so che ci vorrebbe un elsif. lo metterò
+    if attuale < rif:
+        # significa che sta scendendo aspettiamo che arrviamo al minimo
+
+        # devo mettere qualcosa che controlli quando smette di essere inferiore ad attuale
+        # imposto il nuovo valore d'acquisto
+    data["acquisto"] = attuale
     with open("valori.json", "w") as outfile:
         json.dump(data, outfile)
 
