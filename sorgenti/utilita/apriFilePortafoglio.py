@@ -1,9 +1,10 @@
+
 import json
-from costanti.valori_percorso import VALORI_PERCORSO
+from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
 import sys
 
 
-def apriFileValori(nuovoJson={}):
+def apriFilePortafoglio(nuovoJson={}):
     """serve per interagire col file `valori.json`
 
     Keyword Arguments:
@@ -12,19 +13,20 @@ def apriFileValori(nuovoJson={}):
 
     Returns:
 
-        rif, acq, data {list} -- rif, acq, data
-        """
-    with open(VALORI_PERCORSO, 'r+') as jsonFile:
+        xrp, eur, data {list} -- Ripple, Euro, dizionario del json
+    """
+    with open(PORTAFOGLIO_PERCORSO, 'r+') as jsonFile:
         if type(nuovoJson) is dict:
             if (nuovoJson != {}):
                 try:
                     json.dump(nuovoJson, jsonFile)
                 except Exception:
-                    sys.exit('impossibile aggiornare il file' + VALORI_PERCORSO)
+                    sys.exit('impossibile aggiornare il file' +
+                             PORTAFOGLIO_PERCORSO)
             else:
                 data = json.load(jsonFile)
-                rif = data['riferimento']
-                acq = data['acquisto']
-                return [rif, acq, data]
+                xrp = data['xrp']
+                eur = data['eur']
+                return [xrp, eur, data]
         else:
             sys.exit('valore per il json non valida')

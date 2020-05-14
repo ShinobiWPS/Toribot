@@ -2,6 +2,7 @@ import json
 from costanti.valori_percorso import VALORI_PERCORSO
 from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
 from utilita.apriFileValori import apriFileValori
+from utilita.apriFilePortafoglio import apriFilePortafoglio
 
 
 def seVendereOComprare(attuale: int):
@@ -14,12 +15,16 @@ def seVendereOComprare(attuale: int):
     # ATTUALE: valoro che assume la vaiabile all'evento
     # RIFERIMENTO: valore assunto al precedente evento
     # ACQUISTO: valore di acquisto
-    print("sono entrato nel compra e vendi")
 
-    with open(PORTAFOGLIO_PERCORSO, "r") as jsonFile:
-        data = json.load(jsonFile)
-        eur = data['xrp']
-        xrp = data['eur']
+    # todo- dato un numero gia esistente di quantita nel portafoglio
+    # bisogna sottrarre quando vendiamo XRP e sommare quando compriamo, viceversa per gli EUR
+    # suggerimento- se python supporta i numeri negativi possiamo sommare sempre e ci togliamo il pensiero
+    # perche se abbiamo venduto  12 XRP e ne avevamo 20, basta fare 20 + -12
+
+    print("sono entrato nel compra e vendi")
+    xrp, eur, data = apriFilePortafoglio()
+    print('xrp')
+    print(xrp)
 
     if eur > 0:
         quandoComprare(attuale)
@@ -28,14 +33,8 @@ def seVendereOComprare(attuale: int):
 
 
 def quandoVendere(attuale):
-
-    # carico i valori dal json
-    # valori = json.load(open(VALORI_PERCORSO))
-
-    rif, acq = apriFileValori('r')
-    """ rif = data['riferimento']
-	acq = data['acquisto'] """
-    print('questo è il valore di riferimento e acqusto')
+    rif, acq, data = apriFileValori()
+    print('questo è il valore di riferimento e acquisto')
     print(rif)
     print(acq)
 
@@ -46,32 +45,26 @@ def quandoVendere(attuale):
         else:
             print("sta scendendo")
             print("HO VENDUTO")
-
             calcologuad(attuale)
             # bisognerà valutare il minimo di crescita
             quandoComprare(attuale)
 
     else:
         print("valore minore dell'acquisto")
-
-    # aggiorno dati json(non so come aggirnare solo un dato, l'acquesto non è necessario)
-    # ATTENZIONEEEEEEEE-------------------------------non mi aggirna il file json----
     data["riferimento"] = attuale
-    with open(VALORI_PERCORSO, "w") as outfile:
-        json.dump(data, outfile)
+    apriFileValori(data)
 
 
 def quandoComprare(attuale):
     print("ora decido quando comprare")
     # trasformo il valore attuale in valore d'a
-    with open(VALORI_PERCORSO, "r") as jsonFile:
-        data = json.load(jsonFile)
+    rif, acq, data = apriFileValori()
 
     rif = data['riferimento']
     print('questo è il valore di riferimento')
     print(rif)
 
-    # ora stabiliamo se sta scendendo o salendo
+    # todo-ora stabiliamo se sta scendendo o salendo
     # se sale aspettiamo che scenda
     # se scende, comriamo quando ricomincia a salire
 
@@ -87,8 +80,7 @@ def quandoComprare(attuale):
 
         # imposto il nuovo valore d'acquisto
         data["acquisto"] = attuale
-        with open(VALORI_PERCORSO, "w") as outfile:
-            json.dump(data, outfile)
+        apriFileValori(data)
 
 
 def compra(parameter_list):
@@ -99,39 +91,18 @@ def vendi(parameter_list):
     pass
 
 
-def aggiornaPortafoglio(xrp, eur):
-    """Scrivi su file o in variabili i cambiamenti di XRP e EUR
-
-    Arguments:
-                                    xrp {int} -- il valore da sommare di XRP
-                                    eur {int} -- il valore da sommare di EUR
-    """
-    with open(PORTAFOGLIO_PERCORSO, 'w') as file:
-        portafoglioLetto = file.read()
-        portafoglioDict = json.loads(portafoglioLetto)
-        # accedi alle chiavi ad esempio con:
-        # portafoglioDict['xrp']
-
-        # todo- dato un numero gia esistente di quantita nel portafolgio
-        # bisogna sottrarre quando vendiamo XRP e sommare quando compriamo, viceversa per gli EUR
-        # suggerimento- se python supporta i numeri negativi possiamo sommare sempre e ci togliamo il pensiero
-        # perche se abbiamo venduto  12 XRP e ne avevamo 20, basta fare 20 + -12
-
-
 def calcologuad(valVend):
-    pass
     # bisognerà azzerare i ripple, e calcolare i soldi guadagnati
     # valvend saà il valore a cui sono stai venduti i ripple
     # bisogna scrivere sul json con quanti soldi si hanno
-    with open("portafolio.json", "r") as jsonFile:
-        data = json.load(jsonFile)
+    xrp, eur, data = apriFilePortafoglio()
 
     # sul json ci saranno quanti ripple sono stai acquistati l'ultima volta
     xpr = data['xpr']
     # calcoliamo quanto abbiamo guadagnato dalla vendita
     eur = xpr*valVend
 
-    # ANTENZIONEEEE------ bisogna ricareicare i soldi guadagnati sul file json
+    # attenzione------ bisogna ricaricare i soldi guadagnati sul file json
 
 
 def calcolocompr(valcompr):
