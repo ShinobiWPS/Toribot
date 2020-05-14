@@ -1,0 +1,1 @@
+LOG_CARTELLA_PERCORSO = 'log'
