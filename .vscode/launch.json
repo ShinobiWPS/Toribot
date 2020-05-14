@@ -5,10 +5,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Esegui play.py",
+      "name": "play.py",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+
+    {
+      "name": "play.py log",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["log"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     }

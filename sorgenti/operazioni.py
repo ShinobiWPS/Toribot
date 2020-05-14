@@ -4,17 +4,18 @@ from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
 from utilita.apriFileValori import apriFileValori
 from utilita.apriFilePortafoglio import apriFilePortafoglio
 
+# ATTUALE: valoro che assume la vaiabile all'evento
+# RIFERIMENTO: valore assunto al precedente evento
+# ACQUISTO: valore di acquisto
+
 
 def seVendereOComprare(attuale: int):
     """Puoi vendere o comprare?
 
         Arguments:
 
-                attuale {int} -- nuovo prezzo del ripple
+                attuale {int} - - nuovo prezzo del ripple
             """
-    # ATTUALE: valoro che assume la vaiabile all'evento
-    # RIFERIMENTO: valore assunto al precedente evento
-    # ACQUISTO: valore di acquisto
 
     # todo- dato un numero gia esistente di quantita nel portafoglio
     # bisogna sottrarre quando vendiamo XRP e sommare quando compriamo, viceversa per gli EUR
@@ -22,8 +23,7 @@ def seVendereOComprare(attuale: int):
     # perche se abbiamo venduto  12 XRP e ne avevamo 20, basta fare 20 + -12
 
     print("sono entrato nel compra e vendi")
-    xrp, eur, data = apriFilePortafoglio()
-    print('xrp')
+    eur, xrp, data = apriFilePortafoglio()
     print(xrp)
 
     if eur > 0:
@@ -32,55 +32,68 @@ def seVendereOComprare(attuale: int):
         quandoVendere(attuale)
 
 
+# _________________________________________________VENDITA______________________________________________________
 def quandoVendere(attuale):
     rif, acq, data = apriFileValori()
-    print('questo è il valore di riferimento e acquisto')
-    print(rif)
-    print(acq)
+    logging.info("sto valutando quando comprare")
 
+    # il valore attuale è magiore di quello di acquisto?
     if attuale > acq:
-        print("valore maggiore dell'acquisto")
-        if attuale-rif > 0:
-            print("sta crescendo")
+        # se il valore attuale è maggiore dell'acquisto vuol dire sta salendo
+        logging.info("valore magiore dell'acquisto")
+
+        # ora valutiamo se scende o sale
+        if attuale > rif:
+            # in questo caso sta salendo
+            Stato = "aspetto a vendere....sta crescendo...."
+
+            logging.info("aspetto a vendere....sta crescendo....")
+            # nel caso in cui il valore è più alto a quello di acquisto. ma più piccolo dell'ultimo valore registrato.
+            # significa che ha iniziato a scendere
+
         else:
-            print("sta scendendo")
+            # nel momento che si verifichino due situazioni, allora vendo
+            # 1° che si abbia un valore più alto dell'aquisto----->quindi indica una crescita(anche se minima)
+            # 2° che si abbia un cambiamento di andamento. cioè una discesa.
+
+            Stato = "HO VENDUTO"
+            logging.WARNING("HO VENDUTO")
             print("HO VENDUTO")
-            calcologuad(attuale)
-            # bisognerà valutare il minimo di crescita
+
+            # ora calcolo la tranazione, e passo all'acquisto
+            calcolo_guad(attuale)
+
             quandoComprare(attuale)
 
     else:
-        print("valore minore dell'acquisto")
-    data["riferimento"] = attuale
-    apriFileValori(data)
+        # in questo caso sinifica che siamo a un valore sotto all'acquisto
+        logging.info("valore minore dell'acquisto")
 
+
+# _________________________________________COMPRO_____________________________________________________
+
+
+# per decidere quando comprare, diamo per certo che stiamo scendendo. visto che vendiamo quando incomincia a scendere
 
 def quandoComprare(attuale):
-    print("ora decido quando comprare")
-    # trasformo il valore attuale in valore d'a
+    # ora dobbiamo decidere quando comprare
+    Stato = "sto decidendo quando comprare"
+    logging.info("ora decido quando comprare.....")
     rif, acq, data = apriFileValori()
-
-    rif = data['riferimento']
-    print('questo è il valore di riferimento')
-    print(rif)
-
-    # todo-ora stabiliamo se sta scendendo o salendo
-    # se sale aspettiamo che scenda
-    # se scende, comriamo quando ricomincia a salire
-
+    # consideriamo che se abbiamo venduto, siamo già in fase di discesa
     if attuale > rif:
-        # in questo casa sinifica che sta salendo. e non faccio nulla
-        print("aspetto a comprare perchè sta salendo")
+        # in questo casa sinifica che sta salendo. è l'ora di acquistare
+        Stato = "HO ACQUISTATO"
+        logging.info("HO ACQUISTATO")
+        print("HO ACQUISTATO")
 
-    # ----------------------ATTENZIONEEEEE lo so che ci vorrebbe un elsif. lo metterò
-    if attuale < rif:
-        # significa che sta scendendo aspettiamo che arrviamo al minimo
-
-        # devo mettere qualcosa che controlli quando smette di essere inferiore ad attuale
-
-        # imposto il nuovo valore d'acquisto
         data["acquisto"] = attuale
         apriFileValori(data)
+
+    # calcoliamo quanti ripple abbiamo acquistato. e passiamo alla funzione vendere
+    calcolo_acquisto(attuale)
+
+    quandoVendere(attuale)
 
 
 def compra(parameter_list):
@@ -91,22 +104,31 @@ def vendi(parameter_list):
     pass
 
 
-def calcologuad(valVend):
-    # bisognerà azzerare i ripple, e calcolare i soldi guadagnati
-    # valvend saà il valore a cui sono stai venduti i ripple
-    # bisogna scrivere sul json con quanti soldi si hanno
+def calcolo_guad(attuale):
+    # questo calcolo avviene quando vendo i ripple
+
+    # apro il json con i ripple che si avevano all'ultimo acquisto
     xrp, eur, data = apriFilePortafoglio()
 
-    # sul json ci saranno quanti ripple sono stai acquistati l'ultima volta
-    xpr = data['xpr']
     # calcoliamo quanto abbiamo guadagnato dalla vendita
-    eur = xpr*valVend
+    # azzeriamo i ripple
+    eur = xpr*attuale
 
-    # attenzione------ bisogna ricaricare i soldi guadagnati sul file json
+    data["eur"] = eur
+    data["xrp"] = 0
+    apriFileValori(data)
 
 
-def calcolocompr(valcompr):
-    pass
-    # valcompr saà il valore a cui sono stai acquistati i ripple
-    # bisogna scrivere sul json con quanti ripple sono stati acquistati
-    # bisognerà azzerare i soldi e impostare i ripple che si hanno
+def calcolo_acquisto(attuale):
+    # questo calcolo avviene quando compro i ripple
+
+    # apro il json con i soldi che avevo
+    xrp, eur, data = apriFilePortafoglio()
+
+    # calcoliamo quanti ripple abbiamo acquistato
+    # azzeriamo gli euro
+    xrp = eur*attuale
+
+    data["xrp"] = xrp
+    data["eur"] = 0
+    apriFileValori(data)

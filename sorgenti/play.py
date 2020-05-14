@@ -1,10 +1,23 @@
 import json
 import websocket
-# il file .env con il vscode workspace.json sono necessari solo temporaneamente per ovviare al bug di intelliCode (a volte mostra import irrisolti, ma sono falsi negativi) perche usa una preview di Microsoft Python Language Analisys, come per esempio e' successo per importare "operazioni"
-from operazioni import seVendereOComprare
+from operazioni import quandoVendere
+import sys
+from costanti.argomenti_per_il_bot import ARGOMENTI_PER_IL_BOT
+from utilita.log import passa_output_al_log_file
+import logging
 
 
-def avvio():
+def avvio(argv):
+    print('Rock and Roll, baby!')
+    ARGOMENTI_PER_IL_BOT = argv
+    if len(ARGOMENTI_PER_IL_BOT) > 0:
+        if ARGOMENTI_PER_IL_BOT[0] == 'log':
+            passa_output_al_log_file()
+
+    dammi_i_dati_bastardo_tramite_websocket()
+
+
+def dammi_i_dati_bastardo_tramite_websocket():
     try:
         # questo mostra piu informazioni se True
         websocket.enableTrace(False)
@@ -21,8 +34,8 @@ def avvio():
 def on_open(ws):
     """Funzione all'aggancio del WebSocket
 
-            Arguments:
-                            ws {tipo_boh} -- sono dei caratteri apparentemente inutili
+    Arguments:
+        ws {tipo_boh} -- sono dei caratteri apparentemente inutili
             """
     jsonString = json.dumps({
         "event": "bts:subscribe",
@@ -32,7 +45,7 @@ def on_open(ws):
     })
     # manda a bitstamp la richiesta di iscriversi al canale di eventi 'live_trades_xrpeur'
     ws.send(jsonString)
-    print('Luce verde')
+    print('Luce verde 🟢🟢🟢')
 
 
 def on_message(ws, message: str):
@@ -43,8 +56,9 @@ def on_message(ws, message: str):
         # questo print serve solo a noi per lavorare
         attuale = messageDict['data']['price']
         print(attuale)
-        seVendereOComprare(attuale)
-
+        logging.info(attuale)
+        # seVendereOComprare(attuale)
+        quandoVendere(attuale)
         print("sono passato oltre")
 
     """
@@ -56,10 +70,11 @@ def on_message(ws, message: str):
 
 def on_error(ws, error: str):
     print(error)
+    print('❌')
 
 
 def on_close(ws):
-    print("### WebSocketclosed ###")
+    print("### WebSocketclosed 🔴🔴🔴 ###")
 
 
-avvio()
+avvio(sys.argv[1:])
