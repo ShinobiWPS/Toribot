@@ -2,5 +2,6 @@
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
   "python.linting.flake8Enabled": false,
-  "python.envFile": "${workspaceFolder}/.env"
+  "python.envFile": "${workspaceFolder}/.env",
+  "editor.insertSpaces": false
 }
