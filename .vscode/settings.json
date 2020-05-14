@@ -3,5 +3,13 @@
   "python.linting.enabled": true,
   "python.linting.flake8Enabled": false,
   "python.envFile": "${workspaceFolder}/.env",
-  "editor.insertSpaces": false
+  "editor.insertSpaces": false,
+  "todo-tree.general.tags": [
+    "BUG",
+    "HACK",
+    "FIXME",
+    "TODO",
+    "XXX",
+    "todo"
+  ]
 }
