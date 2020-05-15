@@ -1,14 +1,11 @@
+import logging
+from utilita.log import passa_output_al_log_file
+from costanti.argomenti_per_il_bot import ARGOMENTI_PER_IL_BOT
+import sys
+from operazioni import seVendereOComprare
+from operazioni import quandoVendere
 import json
 import websocket
-<<<<<<< HEAD
-from operazioni import quandoVendere
-=======
-from operazioni import seVendereOComprare
->>>>>>> 3d671195135050a7b4389d5c4683c3557bceb67d
-import sys
-from costanti.argomenti_per_il_bot import ARGOMENTI_PER_IL_BOT
-from utilita.log import passa_output_al_log_file
-import logging
 
 
 def avvio(argv):
@@ -61,13 +58,8 @@ def on_message(ws, message: str):
         attuale = messageDict['data']['price']
         print(attuale)
         logging.info(attuale)
-<<<<<<< HEAD
-        # seVendereOComprare(attuale)
-        quandoVendere(attuale)
-=======
         seVendereOComprare(attuale)
 
->>>>>>> 3d671195135050a7b4389d5c4683c3557bceb67d
         print("sono passato oltre")
 
     """
