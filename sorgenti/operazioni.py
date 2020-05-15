@@ -3,6 +3,7 @@ from costanti.valori_percorso import VALORI_PERCORSO
 from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
 from utilita.apriFileValori import apriFileValori
 from utilita.apriFilePortafoglio import apriFilePortafoglio
+import logging
 
 # ATTUALE: valoro che assume la vaiabile all'evento
 # RIFERIMENTO: valore assunto al precedente evento
@@ -57,7 +58,7 @@ def quandoVendere(attuale):
             # 2° che si abbia un cambiamento di andamento. cioè una discesa.
 
             Stato = "HO VENDUTO"
-            logging.WARNING("HO VENDUTO")
+            logging.info("HO VENDUTO")
             print("HO VENDUTO")
 
             # ora calcolo la tranazione, e passo all'acquisto
