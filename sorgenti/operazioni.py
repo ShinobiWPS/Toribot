@@ -5,7 +5,7 @@ from utilita.apriFileValori import apriFileValori
 from utilita.apriFilePortafoglio import apriFilePortafoglio
 import logging
 
-# ATTUALE: valoro che assume la vaiabile all'evento
+# ATTUALE: valoro che assume la variabile all'evento
 # RIFERIMENTO: valore assunto al precedente evento
 # ACQUISTO: valore di acquisto
 
@@ -13,10 +13,10 @@ import logging
 def seVendereOComprare(attuale: int):
     """Puoi vendere o comprare?
 
-        Arguments:
+            Arguments:
 
-                attuale {int} - - nuovo prezzo del ripple
-            """
+                            attuale {int} - - nuovo prezzo del ripple
+                    """
 
     # todo- dato un numero gia esistente di quantita nel portafoglio
     # bisogna sottrarre quando vendiamo XRP e sommare quando compriamo, viceversa per gli EUR
@@ -59,13 +59,11 @@ def quandoVendere(attuale):
             # 1° che si abbia un valore più alto dell'aquisto----->quindi indica una crescita(anche se minima)
             # 2° che si abbia un cambiamento di andamento. cioè una discesa.
 
+            # ora calcolo la tranazione, e passo all'acquisto
+            calcolo_vendita(attuale)
             logging.info("HO VENDUTO")
             print("HO VENDUTO")
-
-            # ora calcolo la tranazione, e passo all'acquisto
-            calcolo_guad(attuale)
-
-            quandoComprare(attuale)
+            # quandoComprare(attuale)
 
     else:
         # in questo caso sinifica che siamo a un valore sotto all'acquisto
@@ -97,14 +95,16 @@ def quandoComprare(attuale):
 
 
 def compra(parameter_list):
-    print("ho aquistato a questo prezzo"+parameter_list)
-
-
-def vendi(parameter_list):
+    # todo-API per comprare N XRP
     pass
 
 
-def calcolo_guad(attuale):
+def vendi(xrp):
+    # todo-API per vendere N XRP
+    pass
+
+
+def calcolo_vendita(attuale):
     # questo calcolo avviene quando vendo i ripple
 
     # apro il json con i ripple che si avevano all'ultimo acquisto
@@ -112,11 +112,11 @@ def calcolo_guad(attuale):
 
     # calcoliamo quanto abbiamo guadagnato dalla vendita
     # azzeriamo i ripple
-    eur = xpr * attuale
+    eur = xrp * attuale
 
     data["eur"] = eur
     data["xrp"] = 0
-    apriFileValori(data)
+    apriFilePortafoglio(data)
 
 
 def calcolo_acquisto(attuale):
