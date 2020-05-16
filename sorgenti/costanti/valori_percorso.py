@@ -1,1 +1,1 @@
-VALORI_PERCORSO = 'sorgenti/valori.json'
+VALORI_PERCORSO = 'sorgenti/valoriCommerciali.json'
