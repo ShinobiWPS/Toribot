@@ -23,18 +23,25 @@ def seVendereOComprare(attuale: int):
     # suggerimento- se python supporta i numeri negativi possiamo sommare sempre e ci togliamo il pensiero
     # perche se abbiamo venduto  12 XRP e ne avevamo 20, basta fare 20 + -12
 
-    print("sono entrato nel compra e vendi")
+    print("devo vendere o comprare?")
     xrp, eur, data = apriFilePortafoglio()
+    print("questi sono i ripple che abbiamo")
     print(xrp)
+    print("questi sono gli euro che abbiamo")
+    print(eur)
 
+    # domandaaaaaaaaaaaaaaaaaaaaaaaaaa
     if eur > 0:
+        print("devo comprare...")
         quandoComprare(attuale)
     elif xrp > 0:
+        print("devo vendere...")
         quandoVendere(attuale)
 
 
 # _________________________________________________VENDITA______________________________________________________
 def quandoVendere(attuale):
+
     rif, acq, data = apriFileValori()
     print("sto valutando quando vendere")
 
@@ -50,7 +57,7 @@ def quandoVendere(attuale):
             print("aspetto a vendere....sta crescendo....")
             # nel caso in cui il valore è più alto a quello di acquisto. ma più piccolo dell'ultimo valore registrato.
             # significa che ha iniziato a scendere
-            # todo- scrivi rif sul file
+            # todo- scrivi rif sul file\
             data['riferimento'] = attuale
             apriFileValori(data)
 
@@ -63,7 +70,6 @@ def quandoVendere(attuale):
             calcolo_vendita(attuale)
             logging.info("HO VENDUTO")
             print("HO VENDUTO")
-            # quandoComprare(attuale)
 
     else:
         # in questo caso sinifica che siamo a un valore sotto all'acquisto
@@ -90,8 +96,6 @@ def quandoComprare(attuale):
 
     # calcoliamo quanti ripple abbiamo acquistato. e passiamo alla funzione vendere
     calcolo_acquisto(attuale)
-
-    quandoVendere(attuale)
 
 
 def compra(parameter_list):

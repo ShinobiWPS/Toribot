@@ -11,5 +11,6 @@
     "TODO",
     "XXX",
     "todo"
-  ]
+  ],
+  "python.pythonPath": "/usr/bin/python3"
 }

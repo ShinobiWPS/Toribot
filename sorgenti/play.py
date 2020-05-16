@@ -10,6 +10,8 @@ import os
 from costanti.dati_forgiati import DATI_FORGIATI_CARTELLA_PERCORSO
 import csv
 
+# ______________________________________roba che serve all'avvio____________________
+
 
 def avvio(argv):
     print('Rock and Roll, baby!')
@@ -24,13 +26,16 @@ def avvio(argv):
 
 
 def processaNuovoPrezzo(attuale):
+    print("questo è il prezzo atuale:")
     print(attuale)
+
     logging.info(attuale)
     seVendereOComprare(attuale)
 
-    print("sono passato oltre")
+    print("ho finito processa nuovo prezzo")
 
 
+# _____________________________________elabora i dati inseriti da noi__________________-
 def dati_statici():
     with open(f'{DATI_FORGIATI_CARTELLA_PERCORSO}/salita_discesa.csv') as csvFile:
         datiStatici = csv.reader(csvFile)
@@ -38,6 +43,7 @@ def dati_statici():
             processaNuovoPrezzo(float(riga[0]))
 
 
+# ______________________________________parte con dati websoket______________________________________
 def dati_da_Bitstamp_websocket():
     try:
         # questo mostra piu informazioni se True
@@ -56,8 +62,8 @@ def on_open(ws):
     """Funzione all'aggancio del WebSocket
 
     Arguments:
-            ws {tipo_boh} -- sono dei caratteri apparentemente inutili
-                    """
+                    ws {tipo_boh} -- sono dei caratteri apparentemente inutili
+                                    """
     jsonString = json.dumps({
         "event": "bts:subscribe",
         "data": {
