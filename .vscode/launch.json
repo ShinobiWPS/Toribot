@@ -5,10 +5,22 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "play.py",
+      "name": "play.py statico ",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
+      "env": { "ISDEVELOPMENT": "true" },
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+
+    {
+      "name": "play.py statico log",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "env": { "ISDEVELOPMENT": "true" },
+      "args": ["log"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },
@@ -19,6 +31,14 @@
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
       "args": ["log"],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "play.py",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     }
