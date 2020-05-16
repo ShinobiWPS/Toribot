@@ -6,6 +6,9 @@ from operazioni import seVendereOComprare
 from operazioni import quandoVendere
 import json
 import websocket
+import os
+from costanti.dati_forgiati import DATI_FORGIATI_CARTELLA_PERCORSO
+import csv
 
 
 def avvio(argv):
@@ -14,11 +17,28 @@ def avvio(argv):
     if len(ARGOMENTI_PER_IL_BOT) > 0:
         if ARGOMENTI_PER_IL_BOT[0] == 'log':
             passa_output_al_log_file()
+    if os.environ.get('ISDEVELOPMENT') == 'true':
+        dati_statici()
+    else:
+        dati_da_Bitstamp_websocket()
 
-    dammi_i_dati_bastardo_tramite_websocket()
+
+def processaNuovoPrezzo(attuale):
+    print(attuale)
+    logging.info(attuale)
+    seVendereOComprare(attuale)
+
+    print("sono passato oltre")
 
 
-def dammi_i_dati_bastardo_tramite_websocket():
+def dati_statici():
+    with open(f'{DATI_FORGIATI_CARTELLA_PERCORSO}/salita_discesa.csv') as csvFile:
+        datiStatici = csv.reader(csvFile)
+        for riga in datiStatici:
+            processaNuovoPrezzo(float(riga[0]))
+
+
+def dati_da_Bitstamp_websocket():
     try:
         # questo mostra piu informazioni se True
         websocket.enableTrace(False)
@@ -36,8 +56,8 @@ def on_open(ws):
     """Funzione all'aggancio del WebSocket
 
     Arguments:
-        ws {tipo_boh} -- sono dei caratteri apparentemente inutili
-            """
+            ws {tipo_boh} -- sono dei caratteri apparentemente inutili
+                    """
     jsonString = json.dumps({
         "event": "bts:subscribe",
         "data": {
@@ -56,16 +76,12 @@ def on_message(ws, message: str):
     if messageDict['data'] != {}:
         # questo print serve solo a noi per lavorare
         attuale = messageDict['data']['price']
-        print(attuale)
-        logging.info(attuale)
-        seVendereOComprare(attuale)
-
-        print("sono passato oltre")
+        processaNuovoPrezzo(attuale)
 
     """
 		esito = seComprareOVendere(datiDaMessage) -> {azione: compra, quantiXRP: 24} || {}
-			if esito != {}
-				compra(esito)
+		if esito != {}
+			compra(esito)
 		"""
 
 
