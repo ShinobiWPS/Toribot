@@ -24,7 +24,7 @@ def seVendereOComprare(attuale: int):
     # perche se abbiamo venduto  12 XRP e ne avevamo 20, basta fare 20 + -12
 
     print("sono entrato nel compra e vendi")
-    eur, xrp, data = apriFilePortafoglio()
+    xrp, eur, data = apriFilePortafoglio()
     print(xrp)
 
     if eur > 0:
@@ -36,28 +36,29 @@ def seVendereOComprare(attuale: int):
 # _________________________________________________VENDITA______________________________________________________
 def quandoVendere(attuale):
     rif, acq, data = apriFileValori()
-    logging.info("sto valutando quando comprare")
+    print("sto valutando quando vendere")
 
     # il valore attuale è magiore di quello di acquisto?
     if attuale > acq:
         # se il valore attuale è maggiore dell'acquisto vuol dire sta salendo
-        logging.info("valore magiore dell'acquisto")
+        print("attuale > acquisto")
 
         # ora valutiamo se scende o sale
         if attuale > rif:
             # in questo caso sta salendo
-            Stato = "aspetto a vendere....sta crescendo...."
 
-            logging.info("aspetto a vendere....sta crescendo....")
+            print("aspetto a vendere....sta crescendo....")
             # nel caso in cui il valore è più alto a quello di acquisto. ma più piccolo dell'ultimo valore registrato.
             # significa che ha iniziato a scendere
+            # todo- scrivi rif sul file
+            data['riferimento'] = attuale
+            apriFileValori(data)
 
         else:
             # nel momento che si verifichino due situazioni, allora vendo
             # 1° che si abbia un valore più alto dell'aquisto----->quindi indica una crescita(anche se minima)
             # 2° che si abbia un cambiamento di andamento. cioè una discesa.
 
-            Stato = "HO VENDUTO"
             logging.info("HO VENDUTO")
             print("HO VENDUTO")
 
@@ -68,7 +69,7 @@ def quandoVendere(attuale):
 
     else:
         # in questo caso sinifica che siamo a un valore sotto all'acquisto
-        logging.info("valore minore dell'acquisto")
+        print("valore minore dell'acquisto")
 
 
 # _________________________________________COMPRO_____________________________________________________
@@ -78,13 +79,11 @@ def quandoVendere(attuale):
 
 def quandoComprare(attuale):
     # ora dobbiamo decidere quando comprare
-    Stato = "sto decidendo quando comprare"
-    logging.info("ora decido quando comprare.....")
+    print("ora decido quando comprare.....")
     rif, acq, data = apriFileValori()
     # consideriamo che se abbiamo venduto, siamo già in fase di discesa
     if attuale > rif:
         # in questo casa sinifica che sta salendo. è l'ora di acquistare
-        Stato = "HO ACQUISTATO"
         logging.info("HO ACQUISTATO")
         print("HO ACQUISTATO")
 
@@ -113,7 +112,7 @@ def calcolo_guad(attuale):
 
     # calcoliamo quanto abbiamo guadagnato dalla vendita
     # azzeriamo i ripple
-    eur = xpr*attuale
+    eur = xpr * attuale
 
     data["eur"] = eur
     data["xrp"] = 0

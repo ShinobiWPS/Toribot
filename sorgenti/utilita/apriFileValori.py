@@ -14,11 +14,11 @@ def apriFileValori(nuovoJson={}):
 
         rif, acq, data {list} -- rif, acq, data
         """
-    with open(VALORI_PERCORSO, 'r+') as jsonFile:
+    with open(VALORI_PERCORSO, 'r+', encoding='utf-8') as jsonFile:
         if type(nuovoJson) is dict:
             if (nuovoJson != {}):
                 try:
-                    json.dump(nuovoJson, jsonFile)
+                    json.dump(nuovoJson, jsonFile, sort_keys=True, indent=4)
                 except Exception:
                     sys.exit('impossibile aggiornare il file' + VALORI_PERCORSO)
             else:
