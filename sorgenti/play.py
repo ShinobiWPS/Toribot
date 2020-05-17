@@ -2,8 +2,7 @@ import logging
 from utilita.log import passa_output_al_log_file
 from costanti.argomenti_per_il_bot import ARGOMENTI_PER_IL_BOT
 import sys
-from operazioni import seVendereOComprare
-from operazioni import quandoVendere
+from operazioni import seVendereOComprare, quandoVendere
 import json
 import websocket
 import os
