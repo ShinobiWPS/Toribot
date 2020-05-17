@@ -135,4 +135,4 @@ def calcolo_acquisto(attuale):
 
     data["xrp"] = xrp
     data["eur"] = 0
-    apriFileValori(data)
+    apriFilePortafoglio(data)

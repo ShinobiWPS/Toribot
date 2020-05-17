@@ -4,19 +4,16 @@ from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
 import sys
 
 
-[0, 1, 2]
-
-
 def apriFilePortafoglio(nuovoJson={}):
     """serve per interagire col file `valori.json`
 
     Keyword Arguments:
 
-                nuovoJson {dict} -- json aggiornato (default: {{}})
+                            nuovoJson {dict} -- json aggiornato (default: {{}})
 
     Returns:
 
-            xrp, eur, data {list} -- Ripple, Euro, dizionario del json
+                    xrp, eur, data {list} -- Ripple, Euro, dizionario del json
     """
     with open(PORTAFOGLIO_PERCORSO, 'r+', encoding='utf-8') as jsonFile:
         if type(nuovoJson) is dict:
