@@ -3,7 +3,7 @@ import logging
 
 
 def passa_output_al_log_file():
-    logging.basicConfig(level=logging.INFO,
-                        filename="log/logfile.log",
-                        filemode="w+",
-                        format="%(asctime)s %(levelname)s %(message)s")
+	logging.basicConfig(level=logging.INFO,
+	                    filename="log/logfile.log",
+	                    filemode="w+",
+	                    format="%(asctime)s %(levelname)s %(message)s")

@@ -1,16 +1,16 @@
 {
-    "data": {
-        "buy_order_id": 1230771779903490,
-        "amount_str": "1200.76796489",
-        "timestamp": "1589316366",
-        "microtimestamp": "1589316366235000",
-        "id": 113063498,
-        "amount": 1200.76796489,
-        "sell_order_id": 1230771693805569,
-        "price_str": "0.18230",
-        "type": 0,
-        "price": 0.1823
-    },
-    "event": "trade",
-    "channel": "live_trades_xrpeur"
+	"data": {
+		"buy_order_id": 1230771779903490,
+		"amount_str": "1200.76796489",
+		"timestamp": "1589316366",
+		"microtimestamp": "1589316366235000",
+		"id": 113063498,
+		"amount": 1200.76796489,
+		"sell_order_id": 1230771693805569,
+		"price_str": "0.18230",
+		"type": 0,
+		"price": 0.1823
+	},
+	"event": "trade",
+	"channel": "live_trades_xrpeur"
 }
