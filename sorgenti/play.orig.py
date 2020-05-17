@@ -1,18 +1,19 @@
-import os
-import sys
-import csv
-import json
 import logging
-import websocket
 from utilita.log import passa_output_al_log_file
 from costanti.argomenti_per_il_bot import ARGOMENTI_PER_IL_BOT
-from operazioni2 import Gestore
+import sys
+from operazioni import seVendereOComprare, quandoVendere
+import json
+import websocket
+import os
 from costanti.dati_forgiati import DATI_FORGIATI_CARTELLA_PERCORSO
+import csv
 
 # ______________________________________roba che serve all'avvio____________________
 
 
 def avvio(argv):
+	print('Rock and Roll, baby!')
 	ARGOMENTI_PER_IL_BOT = argv
 	if len(ARGOMENTI_PER_IL_BOT) > 0:
 		if ARGOMENTI_PER_IL_BOT[0] == 'log':
@@ -24,8 +25,13 @@ def avvio(argv):
 
 
 def processaNuovoPrezzo(attuale):
+	print("questo è il prezzo atuale:")
+	print(attuale)
+
 	logging.info(attuale)
-	Gestore(attuale)
+	seVendereOComprare(attuale)
+
+	print("ho finito processa nuovo prezzo")
 
 
 # _____________________________________elabora i dati inseriti da noi__________________-
