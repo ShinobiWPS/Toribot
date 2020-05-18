@@ -6,7 +6,7 @@ import logging
 import websocket
 from utilita.log import passa_output_al_log_file
 from costanti.argomenti_per_il_bot import ARGOMENTI_PER_IL_BOT
-from operazioni2 import Gestore
+from operazioni import Gestore
 from costanti.dati_forgiati import DATI_FORGIATI_CARTELLA_PERCORSO
 
 # ______________________________________roba che serve all'avvio____________________
