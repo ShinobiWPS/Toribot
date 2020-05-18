@@ -5,15 +5,17 @@ from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
 from utilita.apriFile import Portafoglio, Commercialista
 import logging
 
+
 def Gestore(valore_attuale):
 	cripto, soldi = Portafoglio()
 
 	if soldi:
 		# Decide se comprare e nel caso compra
 		ultimo_valore, valore_acquisto = Commercialista()
-		
+
 		if valore_attuale > ultimo_valore:
-			Commercialista(valore_acquisto)
+			# Compro
+			Commercialista("valore_acquisto", valore_acquisto)
 			Portafoglio("cripto", soldi * valore_attuale)
 			Portafoglio("soldi", 0)
 
@@ -22,9 +24,9 @@ def Gestore(valore_attuale):
 		ultimo_valore, valore_acquisto = Commercialista()
 
 		if valore_attuale > valore_acquisto:
-			if valore_attuale > ultimo_valore:
-				Commercialista("ultimo_valore", ultimo_valore)
-			else:
+			if valore_attuale < ultimo_valore:
+				# Vendo
 				Portafoglio("soldi", cripto * valore_attuale)
 				Portafoglio("cripto", 0)
 
+	Commercialista("ultimo_valore", valore_attuale)

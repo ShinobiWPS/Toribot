@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import json
 import logging
 from costanti.valori_percorso import VALORI_PERCORSO
@@ -6,16 +6,19 @@ from costanti.valori_percorso import VALORI_PERCORSO
 
 def GestoreValoriJson(chiave=None, valore=None):
 	try:
-		with open(VALORI_PERCORSO, 'r+', encoding='utf-8') as jsonFile:
-			if chiave and valore:
+		with open(VALORI_PERCORSO, 'r+') as jsonFile:
+			if chiave is not None and valore is not None:
 				try:
-					valori_json = json.load(jsonFile)
+					valori_json = json.loads(jsonFile.read())
+					jsonFile.seek(0)
 					valori_json[chiave] = valore
-					json.dump(valori_json, jsonFile, sort_keys=True, indent=4)
+					jsonFile.write(json.dumps(valori_json, sort_keys=True, indent=4))
+					jsonFile.truncate()
+					return valori_json
 				except Exception as e:
 					logging.error(e)
 			else:
-				return json.load(jsonFile)
+				return json.loads(jsonFile.read())
 	except Exception as e:
 		logging.error(e)
 
