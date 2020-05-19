@@ -5,7 +5,6 @@ import json
 import logging
 import websocket
 from utilita.log import passa_output_al_log_file
-from costanti.argomenti_per_il_bot import ARGOMENTI_PER_IL_BOT
 from operazioni import Gestore
 from utilita.apriFile import Portafoglio, Commercialista
 from costanti.dati_forgiati import DATI_FORGIATI_CARTELLA_PERCORSO
@@ -19,9 +18,8 @@ MONETA = "€"
 
 
 def avvio(argv):
-	ARGOMENTI_PER_IL_BOT = argv
-	if len(ARGOMENTI_PER_IL_BOT) > 0:
-		if ARGOMENTI_PER_IL_BOT[0] == 'log':
+	if len(argv) > 0:
+		if 'log' in argv:
 			passa_output_al_log_file()
 
 	cripto, soldi = Portafoglio()
@@ -31,10 +29,11 @@ def avvio(argv):
 		logging.info("Inizio con " + str(round(cripto, 3)) + " " +
 		             str(CRIPTOMONETA))
 
-	if os.environ.get('ISDEVELOPMENT') == 'true':
+	if os.environ.get('ISDEVELOPMENT') == 'true' or "statico" in argv:
 		dati_statici()
 	else:
 		dati_da_Bitstamp_websocket()
+		print(cripto)
 
 	cripto, soldi = Portafoglio()
 	if soldi:
