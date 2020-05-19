@@ -29,3 +29,9 @@
 ## VSCode
 
 - il file .env con il vscode workspace.json sono necessari solo temporaneamente per ovviare al bug di intelliCode (a volte mostra import irrisolti, ma sono falsi negativi) perche usa una preview di Microsoft Python Language Analisys
+
+---
+
+## Install
+
+pip install -r requirements.txt
