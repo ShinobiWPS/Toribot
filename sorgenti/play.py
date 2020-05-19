@@ -5,7 +5,7 @@ import json
 import logging
 import websocket
 from utilita.log import passa_output_al_log_file
-from operazioni import Gestore
+from operazioni import Gestore_M, Gestore_BSA
 from utilita.apriFile import Portafoglio, Commercialista
 from costanti.dati_forgiati import DATI_FORGIATI_CARTELLA_PERCORSO
 
@@ -33,7 +33,6 @@ def avvio(argv):
 		dati_statici()
 	else:
 		dati_da_Bitstamp_websocket()
-		print(cripto)
 
 	cripto, soldi = Portafoglio()
 	if soldi:
@@ -50,7 +49,7 @@ def avvio(argv):
 
 def processaNuovoPrezzo(attuale):
 	# logging.info(attuale)
-	Gestore(attuale)
+	Gestore_M(attuale)
 
 
 # _____________________________________elabora i dati inseriti da noi__________________-
