@@ -1,13 +1,21 @@
 import os
 import sys
 import json
-
+import logging
 import websocket
 
 # ______________________________________roba che serve all'avvio____________________
 
 
+def passa_output_al_log_file():
+	logging.basicConfig(level=logging.INFO,
+	                    filename="programmi/copia-carbone/da_bitstamp.csv",
+	                    filemode="w+",
+	                    format="%(message)s")
+
+
 def avvio(argv):
+	passa_output_al_log_file()
 	dati_da_Bitstamp_websocket()
 
 
@@ -50,8 +58,7 @@ def on_message(ws, message: str):
 	if messageDict['data'] != {}:
 		# questo print serve solo a noi per lavorare
 		attuale = messageDict['data']['price']
-		with open('programmi/copia-carbone/da_bitstamp.csv', 'a') as jsonFile:
-			json.dump(attuale, jsonFile)
+		logging.info(attuale)
 
 
 def on_error(ws, error: str):
