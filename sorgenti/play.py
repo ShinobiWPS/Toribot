@@ -60,7 +60,7 @@ def dati_statici():
 	    f'{DATI_FORGIATI_CARTELLA_PERCORSO}/salita_discesa.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
-			if riga[0]:
+			if riga and riga[0]:
 				processaNuovoPrezzo(float(riga[0]))
 
 
