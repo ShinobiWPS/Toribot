@@ -1,1 +1,0 @@
-DATI_FORGIATI_CARTELLA_PERCORSO = 'dati_forgiati'
