@@ -18,11 +18,15 @@
 
 ## Strategie di commercio
 
-- #### Binaria Senza Approssimazione (BSA)
+- #### Binaria (B)
   ![alt text](BSA.png)
 - #### Montagna (M)
+
   ![alt text](montagna.png)
-- ### _Binaria Approssimata (BA) - manca spiegazione_
+
+  ### --Modificatori--
+
+  - Approssimazione (1o decimale, 2o decimale, 3o decimale,ecc)
 
 ---
 
