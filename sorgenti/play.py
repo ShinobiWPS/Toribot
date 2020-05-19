@@ -7,7 +7,7 @@ import websocket
 from utilita.log import passa_output_al_log_file
 from operazioni import Gestore_M, Gestore_BSA
 from utilita.apriFile import Portafoglio, Commercialista
-from costanti.dati_forgiati import DATI_FORGIATI_CARTELLA_PERCORSO
+from costanti.dataset import DATASET_CARTELLA_PERCORSO
 
 CRIPTOVALUTA = "Ripple"
 CRIPTOMONETA = "XRP"
@@ -54,8 +54,7 @@ def processaNuovoPrezzo(attuale):
 
 # _____________________________________elabora i dati inseriti da noi__________________-
 def dati_statici():
-	with open(
-	    f'{DATI_FORGIATI_CARTELLA_PERCORSO}/salita_discesa.csv') as csvFile:
+	with open(f'{DATASET_CARTELLA_PERCORSO}/salita_discesa.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
 			if riga and riga[0]:
