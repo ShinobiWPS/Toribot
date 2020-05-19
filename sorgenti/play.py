@@ -7,7 +7,13 @@ import websocket
 from utilita.log import passa_output_al_log_file
 from costanti.argomenti_per_il_bot import ARGOMENTI_PER_IL_BOT
 from operazioni import Gestore
+from utilita.apriFile import Portafoglio, Commercialista
 from costanti.dati_forgiati import DATI_FORGIATI_CARTELLA_PERCORSO
+
+CRIPTOVALUTA = "Ripple"
+CRIPTOMONETA = "XRP"
+VALUTA = "Euro"
+MONETA = "€"
 
 # ______________________________________roba che serve all'avvio____________________
 
@@ -17,14 +23,34 @@ def avvio(argv):
 	if len(ARGOMENTI_PER_IL_BOT) > 0:
 		if ARGOMENTI_PER_IL_BOT[0] == 'log':
 			passa_output_al_log_file()
+
+	cripto, soldi = Portafoglio()
+	if soldi:
+		logging.info("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
+	if cripto:
+		logging.info("Inizio con " + str(round(cripto, 3)) + " " +
+		             str(CRIPTOMONETA))
+
 	if os.environ.get('ISDEVELOPMENT') == 'true':
 		dati_statici()
 	else:
 		dati_da_Bitstamp_websocket()
 
+	cripto, soldi = Portafoglio()
+	if soldi:
+		logging.info("Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
+	if cripto:
+		ultimo_valore, valore_acquisto = Commercialista()
+		logging.info("Finisco con " + str(round(cripto, 3)) + " " +
+		             str(CRIPTOMONETA))
+		logging.info("Finisco con " + str(
+		    round(
+		        cripto * (ultimo_valore if ultimo_valore > valore_acquisto else
+		                  valore_acquisto), 2)) + " " + str(MONETA))
+
 
 def processaNuovoPrezzo(attuale):
-	logging.info(attuale)
+	# logging.info(attuale)
 	Gestore(attuale)
 
 
@@ -34,7 +60,8 @@ def dati_statici():
 	    f'{DATI_FORGIATI_CARTELLA_PERCORSO}/salita_discesa.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
-			processaNuovoPrezzo(float(riga[0]))
+			if riga[0]:
+				processaNuovoPrezzo(float(riga[0]))
 
 
 # ______________________________________parte con dati websoket______________________________________
