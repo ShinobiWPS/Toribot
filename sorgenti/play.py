@@ -5,7 +5,7 @@ import json
 import logging
 import websocket
 from utilita.log import passa_output_al_log_file
-from operazioni import Gestore_M, Gestore_BSA
+from operazioni import Gestore_B as Gestore
 from utilita.apriFile import Portafoglio, Commercialista
 from costanti.dati_forgiati import DATI_FORGIATI_CARTELLA_PERCORSO
 
@@ -41,21 +41,19 @@ def avvio(argv):
 		ultimo_valore, valore_acquisto = Commercialista()
 		logging.info("Finisco con " + str(round(cripto, 3)) + " " +
 		             str(CRIPTOMONETA))
-		logging.info("Finisco con " + str(
-		    round(
-		        cripto * (ultimo_valore if ultimo_valore > valore_acquisto else
-		                  valore_acquisto), 2)) + " " + str(MONETA))
+		#logging.info("Finisco con " + str(round(cripto * (ultimo_valore if ultimo_valore > valore_acquisto else valore_acquisto), 2)) + " " + str(MONETA))
+		logging.info("Finisco con " + str(round(cripto * ultimo_valore, 2)) +
+		             " " + str(MONETA))
 
 
 def processaNuovoPrezzo(attuale):
 	# logging.info(attuale)
-	Gestore_M(attuale)
+	Gestore(attuale)
 
 
 # _____________________________________elabora i dati inseriti da noi__________________-
 def dati_statici():
-	with open(
-	    f'{DATI_FORGIATI_CARTELLA_PERCORSO}/salita_discesa.csv') as csvFile:
+	with open(f'{DATI_FORGIATI_CARTELLA_PERCORSO}/da_bitstamp.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
 			if riga and riga[0]:

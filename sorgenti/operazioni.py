@@ -6,6 +6,8 @@ from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
 from utilita.apriFile import Portafoglio, Commercialista
 
 primo_acquisto = True
+# Se Fattore d'approssimazione a 8 Strategia B, se inferiore di 8 strategia B+An
+BA_Fattore_Approssimazionoe = 8
 
 
 def Gestore_M(valore_attuale):
@@ -52,7 +54,7 @@ def Gestore_M(valore_attuale):
 	Commercialista("ultimo_valore", valore_attuale)
 
 
-def Gestore_BSA(valore_attuale):
+def Gestore_B(valore_attuale):
 	global primo_acquisto
 	cripto, soldi = Portafoglio()
 
@@ -64,7 +66,9 @@ def Gestore_BSA(valore_attuale):
 		ultimo_valore, valore_acquisto = Commercialista()
 
 		# Se il valore attuale è maggiore dell'ultimo valore
-		if valore_attuale < ultimo_valore or primo_acquisto:
+		if round(
+		    valore_attuale,
+		    BA_Fattore_Approssimazionoe) < ultimo_valore or primo_acquisto:
 			primo_acquisto = False
 			# Compro
 			logging.info("Acquisto [" + str(valore_attuale) + "] " +
@@ -80,9 +84,11 @@ def Gestore_BSA(valore_attuale):
 		ultimo_valore, valore_acquisto = Commercialista()
 
 		# Se il valore attuale è maggiore dal valore d'acquisto (in caso opposto perderei i soldi)
-		if valore_attuale > valore_acquisto:
+		if round(valore_attuale,
+		         BA_Fattore_Approssimazionoe) > valore_acquisto:
 			# Se il valore attuale è minore dell'ultimo valore, sta scendendo (forse)
-			if valore_attuale > ultimo_valore:
+			if round(valore_attuale,
+			         BA_Fattore_Approssimazionoe) > ultimo_valore:
 				# Resetto il valore d'acquisto, dato che non ho più roba
 				Commercialista("valore_acquisto", 0)
 				# Vendo
