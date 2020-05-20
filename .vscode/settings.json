@@ -9,7 +9,7 @@
   "editor.formatOnSave": true,
   "python.formatting.provider": "yapf",
   "python.formatting.yapfArgs": [
-    "--style={based_on_style: pep8, column_limit=100}"
+    "--style={based_on_style: facebook, column_limit=80}"
   ],
   "files.exclude": {
     "**/__pycache__": true
