@@ -4,6 +4,7 @@ import csv
 import json
 import logging
 import websocket
+import unicodedata
 from utilita.log import passa_output_al_log_file
 from operazioni import Gestore_B as Gestore
 from utilita.apriFile import Portafoglio, Commercialista
@@ -12,7 +13,7 @@ from costanti.dataset import DATASET_CARTELLA_PERCORSO
 CRIPTOVALUTA = "Ripple"
 CRIPTOMONETA = "XRP"
 VALUTA = "Euro"
-MONETA = "€"
+MONETA = VALUTA[0:3]
 
 # ______________________________________roba che serve all'avvio____________________
 
@@ -22,12 +23,20 @@ def avvio(argv):
 		if 'log' in argv:
 			passa_output_al_log_file()
 
+	if os.environ.get('ISDEVELOPMENT') == 'true' or "statico" in argv:
+		cripto, soldi = Portafoglio("cripto", 0)
+		cripto, soldi = Portafoglio("soldi", 1000)
+		ultimo_valore, valore_acquisto = Commercialista("ultimo_valore", 0)
+		ultimo_valore, valore_acquisto = Commercialista("valore_acquisto", 0)
 	cripto, soldi = Portafoglio()
 	if soldi:
+		print("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
 		logging.info("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
 	if cripto:
 		logging.info("Inizio con " + str(round(cripto, 3)) + " " +
 		             str(CRIPTOMONETA))
+		print("Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA))
+	sys.stdout.flush()
 
 	if os.environ.get('ISDEVELOPMENT') == 'true' or "statico" in argv:
 		dati_statici()
@@ -37,13 +46,17 @@ def avvio(argv):
 	cripto, soldi = Portafoglio()
 	if soldi:
 		logging.info("Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
+		print("Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
 	if cripto:
 		ultimo_valore, valore_acquisto = Commercialista()
+		print("Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
+		      str(MONETA))
 		logging.info("Finisco con " + str(round(cripto, 3)) + " " +
 		             str(CRIPTOMONETA))
 		#logging.info("Finisco con " + str(round(cripto * (ultimo_valore if ultimo_valore > valore_acquisto else valore_acquisto), 2)) + " " + str(MONETA))
 		logging.info("Finisco con " + str(round(cripto * ultimo_valore, 2)) +
 		             " " + str(MONETA))
+	sys.stdout.flush()
 
 
 def processaNuovoPrezzo(attuale):
@@ -53,7 +66,8 @@ def processaNuovoPrezzo(attuale):
 
 # _____________________________________elabora i dati inseriti da noi__________________-
 def dati_statici():
-	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp.csv') as csvFile:
+	with open(
+	    f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_xrpeur.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
 			if riga and riga[0]:
