@@ -1,24 +1,17 @@
 {
-	"python.linting.pylintEnabled": true,
-	"python.linting.enabled": true,
-	"python.linting.flake8Enabled": false,
-	"python.envFile": "${workspaceFolder}/.env",
-	"editor.insertSpaces": false,
-	"todo-tree.general.tags": [
-		"BUG",
-		"HACK",
-		"FIXME",
-		"TODO",
-		"XXX",
-		"todo"
-	],
-	"editor.detectIndentation": false,
-	"editor.formatOnSave": true,
-	"python.formatting.provider": "yapf",
-	"python.formatting.yapfArgs": [
-		"--style={based_on_style: pep8, use_tabs: true}"
-	],
-	"files.exclude": {
-		"**/__pycache__": true
-	},
+  "python.linting.pylintEnabled": true,
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": false,
+  "python.envFile": "${workspaceFolder}/.env",
+  "editor.insertSpaces": false,
+  "todo-tree.general.tags": ["BUG", "HACK", "FIXME", "TODO", "XXX", "todo"],
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "python.formatting.provider": "yapf",
+  "python.formatting.yapfArgs": [
+    "--style={based_on_style: pep8, column_limit=100}"
+  ],
+  "files.exclude": {
+    "**/__pycache__": true
+  }
 }
