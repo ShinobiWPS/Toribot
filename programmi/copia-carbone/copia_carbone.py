@@ -5,13 +5,12 @@ import logging
 import websocket
 from datetime import datetime
 
-# ______________________________________roba che serve all'avvio____________________
+# ________________roba che serve all'avvio________________
 
 
 def passa_output_al_log_file():
 	logging.basicConfig(level=logging.INFO,
-	                    # filename="programmi/copia-carbone/da_bitstamp.csv",
-	                    filename="da_bitstamp.csv",
+	                    filename="programmi/copia-carbone/da_bitstamp.csv",
 	                    filemode="a",
 	                    format="%(asctime)s,%(message)s",
 	                    datefmt='%d-%m-%Y %H:%M:%S')
@@ -22,7 +21,7 @@ def avvio(argv):
 	dati_da_Bitstamp_websocket()
 
 
-# ______________________________________parte con dati websoket______________________________________
+# _______________parte con dati websocket___________________
 def dati_da_Bitstamp_websocket():
 	try:
 		# questo mostra piu informazioni se True
@@ -65,7 +64,7 @@ def on_message(ws, message: str):
 			# PARE che appena si aggancia il socket manda un messaggio vuoto che fa crashare il bot
 			if messageDict and messageDict['data']:
 				now = datetime.now()
-				print("Update:",now.strftime("%d/%m/%Y %H:%M:%S"))
+				print("Update:", now.strftime("%d/%m/%Y %H:%M:%S"))
 				sys.stdout.flush()
 
 				timestamp = messageDict['data']['timestamp']
