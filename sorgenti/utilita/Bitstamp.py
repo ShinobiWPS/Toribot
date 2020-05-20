@@ -12,8 +12,9 @@ API_SECRET = b'api_key_secret'
 
 timestamp = str(int(round(time.time() * 1000)))
 nonce = str(uuid.uuid4())
+print(nonce)
 content_type = 'application/x-www-form-urlencoded'
-payload = {'offset': '1'}
+payload = {}
 
 payload_string = urlencode(payload)
 
@@ -21,9 +22,8 @@ payload_string = urlencode(payload)
 message = 'BITSTAMP ' + api_key + \
     'POST' + \
     'www.bitstamp.net' + \
-    '/api/v2/user_transactions/' + \
+    '/api/v2/balance/' + \
     '' + \
-    content_type + \
     nonce + \
     timestamp + \
     'v2' + \
@@ -37,12 +37,13 @@ headers = {
     'X-Auth-Nonce': nonce,
     'X-Auth-Timestamp': timestamp,
     'X-Auth-Version': 'v2',
-    'Content-Type': content_type
+    #'Content-Type': content_type
 }
-r = requests.post('https://www.bitstamp.net/api/v2/user_transactions/',
+r = requests.post('https://www.bitstamp.net/api/v2/balance/',
                   headers=headers,
                   data=payload_string)
 if not r.status_code == 200:
+	print(r.content)
 	raise Exception('Status code not 200')
 
 string_to_sign = (nonce + timestamp +
