@@ -3,22 +3,22 @@ import json
 import logging
 from costanti.valori_percorso import VALORI_PERCORSO
 from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
-from utilita.apriFile import Portafoglio, Commercialista
+from utilita.apriFile import portafoglio, commercialista
 
 primo_acquisto = True
 # Se Fattore d'approssimazione a 8 Strategia B, se inferiore di 8 strategia B+An
 BA_Fattore_Approssimazionoe = 8
 
 
-def Gestore_M(valore_attuale):
-	cripto, soldi = Portafoglio()
+def gestore_M(valore_attuale):
+	cripto, soldi = portafoglio()
 
 	#_______INIZIO STRATEGIA_____________________________________
 
 	#_____________________ Comprare _____________________________
 	# Se ho soldi
 	if soldi:
-		ultimo_valore, valore_acquisto = Commercialista()
+		ultimo_valore, valore_acquisto = commercialista()
 
 		# Se il valore attuale è maggiore dell'ultimo valore
 		if valore_attuale > ultimo_valore:
@@ -26,44 +26,44 @@ def Gestore_M(valore_attuale):
 			logging.info("Acquisto [" + str(valore_attuale) + "] " +
 			             str(soldi) + " -> " +
 			             str(round(soldi / valore_attuale, 8)))
-			Commercialista("valore_acquisto", valore_attuale)
-			Portafoglio("cripto", round(soldi / valore_attuale, 8))
-			Portafoglio("soldi", 0)
+			commercialista("valore_acquisto", valore_attuale)
+			portafoglio("cripto", round(soldi / valore_attuale, 8))
+			portafoglio("soldi", 0)
 
 	#_____________________ Vendere _____________________________
 	# Se ho criptomonete
 	elif cripto:
-		ultimo_valore, valore_acquisto = Commercialista()
+		ultimo_valore, valore_acquisto = commercialista()
 
 		# Se il valore attuale è maggiore dal valore d'acquisto (in caso opposto perderei i soldi)
 		if valore_attuale > valore_acquisto:
 			# Se il valore attuale è minore dell'ultimo valore, sta scendendo (forse)
 			if valore_attuale < ultimo_valore:
 				# Resetto il valore d'acquisto, dato che non ho più roba
-				Commercialista("valore_acquisto", 0)
+				commercialista("valore_acquisto", 0)
 				# Vendo
 				logging.info("Vendita [" + str(valore_attuale) + "] " +
 				             str(cripto) + " -> " +
 				             str(round(cripto * valore_attuale, 8)))
-				Portafoglio("soldi", round(cripto * valore_attuale, 5))
-				Portafoglio("cripto", 0)
+				portafoglio("soldi", round(cripto * valore_attuale, 5))
+				portafoglio("cripto", 0)
 
 	#_______FINE STRATEGIA_____________________________________
 
 	# Aggiorno l'ultimo valore
-	Commercialista("ultimo_valore", valore_attuale)
+	commercialista("ultimo_valore", valore_attuale)
 
 
-def Gestore_B(valore_attuale):
+def gestore_B(valore_attuale):
 	global primo_acquisto
-	cripto, soldi = Portafoglio()
+	cripto, soldi = portafoglio()
 
 	#_______INIZIO STRATEGIA_____________________________________
 
 	#_____________________ Comprare _____________________________
 	# Se ho soldi
 	if soldi:
-		ultimo_valore, valore_acquisto = Commercialista()
+		ultimo_valore, valore_acquisto = commercialista()
 
 		# Se il valore attuale è maggiore dell'ultimo valore
 		if round(
@@ -74,14 +74,14 @@ def Gestore_B(valore_attuale):
 			logging.info("Acquisto [" + str(valore_attuale) + "] " +
 			             str(soldi) + " -> " +
 			             str(round(soldi / valore_attuale, 8)))
-			Commercialista("valore_acquisto", valore_attuale)
-			Portafoglio("cripto", round(soldi / valore_attuale, 8))
-			Portafoglio("soldi", 0)
+			commercialista("valore_acquisto", valore_attuale)
+			portafoglio("cripto", round(soldi / valore_attuale, 8))
+			portafoglio("soldi", 0)
 
 	#_____________________ Vendere _____________________________
 	# Se ho criptomonete
 	elif cripto:
-		ultimo_valore, valore_acquisto = Commercialista()
+		ultimo_valore, valore_acquisto = commercialista()
 
 		# Se il valore attuale è maggiore dal valore d'acquisto (in caso opposto perderei i soldi)
 		if round(valore_attuale,
@@ -90,15 +90,15 @@ def Gestore_B(valore_attuale):
 			if round(valore_attuale,
 			         BA_Fattore_Approssimazionoe) > ultimo_valore:
 				# Resetto il valore d'acquisto, dato che non ho più roba
-				Commercialista("valore_acquisto", 0)
+				commercialista("valore_acquisto", 0)
 				# Vendo
 				logging.info("Vendita [" + str(valore_attuale) + "] " +
 				             str(cripto) + " -> " +
 				             str(round(cripto * valore_attuale, 8)))
-				Portafoglio("soldi", round(cripto * valore_attuale, 5))
-				Portafoglio("cripto", 0)
+				portafoglio("soldi", round(cripto * valore_attuale, 5))
+				portafoglio("cripto", 0)
 
 	#_______FINE STRATEGIA_____________________________________
 
 	# Aggiorno l'ultimo valore
-	Commercialista("ultimo_valore", valore_attuale)
+	commercialista("ultimo_valore", valore_attuale)

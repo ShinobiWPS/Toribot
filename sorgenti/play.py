@@ -6,8 +6,8 @@ import logging
 import websocket
 import unicodedata
 from utilita.log import passa_output_al_log_file
-from operazioni import Gestore_B as Gestore
-from utilita.apriFile import Portafoglio, Commercialista
+from operazioni import gestore_B as gestore
+from utilita.apriFile import portafoglio, commercialista
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
 
 CRIPTOVALUTA = "Ripple"
@@ -24,11 +24,11 @@ def avvio(argv):
 			passa_output_al_log_file()
 
 	if os.environ.get('ISDEVELOPMENT') == 'true' or "statico" in argv:
-		cripto, soldi = Portafoglio("cripto", 0)
-		cripto, soldi = Portafoglio("soldi", 1000)
-		ultimo_valore, valore_acquisto = Commercialista("ultimo_valore", 0)
-		ultimo_valore, valore_acquisto = Commercialista("valore_acquisto", 0)
-	cripto, soldi = Portafoglio()
+		cripto, soldi = portafoglio("cripto", 0)
+		cripto, soldi = portafoglio("soldi", 1000)
+		ultimo_valore, valore_acquisto = commercialista("ultimo_valore", 0)
+		ultimo_valore, valore_acquisto = commercialista("valore_acquisto", 0)
+	cripto, soldi = portafoglio()
 	if soldi:
 		print("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
 		logging.info("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
@@ -43,12 +43,12 @@ def avvio(argv):
 	else:
 		dati_da_Bitstamp_websocket()
 
-	cripto, soldi = Portafoglio()
+	cripto, soldi = portafoglio()
 	if soldi:
 		logging.info("Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
 		print("Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
 	if cripto:
-		ultimo_valore, valore_acquisto = Commercialista()
+		ultimo_valore, valore_acquisto = commercialista()
 		print("Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
 		      str(MONETA))
 		logging.info("Finisco con " + str(round(cripto, 3)) + " " +
@@ -61,7 +61,7 @@ def avvio(argv):
 
 def processaNuovoPrezzo(attuale):
 	# logging.info(attuale)
-	Gestore(attuale)
+	gestore(attuale)
 
 
 # _____________________________________elabora i dati inseriti da noi__________________-

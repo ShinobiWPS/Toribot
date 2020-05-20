@@ -4,7 +4,7 @@ from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
 import sys
 
 
-def apriFilePortafoglio(nuovoJson={}):
+def apriFileportafoglio(nuovoJson={}):
     """serve per interagire col file `valori.json`
 
     Keyword Arguments:
