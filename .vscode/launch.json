@@ -5,40 +5,40 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "play.py statico ",
+      "name": "Play B dev ", //dev:statici
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "env": { "ISDEVELOPMENT": "true" },
+      "args": ["B", "dev"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },
 
     {
-      "name": "play.py statico log",
+      "name": "Play B dev log", //dev:statici + log
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "env": { "ISDEVELOPMENT": "true" },
-      "args": ["log"],
+      "args": ["B", "log", "dev"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },
 
     {
-      "name": "play.py log",
+      "name": "Play B log", //produzione:websocket + log
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["log"],
+      "args": ["B", "log"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "play.py",
+      "name": "Play NO_LOG", //produzione:websocket
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["B"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     }
