@@ -1,19 +1,22 @@
-import os
-import sys
 import json
 import logging
-import websocket
+import os
+import sys
 from datetime import datetime
+
+import websocket
 
 # ________________roba che serve all'avvio________________
 
 
 def passa_output_al_log_file():
-	logging.basicConfig(level=logging.INFO,
-	                    filename="programmi/copia-carbone/da_bitstamp.csv",
-	                    filemode="a",
-	                    format="%(asctime)s,%(message)s",
-	                    datefmt='%d-%m-%Y %H:%M:%S')
+	logging.basicConfig(
+	    level=logging.INFO,
+	    filename="programmi/copia-carbone/da_bitstamp.csv",
+	    filemode="a",
+	    format="%(asctime)s,%(message)s",
+	    datefmt='%d-%m-%Y %H:%M:%S'
+	)
 
 
 def avvio(argv):
@@ -26,10 +29,12 @@ def dati_da_Bitstamp_websocket():
 	try:
 		# questo mostra piu informazioni se True
 		websocket.enableTrace(False)
-		ws = websocket.WebSocketApp("wss://ws.bitstamp.net",
-		                            on_message=on_message,
-		                            on_error=on_error,
-		                            on_close=on_close)
+		ws = websocket.WebSocketApp(
+		    "wss://ws.bitstamp.net",
+		    on_message=on_message,
+		    on_error=on_error,
+		    on_close=on_close
+		)
 		ws.on_open = on_open
 		ws.run_forever()
 	except KeyboardInterrupt:
@@ -42,8 +47,9 @@ def on_open(ws):
 	"""Funzione all'aggancio del WebSocket
 
 	Arguments:
-									ws {tipo_boh} -- sono dei caratteri apparentemente inutili
-																	"""
+
+		ws {boh} -- sono dei caratteri apparentemente inutili
+		"""
 	jsonString = json.dumps({
 	    "event": "bts:subscribe",
 	    "data": {
