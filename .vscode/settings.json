@@ -17,5 +17,9 @@
   },
   "editor.codeActionsOnSave": {
     "source.organizeImports": true
-  }
+},
+"todo-tree.filtering.useBuiltInExcludes": "file and search excludes",
+"todo-tree.filtering.excludeGlobs": [
+	"**/env"
+]
 }
