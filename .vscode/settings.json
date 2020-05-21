@@ -9,9 +9,10 @@
   "editor.formatOnSave": true,
   "python.formatting.provider": "yapf",
   "python.formatting.yapfArgs": [
-    "--style={based_on_style: facebook, column_limit=80}"
+    "--style={based_on_style: pep8, COLUMN_LIMIT=80, SPLIT_BEFORE_DOT=true,DEDENT_CLOSING_BRACKETS=true,COALESCE_BRACKETS=true,USE_TABS=TRUE,CONTINUATION_ALIGN_STYLE=tabs}"
   ],
   "files.exclude": {
-    "**/__pycache__": true
+    "**/__pycache__": true,
+    "**/env": true
   }
 }
