@@ -1,4 +1,5 @@
 import csv
+import importlib
 import json
 import logging
 import os
@@ -8,7 +9,6 @@ import unicodedata
 import websocket
 
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
-from operazioni import gestore_B as gestore
 from piattaforme.bitstamp.bitstampRequests import buy, getPortafoglio, sell
 from utilita.apriFile import commercialista, portafoglio
 from utilita.log import passa_output_al_log_file
@@ -19,14 +19,20 @@ VALUTA = "Euro"
 MONETA = VALUTA[0:3] # diego pigro a scrivere Eur,tagliando la O
 
 # ______________________________________roba che serve all'avvio____________________
+strategiaSigla=sys.argv[1]
+# no error handling on purpose,
+# we want to crash the bot if a correct strategy name it's not provided
+path=f'strategie.{strategiaSigla}'
+strategiaModulo= importlib.import_module(path)
 
-
+# argv:  gli argomenti tranne il primo perche e' il nome del file
 def avvio(argv):
 	if len(argv) > 0:
 		if 'log' in argv:
 			passa_output_al_log_file()
 
-	if os.environ.get('ISDEVELOPMENT') == 'true' or "statico" in argv:
+
+	if "dev" in argv:
 		cripto, soldi = portafoglio("cripto", 0)
 		cripto, soldi = portafoglio("soldi", 1000)
 		ultimo_valore, valore_acquisto = commercialista("ultimo_valore", 0)
@@ -42,7 +48,7 @@ def avvio(argv):
 		print("Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA))
 	sys.stdout.flush()
 
-	if os.environ.get('ISDEVELOPMENT') == 'true' or "statico" in argv:
+	if "dev" in argv:
 		dati_statici()
 	else:
 		dati_da_Bitstamp_websocket()
@@ -70,7 +76,7 @@ def avvio(argv):
 
 def processaNuovoPrezzo(attuale):
 	# logging.info(attuale)
-	gestore(attuale)
+	strategiaModulo.gestore(attuale)
 
 
 # _____________________________________elabora i dati inseriti da noi__________________-
