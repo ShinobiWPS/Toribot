@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import telepot
-import pprint
 import os
-import time
+import pprint
 import sys
-# è la libreria che gestisce le kaybord del bot
-from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
-from pprint import pprint  # printa il risultato del oggetto msg in modo ordinato
+import time
+from pprint import \
+				pprint  # printa il risultato del oggetto msg in modo ordinato
+
+import telepot
 # gestisce la parte della ricezione di nuovi messaggi
 from telepot.loop import MessageLoop
+# è la libreria che gestisce le kaybord del bot
+from telepot.namedtuple import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def telegram(azione, text):

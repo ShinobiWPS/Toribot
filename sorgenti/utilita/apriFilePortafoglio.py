@@ -1,7 +1,8 @@
 
 import json
-from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
 import sys
+
+from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
 
 
 def apriFileportafoglio(nuovoJson={}):
@@ -9,11 +10,11 @@ def apriFileportafoglio(nuovoJson={}):
 
     Keyword Arguments:
 
-                            nuovoJson {dict} -- json aggiornato (default: {{}})
+        nuovoJson {dict} -- json aggiornato (default: {{}})
 
     Returns:
 
-                    xrp, eur, data {list} -- Ripple, Euro, dizionario del json
+        xrp, eur, data {list} -- Ripple, Euro, dizionario del json
     """
     with open(PORTAFOGLIO_PERCORSO, 'r+', encoding='utf-8') as jsonFile:
         if type(nuovoJson) is dict:

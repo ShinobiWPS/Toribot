@@ -1,5 +1,6 @@
-from costanti.log_cartella_percorso import LOG_CARTELLA_PERCORSO
 import logging
+
+from costanti.log_cartella_percorso import LOG_CARTELLA_PERCORSO
 
 
 def passa_output_al_log_file():

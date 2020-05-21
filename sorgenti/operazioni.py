@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
-from costanti.valori_percorso import VALORI_PERCORSO
+
 from costanti.portafoglio_percorso import PORTAFOGLIO_PERCORSO
-from utilita.apriFile import portafoglio, commercialista
+from costanti.valori_percorso import VALORI_PERCORSO
+from utilita.apriFile import commercialista, portafoglio
 
 primo_acquisto = True
 # Se Fattore d'approssimazione a 8 Strategia B, se inferiore di 8 strategia B+An

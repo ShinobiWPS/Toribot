@@ -1,6 +1,8 @@
-import sys, os
 import json
 import logging
+import os
+import sys
+
 from costanti.valori_percorso import VALORI_PERCORSO
 
 

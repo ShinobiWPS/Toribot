@@ -9,13 +9,14 @@ import websocket
 
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
 from operazioni import gestore_B as gestore
+from piattaforme.bitstamp.bitstampRequests import buy, getPortafoglio, sell
 from utilita.apriFile import commercialista, portafoglio
 from utilita.log import passa_output_al_log_file
 
 CRIPTOVALUTA = "Ripple"
 CRIPTOMONETA = "XRP"
 VALUTA = "Euro"
-MONETA = VALUTA[0:3]
+MONETA = VALUTA[0:3] # diego pigro a scrivere Eur,tagliando la O
 
 # ______________________________________roba che serve all'avvio____________________
 

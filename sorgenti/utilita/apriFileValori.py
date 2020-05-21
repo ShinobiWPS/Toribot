@@ -1,6 +1,7 @@
 import json
-from costanti.valori_percorso import VALORI_PERCORSO
 import sys
+
+from costanti.valori_percorso import VALORI_PERCORSO
 
 
 def apriFileValori(nuovoJson={}):
