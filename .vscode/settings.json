@@ -14,5 +14,8 @@
   "files.exclude": {
     "**/__pycache__": true,
     "**/env": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
   }
 }
