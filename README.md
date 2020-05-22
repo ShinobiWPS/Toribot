@@ -25,10 +25,10 @@
 ## Strategie di commercio
 
 - #### Binaria (B)
-  ![alt text](BSA.png)
+  ![alt text](B.png)
 - #### Montagna (M)
 
-  ![alt text](montagna.png)
+  ![alt text](M.png)
 
   ### --Modificatori--
 
