@@ -28,7 +28,7 @@ def avvio(argv):
 
 	if os.environ.get('ISDEVELOPMENT') == 'true' or "statico" in argv:
 		cripto, soldi = portafoglio("cripto", 0)
-		cripto, soldi = portafoglio("soldi", 1000)
+		cripto, soldi = portafoglio("soldi", 5)
 		ultimo_valore, valore_acquisto = commercialista("ultimo_valore", 0)
 		ultimo_valore, valore_acquisto = commercialista("valore_acquisto", 0)
 	cripto, soldi = portafoglio()
@@ -75,10 +75,11 @@ def processaNuovoPrezzo(attuale):
 
 # _____________________________________elabora i dati inseriti da noi__________________-
 def dati_statici():
-	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_xrpeur.csv') as csvFile:
+	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_xrpeur_67h.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
 			if riga and riga[0]:
+				logging.info("" + str(riga[1]) + " : " + str(riga[0]))
 				processaNuovoPrezzo(float(riga[0]))
 
 
