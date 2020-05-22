@@ -80,11 +80,11 @@ def processaNuovoPrezzo(attuale):
 
 # _____________________________________elabora i dati inseriti da noi__________________-
 def dati_statici():
-	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_xrpeur_67h.csv') as csvFile:
+	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_btcusd_54h.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
 			if riga and riga[0]:
-				logging.info("" + str(riga[1]) + " : " + str(riga[0]))
+				# logging.info("" + str(riga[1]) + " : " + str(riga[0]))
 				processaNuovoPrezzo(float(riga[0]))
 
 
