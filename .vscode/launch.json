@@ -34,6 +34,64 @@
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
+      "name": "Play BR dev ", //dev:statici
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["BR", "dev"],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+
+    {
+      "name": "Play BR dev log", //dev:statici + log
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["BR", "log", "dev"],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+
+    {
+      "name": "Play BR log", //produzione:websocket + log
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["BR", "log"],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Play M dev ", //dev:statici
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["M", "dev"],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+
+    {
+      "name": "Play M dev log", //dev:statici + log
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["M", "log", "dev"],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+
+    {
+      "name": "Play M log", //produzione:websocket + log
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["M", "log"],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
       "name": "Play NO_LOG", //produzione:websocket
       "type": "python",
       "request": "launch",
