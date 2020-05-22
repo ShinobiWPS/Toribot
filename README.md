@@ -14,6 +14,14 @@
 
 ---
 
+## Spiegazione richieste Bitstamp
+
+1 balance - per controllare se abbiamo asset per fare il necessario
+2 order status - se l'ordine e' completato oppure non esiste,prosegui,altrimenti se e' Open, non fare make-order
+3 make order - crea l'ordine
+
+---
+
 ## Glossario
 
 - **asset** = insieme di beni da utilizzare per il commercio (euro,xrp,btc,petrolio,azioni, burro,mais,ecc)
