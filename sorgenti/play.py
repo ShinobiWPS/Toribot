@@ -8,7 +8,7 @@ import sys
 import websocket
 
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
-from piattaforme.bitstamp.bitstampRequests import buy, getPortafoglio, sell
+from piattaforme.bitstamp.bitstampRequests import buy, getBalance, sell
 from utilita.apriFile import commercialista, portafoglio
 from utilita.log import passa_output_al_log_file
 
