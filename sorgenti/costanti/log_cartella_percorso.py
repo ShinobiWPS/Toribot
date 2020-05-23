@@ -1,1 +1,2 @@
 LOG_CARTELLA_PERCORSO = 'log'
+TRADING_REPORT_FILENAME = "log/report.txt"

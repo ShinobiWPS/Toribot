@@ -4,12 +4,16 @@ import json
 import logging
 import os
 import sys
+import time
+from datetime import datetime
 
 import websocket
 
+import utilita.GestoreRapporti as GestoreRapporti
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
+from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
 from piattaforme.bitstamp.bitstampRequests import buy, getBalance, sell
-from utilita.apriFile import commercialista, portafoglio
+from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita.log import passa_output_al_log_file
 
 CRIPTOVALUTA = "Ripple"
@@ -30,19 +34,24 @@ def avvio(argv):
 		if 'log' in argv:
 			passa_output_al_log_file()
 
+	now = datetime.now()
+	dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+
+	# pulisco il report prime di scriverci sopra
+	GestoreRapporti.FileWrite(TRADING_REPORT_FILENAME,"")
 
 	if "dev" in argv:
 		cripto, soldi = portafoglio("cripto", 0)
-		cripto, soldi = portafoglio("soldi", 5)
+		cripto, soldi = portafoglio("soldi", 29)
 		ultimo_valore, valore_acquisto = commercialista("ultimo_valore", 0)
 		ultimo_valore, valore_acquisto = commercialista("valore_acquisto", 0)
 	cripto, soldi = portafoglio()
 	if soldi:
 		print("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
-		logging.info("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
+		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
 	if cripto:
-		logging.info(
-		    "Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA)
+		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
+		    dt_string+" Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA)
 		)
 		print("Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA))
 	sys.stdout.flush()
@@ -54,7 +63,7 @@ def avvio(argv):
 
 	cripto, soldi = portafoglio()
 	if soldi:
-		logging.info("Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
+		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
 		print("Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
 	if cripto:
 		ultimo_valore, valore_acquisto = commercialista()
@@ -62,12 +71,12 @@ def avvio(argv):
 		    "Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
 		    str(MONETA)
 		)
-		logging.info(
-		    "Finisco con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA)
+		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
+		    dt_string+" Finisco con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA)
 		)
-		#logging.info("Finisco con " + str(round(cripto * (ultimo_valore if ultimo_valore > valore_acquisto else valore_acquisto), 2)) + " " + str(MONETA))
-		logging.info(
-		    "Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
+		#GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(cripto * (ultimo_valore if ultimo_valore > valore_acquisto else valore_acquisto), 2)) + " " + str(MONETA))
+		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
+		    dt_string+" Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
 		    str(MONETA)
 		)
 	sys.stdout.flush()
@@ -84,13 +93,32 @@ def dati_statici():
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
 			if riga and riga[0]:
-				# logging.info("" + str(riga[1]) + " : " + str(riga[0]))
+				# GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,"" + str(riga[1]) + " : " + str(riga[0]))
 				processaNuovoPrezzo(float(riga[0]))
 
 
 # ______________________________________parte con dati websoket______________________________________
 def dati_da_Bitstamp_websocket():
 	try:
+		ultimo_id_ordine(0)
+
+		# balance
+		now = datetime.now()
+		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+		cripto, soldi = portafoglio()
+		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sincronizzo bilancio")
+		balance = json.loads(getBalance())
+		GestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
+		cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
+		soldi_balance = float(balance["eur_available"]) if "eur_available" in balance else None
+		portafoglio("soldi", soldi_balance)
+		if soldi_balance!=soldi:
+			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
+		portafoglio("cripto", cripto_balance)
+		if cripto_balance!=cripto:
+			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(cripto_balance-cripto,5))+" "+str(CRIPTOMONETA))
+
+
 		# questo mostra piu informazioni se True
 		websocket.enableTrace(False)
 		ws = websocket.WebSocketApp(
@@ -120,7 +148,8 @@ def on_open(ws):
 	})
 	# manda a bitstamp la richiesta di iscriversi al canale di eventi 'live_trades_xrpeur'
 	ws.send(jsonString)
-	print('Luce verde 🟢🟢🟢')
+	# print('Luce verde 🟢🟢🟢')
+	print('Luce verde')
 
 
 def on_message(ws, message: str):
@@ -140,11 +169,12 @@ def on_message(ws, message: str):
 
 def on_error(ws, error: str):
 	print(error)
-	print('❌')
+	# print('❌')
 
 
 def on_close(ws):
-	print("### WebSocketclosed 🔴🔴🔴 ###")
+	# print("### WebSocketclosed 🔴🔴🔴 ###")
+	print("### WebSocketclosed ###")
 
 
 avvio(sys.argv[1:])

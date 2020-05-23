@@ -11,8 +11,6 @@ client_id = 'Shinobi'
 api_key = 'hn7US4TKEVRRo4G6NUM1K8dUbnZ5GMrI'
 API_SECRET = b'wQww0PWWRP7z1kwYbCvo9NSovcTPCAhc'
 
-timestamp = str(int(round(time.time() * 1000)))
-nonce = str(uuid.uuid4())
 content_type = 'application/x-www-form-urlencoded'
 
 def buy(xrp:float):
@@ -39,6 +37,8 @@ def buyORsell(operation:str,xrp:str):
 
 		dict-- contenuto della risposta completo
 	"""
+	timestamp = str(int(round(time.time() * 1000)))
+	nonce = str(uuid.uuid4())
 	payload = {'amount': xrp}
 	payload_string = urlencode(payload)
 
@@ -94,6 +94,8 @@ def getBalance():
 	Returns:
 		list -- array di XRP,EUR disponibili
 	"""
+	timestamp = str(int(round(time.time() * 1000)))
+	nonce = str(uuid.uuid4())
 	payload = {}
 
 	payload_string = urlencode(payload)
@@ -132,6 +134,8 @@ def getOrderStatus(order_id):
 	Returns:
 		list -- array di XRP,EUR disponibili
 	"""
+	timestamp = str(int(round(time.time() * 1000)))
+	nonce = str(uuid.uuid4())
 	payload = {'id':order_id}
 
 	payload_string = urlencode(payload)

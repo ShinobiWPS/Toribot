@@ -38,3 +38,10 @@ def commercialista(chiave=None, valore=None):
 	if valori_json and "ultimo_valore" in valori_json and "valore_acquisto" in valori_json:
 		return [valori_json["ultimo_valore"], valori_json["valore_acquisto"]]
 	return [None, None]
+
+
+def ultimo_id_ordine(valore=None):
+	valori_json = gestoreValoriJson("ultimo_id", valore)
+	if valori_json and "ultimo_id" in valori_json:
+		return valori_json["ultimo_id"]
+	return None 

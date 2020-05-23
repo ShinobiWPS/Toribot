@@ -1,0 +1,8 @@
+{
+    "reason": {
+        "__all__": [
+            "Minimum order size is 25.0 EUR."
+        ]
+    },
+    "status": "error"
+}
