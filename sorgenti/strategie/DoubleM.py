@@ -16,32 +16,42 @@ from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 primo_acquisto = True
 # Se Fattore d'approssimazione a 8 Strategia B, se inferiore di 8 strategia B+An
 BR_Fattore_Approssimazionoe = 8
-BR_Fattore_Perdita = -0.01
-FEE = 0.5
-NUMERO_CAMPIONI = 100
+BR_Fattore_Perdita = 0
+FEE = 0.1
+NUMERO_CAMPIONI = 500
 
 def gestore(valore_attuale):
 	global primo_acquisto, BR_Fattore_Approssimazionoe
 	cripto, soldi = portafoglio()
 
 	try:
+		now = datetime.now()
+		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+
 		#_______INIZIO STRATEGIA_____________________________________
 
 		#_____________________ Comprare _____________________________
 		# Se ho soldi
 		if soldi:
 			ultimo_valore, valore_acquisto = commercialista()
-			# Compro
-			compro(soldi, valore_attuale)
+			if len(ultimo_valore)==NUMERO_CAMPIONI and valore_attuale <= min(ultimo_valore):
+				# Compro
+				compro(soldi, valore_attuale)
 		#_____________________ Vendere _____________________________
 		# Se ho criptomonete
 		elif cripto:
 			ultimo_valore, valore_acquisto = commercialista()
-			# Vendo
-			vendo(cripto, valore_attuale)
+			if len(ultimo_valore)==NUMERO_CAMPIONI and valore_attuale > valore_acquisto + valore_attuale*FEE*2/100:
+				#if valore_attuale > max(ultimo_valore):
+				if valore_attuale > sum(ultimo_valore)/len(ultimo_valore):
+					# Vendo
+					vendo(cripto, valore_attuale)
+				# else:
+					# GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Non è un picco.")
+
 		#_______FINE STRATEGIA_____________________________________
-	except Exception as e:
-		raise e
+	#except Exception as e:
+	#	raise e
 	finally:
 		# Aggiorno l'ultimo valore
 		# commercialista("ultimo_valore", valore_attuale)

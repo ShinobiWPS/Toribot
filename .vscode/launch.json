@@ -12,17 +12,16 @@
       "args": ["DoubleM", "log", "dev"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
-    } /*,
-
+    },
     {
-      "name": "Play B dev log", //dev:statici + log
+      "name": "Play MemoryM dev ", //dev:statici
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["B", "log", "dev"],
+      "args": ["MemoryM", "log", "dev"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
-    },
+    } /*,
 
     {
       "name": "Play B log", //produzione:websocket + log

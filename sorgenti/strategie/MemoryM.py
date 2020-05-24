@@ -2,7 +2,10 @@ import json
 import logging
 import os
 import sys
+import time
 from datetime import datetime
+
+import numpy as np
 
 import utilita.GestoreRapporti as GestoreRapporti
 from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
@@ -12,12 +15,13 @@ from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 
 primo_acquisto = True
 # Se Fattore d'approssimazione a 8 Strategia B, se inferiore di 8 strategia B+An
-BR_Fattore_Approssimazionoe = 8
-BR_Fattore_Perdita = 100
+BR_Fattore_Approssimazione = 8
+BR_Fattore_Perdita = 0
 FEE = 0.5
+NUMERO_CAMPIONI = 200
 
 def gestore(valore_attuale):
-	global primo_acquisto, BR_Fattore_Approssimazionoe
+	global primo_acquisto, BR_Fattore_Approssimazione
 	cripto, soldi = portafoglio()
 
 	try:
@@ -27,26 +31,17 @@ def gestore(valore_attuale):
 		# Se ho soldi
 		if soldi:
 			ultimo_valore, valore_acquisto = commercialista()
-
-			# Se il valore attuale è maggiore dell'ultimo valore
-			#todo-fai round all inizio e basta,rimuovi i round sparsi
-			if round(
-			    valore_attuale,
-			    BR_Fattore_Approssimazionoe) < ultimo_valore or primo_acquisto:
-				primo_acquisto = False
+			if len(ultimo_valore)==NUMERO_CAMPIONI and valore_attuale > sum(ultimo_valore)/len(ultimo_valore):
 				# Compro
 				compro(soldi, valore_attuale)
+
 		#_____________________ Vendere _____________________________
 		# Se ho criptomonete
 		elif cripto:
 			ultimo_valore, valore_acquisto = commercialista()
-
-			# Se il valore attuale è maggiore dal valore d'acquisto (in caso opposto perderei i soldi)
-			if BR_Fattore_Perdita == None or valore_acquisto - round(valore_attuale,BR_Fattore_Approssimazionoe) <= BR_Fattore_Perdita:# - (cripto*valore_attuale*0.5/100):
-			# if cripto*valore_acquisto - cripto*valore_attuale <= BR_Fattore_Perdita - (cripto*valore_attuale*FEE/100*2):
-				# Se il valore attuale è minore dell'ultimo valore, sta scendendo (forse)
-				if round(valore_attuale,
-				         BR_Fattore_Approssimazionoe) > ultimo_valore:
+			# GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,str(valore_attuale-(valore_acquisto + BR_Fattore_Perdita*valore_attuale/100 + valore_attuale*FEE*2/100)))
+			if len(ultimo_valore)==NUMERO_CAMPIONI and valore_attuale > valore_acquisto + BR_Fattore_Perdita*valore_attuale/100 + valore_attuale*FEE*2/100:
+				if valore_attuale < sum(ultimo_valore)/len(ultimo_valore):
 					# Vendo
 					vendo(cripto, valore_attuale)
 		#_______FINE STRATEGIA_____________________________________
@@ -54,7 +49,18 @@ def gestore(valore_attuale):
 		raise e
 	finally:
 		# Aggiorno l'ultimo valore
-		commercialista("ultimo_valore", valore_attuale)
+		# commercialista("ultimo_valore", valore_attuale)
+		ultimo_valore, valore_acquisto = commercialista()
+		if len(ultimo_valore)>=NUMERO_CAMPIONI:
+			ultimo_valore.pop(0)
+		ultimo_valore.append(valore_attuale)
+		commercialista("ultimo_valore", ultimo_valore)
+
+
+def moving_average(a, n=20) :
+	ret = np.cumsum(a, dtype=float)
+	ret[n:] = ret[n:] - ret[:-n]
+	return ret[n - 1:] / n
 
 
 
@@ -66,7 +72,7 @@ def compro(soldi, valore_attuale):
 
 		if "dev" in sys.argv[1:]:
 			cripto_converted = soldi / valore_attuale
-			cripto_feeded = cripto_converted #- cripto_converted * FEE / 100
+			cripto_feeded = cripto_converted - cripto_converted * FEE / 100
 			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto [" + str(valore_attuale) + "] " +
 						str(soldi) + " -> " +
 						str(round(cripto_feeded, 8)))
@@ -135,7 +141,7 @@ def vendo(cripto, valore_attuale):
 
 		if "dev" in sys.argv[1:]:
 			soldi_converted = cripto * valore_attuale
-			soldi_feeded = soldi_converted #- soldi_converted * FEE / 100
+			soldi_feeded = soldi_converted - soldi_converted * FEE / 100
 			# Resetto il valore d'acquisto, dato che non ho più roba
 			commercialista("valore_acquisto", 0)
 			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Vendita [" + str(valore_attuale) + "] " +

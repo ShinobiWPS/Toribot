@@ -42,7 +42,7 @@ def avvio(argv):
 
 	if "dev" in argv:
 		portafoglio("cripto", 0)
-		portafoglio("soldi", 29)
+		portafoglio("soldi", 100)
 		commercialista("ultimo_valore", [])
 		commercialista("valore_acquisto", 0)
 	cripto, soldi = portafoglio()
@@ -68,7 +68,7 @@ def avvio(argv):
 	if cripto:
 		ultimo_valore, valore_acquisto = commercialista()
 		print(
-		    "Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
+		    "Finisco con " + str(round(cripto * ultimo_valore[-1], 2)) + " " +
 		    str(MONETA)
 		)
 		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
@@ -76,7 +76,7 @@ def avvio(argv):
 		)
 		#GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(cripto * (ultimo_valore if ultimo_valore > valore_acquisto else valore_acquisto), 2)) + " " + str(MONETA))
 		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
-		    dt_string+" Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
+		    dt_string+" Finisco con " + str(round(cripto * ultimo_valore[-1], 2)) + " " +
 		    str(MONETA)
 		)
 	sys.stdout.flush()
@@ -89,7 +89,7 @@ def processaNuovoPrezzo(attuale):
 
 # _____________________________________elabora i dati inseriti da noi__________________-
 def dati_statici():
-	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_btcusd_54h.csv') as csvFile:
+	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_xrpeur_125h.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
 			if riga and riga[0]:
