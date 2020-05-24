@@ -89,7 +89,7 @@ def processaNuovoPrezzo(attuale):
 
 # _____________________________________elabora i dati inseriti da noi__________________-
 def dati_statici():
-	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_btcusd_54h.csv') as csvFile:
+	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_xrpeur_67h.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
 			if riga and riga[0]:
@@ -116,7 +116,7 @@ def dati_da_Bitstamp_websocket():
 			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
 		portafoglio("cripto", cripto_balance)
 		if cripto_balance!=cripto:
-			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(cripto_balance-cripto,5))+" "+str(CRIPTOMONETA))
+			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(cripto_balance-cripto,8))+" "+str(CRIPTOMONETA))
 
 
 		# questo mostra piu informazioni se True
