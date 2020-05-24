@@ -13,20 +13,20 @@ API_SECRET = b'wQww0PWWRP7z1kwYbCvo9NSovcTPCAhc'
 
 content_type = 'application/x-www-form-urlencoded'
 
-def buy(xrp:float):
-	return buyORsell('buy',str(xrp))
+def buy(soldi:float):
+	return buyORsell('buy',str(soldi))
 
 def sell(xrp:float):
 	return buyORsell('sell',str(xrp))
 
 
-def buyORsell(operation:str,xrp:str):
+def buyORsell(operation:str,soldi:str):
 	"""Make a BUY or SELL request
 
 	Arguments:
 
 		operation {str} -- operazione
-		xrp {str} -- ammontare di XRP
+		soldi {str} -- ammontare di XRP
 
 	Raises:
 
@@ -39,7 +39,7 @@ def buyORsell(operation:str,xrp:str):
 	"""
 	timestamp = str(int(round(time.time() * 1000)))
 	nonce = str(uuid.uuid4())
-	payload = {'amount': xrp}
+	payload = {'amount': soldi}
 	payload_string = urlencode(payload)
 
 	# '' (empty string) in message represents any query parameters or an empty string in case there are none
