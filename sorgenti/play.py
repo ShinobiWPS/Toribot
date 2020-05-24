@@ -41,10 +41,10 @@ def avvio(argv):
 	GestoreRapporti.FileWrite(TRADING_REPORT_FILENAME,"")
 
 	if "dev" in argv:
-		cripto, soldi = portafoglio("cripto", 0)
-		cripto, soldi = portafoglio("soldi", 29)
-		ultimo_valore, valore_acquisto = commercialista("ultimo_valore", 0)
-		ultimo_valore, valore_acquisto = commercialista("valore_acquisto", 0)
+		portafoglio("cripto", 0)
+		portafoglio("soldi", 29)
+		commercialista("ultimo_valore", [])
+		commercialista("valore_acquisto", 0)
 	cripto, soldi = portafoglio()
 	if soldi:
 		print("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
@@ -89,7 +89,7 @@ def processaNuovoPrezzo(attuale):
 
 # _____________________________________elabora i dati inseriti da noi__________________-
 def dati_statici():
-	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_xrpeur_67h.csv') as csvFile:
+	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_btcusd_54h.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
 			if riga and riga[0]:

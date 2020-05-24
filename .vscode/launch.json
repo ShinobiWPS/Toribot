@@ -5,14 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Play B dev ", //dev:statici
+      "name": "Play MM dev ", //dev:statici
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["B", "dev"],
+      "args": ["DoubleM", "log", "dev"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
-    },
+    } /*,
 
     {
       "name": "Play B dev log", //dev:statici + log
@@ -99,6 +99,6 @@
       "args": ["B"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
-    }
+    }*/
   ]
 }
