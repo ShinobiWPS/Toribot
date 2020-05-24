@@ -7,9 +7,7 @@ from urllib.parse import urlencode
 
 import requests
 
-client_id = 'Shinobi'
-api_key = 'hn7US4TKEVRRo4G6NUM1K8dUbnZ5GMrI'
-API_SECRET = b'wQww0PWWRP7z1kwYbCvo9NSovcTPCAhc'
+from piattaforme.bitstamp.key import API_SECRET, api_key, client_id
 
 content_type = 'application/x-www-form-urlencoded'
 
