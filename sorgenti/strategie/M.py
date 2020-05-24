@@ -10,6 +10,7 @@ from piattaforme.bitstamp.bitstampRequests import (buy, getBalance,
                                                    getOrderStatus, sell)
 from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 
+FEE = 0.5
 
 def gestore(valore_attuale):
 	cripto, soldi = portafoglio()
@@ -34,8 +35,7 @@ def gestore(valore_attuale):
 		ultimo_valore, valore_acquisto = commercialista()
 	
 		# Se il valore attuale è maggiore dal valore d'acquisto (in caso opposto perderei i soldi)
-		if cripto*valore_attuale > cripto*valore_acquisto + (cripto*valore_attuale*0.5/100*2):
-			print(str(cripto*valore_attuale)+" > "+str(cripto*valore_acquisto)+" + "+str((cripto*valore_attuale*0.5/100*2)))
+		if cripto*valore_attuale > cripto*valore_acquisto + (cripto*valore_attuale*FEE/100*2):
 			# Se il valore attuale è minore dell'ultimo valore, sta scendendo (forse)
 			if valore_attuale < ultimo_valore:
 				# Vendo
@@ -55,7 +55,7 @@ def compro(soldi, valore_attuale):
 
 		if "dev" in sys.argv[1:]:
 			cripto_converted = soldi / valore_attuale
-			cripto_feeded = cripto_converted - cripto_converted * 0.5 / 100
+			cripto_feeded = cripto_converted - cripto_converted * FEE / 100
 			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto [" + str(valore_attuale) + "] " +
 						str(soldi) + " -> " +
 						str(round(cripto_feeded, 8)))
@@ -65,7 +65,6 @@ def compro(soldi, valore_attuale):
 		else:
 
 			# balance
-			logging.info("buy / balance")
 			balance = json.loads(getBalance())
 			if balance:
 				GestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
@@ -75,9 +74,7 @@ def compro(soldi, valore_attuale):
 
 				# check order status
 				ultimo_id = ultimo_id_ordine()
-				logging.info("buy / order status")
 				if ultimo_id:
-					logging.info("buy / last order id: "+str(ultimo_id))
 					status = json.loads(getOrderStatus(ultimo_id))
 					GestoreRapporti.JsonWrites("log/buy_getOrderStatus.json","w+",status)
 					status = status["status"] if "status" in status else None
@@ -85,20 +82,13 @@ def compro(soldi, valore_attuale):
 				if soldi and soldi_balance and soldi != soldi_balance:
 					GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Aggiunti soldi manualmente: "+str(soldi_balance-soldi))
 
-				logging.info("can buy1: "+str(soldi_balance))
-				logging.info("can buy2: "+str(not ultimo_id ))
-				if ultimo_id:
-					logging.info("can buy3: "+str(status and status.lower() == "finished"))
 				if soldi_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
 					# order
-					logging.info("buy / buy")
-					logging.info(str(soldi_balance)+" -> "+str(soldi_balance / valore_attuale))
 					soldi_balance_feeded = soldi_balance - ( soldi_balance * fee / 100 )
 					# result = json.loads(buy(round(soldi_balance / valore_attuale,8)))
 					result = json.loads(buy(round(soldi_balance,8)))
 					GestoreRapporti.JsonWrites("log/buy_buy.json","w+",result)
 					if "id" in result:
-						logging.info("buy / buy success")
 						ultimo_id_ordine(result["id"] if "id" in result else None)
 						prezzo_ordine = float(result["price"]) if "price" in result else None
 
@@ -115,8 +105,6 @@ def compro(soldi, valore_attuale):
 
 						# logging.error(result["status"]+": "+result["reason"])
 						logging.error(result)
-			else:
-				logging.error("Balance api error")
 	except Exception as e:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -136,7 +124,7 @@ def vendo(cripto, valore_attuale):
 
 		if "dev" in sys.argv[1:]:
 			soldi_converted = cripto * valore_attuale
-			soldi_feeded = soldi_converted - soldi_converted * 0.5 / 100
+			soldi_feeded = soldi_converted - soldi_converted * FEE / 100
 			# Resetto il valore d'acquisto, dato che non ho più roba
 			commercialista("valore_acquisto", 0)
 			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Vendita [" + str(valore_attuale) + "] " +
@@ -146,7 +134,6 @@ def vendo(cripto, valore_attuale):
 			portafoglio("cripto", 0)
 		else:
 			# balance
-			logging.info("sell / balance")
 			balance = json.loads(getBalance())
 			if balance:
 				GestoreRapporti.JsonWrites("log/sell_balance.json","w+",balance)
@@ -156,9 +143,7 @@ def vendo(cripto, valore_attuale):
 
 				# check order status
 				ultimo_id = ultimo_id_ordine()
-				logging.info("sell / order status")
 				if ultimo_id:
-					logging.info("sell / last order id: "+str(ultimo_id))
 					status = json.loads(getOrderStatus(ultimo_id))
 					GestoreRapporti.JsonWrites("log/sell_getOrderStatus.json","w+",status)
 					status = status["status"] if "status" in status else None
@@ -166,17 +151,12 @@ def vendo(cripto, valore_attuale):
 				if cripto and cripto_balance and cripto != cripto_balance:
 					GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Aggiunta cripto manualmente: "+str(cripto_balance-cripto))
 
-				logging.info("can sell: "+str(cripto_balance and ( not ultimo_id or ( status and status.lower() == "finished"))))
 				if cripto_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
 					# order
-					logging.info("sell / sell")
-					logging.info(str(cripto_balance)+" -> ")
 					# result = json.loads(sell(round(cripto_balance * valore_attuale,8)))
 					result = json.loads(sell(round(cripto_balance,8)))
-					logging.info(result)
 					GestoreRapporti.JsonWrites("log/sell_sell.json","w+",result)
 					if "id" in result:
-						logging.info("sell / sell success")
 						ultimo_id_ordine(result["id"] if "id" in result else None)
 						prezzo_ordine = float(result["price"]) if "price" in result else None
 
@@ -197,8 +177,6 @@ def vendo(cripto, valore_attuale):
 
 						# logging.error(result["status"]+": "+result["reason"])
 						logging.error(result)
-			else:
-				logging.error("Balance api error")
 	except Exception as e:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
