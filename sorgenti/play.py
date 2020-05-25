@@ -10,6 +10,7 @@ from datetime import datetime
 import websocket
 
 import utilita.GestoreRapporti as GestoreRapporti
+from _datetime import timedelta
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
 from costanti.dataset_nome_da_usare import DATASET_NOME_DA_USARE
 from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
@@ -92,10 +93,19 @@ def processaNuovoPrezzo(attuale):
 def dati_statici():
 	with open(f'{DATASET_CARTELLA_PERCORSO}/{DATASET_NOME_DA_USARE}.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
+		lastReferenceTime= False
+		timeframe=timedelta(minutes=60)
 		for riga in datiStatici:
 			if riga and riga[0]:
-				# GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,"" + str(riga[1]) + " : " + str(riga[0]))
-				processaNuovoPrezzo(float(riga[0]))
+				tradeTime = datetime.strptime(riga[1], '%d-%m-%Y %H:%M:%S')
+				if lastReferenceTime is False :
+					lastReferenceTime = tradeTime
+				time_difference = tradeTime - lastReferenceTime
+				time_difference_in_minutes = time_difference / timedelta(minutes=1)
+				if time_difference_in_minutes >= timeframe:
+					lastReferenceTime = datetime.datetime.strptime(tradeTime, '%d-%m-%Y %H:%M:%S')
+					# GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,"" + str(riga[1]) + " : " + str(riga[0]))
+					processaNuovoPrezzo(float(riga[0]))
 
 
 # ______________________________________parte con dati websocket______________________________________
@@ -149,7 +159,6 @@ def on_open(ws):
 	})
 	# manda a bitstamp la richiesta di iscriversi al canale di eventi 'live_trades_xrpeur'
 	ws.send(jsonString)
-	# print('Luce verde 🟢🟢🟢')
 	print('Luce verde')
 
 
@@ -170,11 +179,9 @@ def on_message(ws, message: str):
 
 def on_error(ws, error: str):
 	print(error)
-	# print('❌')
 
 
 def on_close(ws):
-	# print("### WebSocketclosed 🔴🔴🔴 ###")
 	print("### WebSocketclosed ###")
 
 
