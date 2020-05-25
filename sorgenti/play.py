@@ -98,7 +98,7 @@ def dati_statici():
 				processaNuovoPrezzo(float(riga[0]))
 
 
-# ______________________________________parte con dati websoket______________________________________
+# ______________________________________parte con dati websocket______________________________________
 def dati_da_Bitstamp_websocket():
 	try:
 		ultimo_id_ordine(0)
