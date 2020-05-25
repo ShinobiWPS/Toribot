@@ -11,6 +11,7 @@ import websocket
 
 import utilita.GestoreRapporti as GestoreRapporti
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
+from costanti.dataset_nome_da_usare import DATASET_NOME_DA_USARE
 from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
 from piattaforme.bitstamp.bitstampRequests import buy, getBalance, sell
 from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
@@ -42,7 +43,7 @@ def avvio(argv):
 
 	if "dev" in argv:
 		cripto, soldi = portafoglio("cripto", 0)
-		cripto, soldi = portafoglio("soldi", 29)
+		cripto, soldi = portafoglio("soldi", 1000)
 		ultimo_valore, valore_acquisto = commercialista("ultimo_valore", 0)
 		ultimo_valore, valore_acquisto = commercialista("valore_acquisto", 0)
 	cripto, soldi = portafoglio()
@@ -89,7 +90,7 @@ def processaNuovoPrezzo(attuale):
 
 # _____________________________________elabora i dati inseriti da noi__________________-
 def dati_statici():
-	with open(f'{DATASET_CARTELLA_PERCORSO}/da_bitstamp_xrpeur_67h.csv') as csvFile:
+	with open(f'{DATASET_CARTELLA_PERCORSO}/{DATASET_NOME_DA_USARE}.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		for riga in datiStatici:
 			if riga and riga[0]:
