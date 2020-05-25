@@ -35,6 +35,14 @@
 - #### Binaria (B)
   ![alt text](B.png)
 - #### Binaria con Rischio (BR)
+
+  > Come la B ma essa accetta un CAP di perdita per evitare di rimanere in attesa di un guadagno certo riducendo difatto il guadagno perche fermo
+
+
+      		- 	BR_Fattore_Approssimazionoe = 8
+      		- 	BR_Fattore_Perdita = -0.01
+      		- 	FEE = 0.5
+
 - #### Montagna (M)
 
   ![alt text](M.png)
@@ -47,7 +55,7 @@
 
 ## Accorgimenti
 
-- piu alta la fee, maggiore il tempo da prendere in considerazione (per giocare sul realtime servirebbe qualcosa inferiore al 0.05% pre trade)
+- maggiore la fee, maggiore il tempo da prendere in considerazione (per giocare sul realtime/minuto servirebbe qualcosa non superiore al 0.1% per trade)
 
 ---
 

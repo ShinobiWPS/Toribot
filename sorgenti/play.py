@@ -44,7 +44,7 @@ def avvio(argv):
 
 	if "dev" in argv:
 		cripto, soldi = portafoglio("cripto", 0)
-		cripto, soldi = portafoglio("soldi", 1000)
+		cripto, soldi = portafoglio("soldi", 100)
 		ultimo_valore, valore_acquisto = commercialista("ultimo_valore", 0)
 		ultimo_valore, valore_acquisto = commercialista("valore_acquisto", 0)
 	cripto, soldi = portafoglio()
