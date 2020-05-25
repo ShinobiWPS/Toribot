@@ -94,16 +94,18 @@ def dati_statici():
 	with open(f'{DATASET_CARTELLA_PERCORSO}/{DATASET_NOME_DA_USARE}.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		lastReferenceTime= False
-		timeframe=timedelta(minutes=60)
+		frequency=timedelta(minutes=120)
 		for riga in datiStatici:
 			if riga and riga[0]:
 				tradeTime = datetime.strptime(riga[1], '%d-%m-%Y %H:%M:%S')
-				if lastReferenceTime is False :
+				if lastReferenceTime is False : #for first-run-only
 					lastReferenceTime = tradeTime
+					processaNuovoPrezzo(float(riga[0]))
 				time_difference = tradeTime - lastReferenceTime
-				time_difference_in_minutes = time_difference / timedelta(minutes=1)
-				if time_difference_in_minutes >= timeframe:
-					lastReferenceTime = datetime.datetime.strptime(tradeTime, '%d-%m-%Y %H:%M:%S')
+				pre_time_difference_in_minutes = time_difference / timedelta(minutes=1)
+				time_difference_in_minutes = timedelta(minutes=pre_time_difference_in_minutes)
+				if time_difference_in_minutes >= frequency:
+					lastReferenceTime = datetime.strptime(riga[1], '%d-%m-%Y %H:%M:%S')
 					# GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,"" + str(riga[1]) + " : " + str(riga[0]))
 					processaNuovoPrezzo(float(riga[0]))
 
