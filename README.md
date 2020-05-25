@@ -34,6 +34,7 @@
 
 - #### Binaria (B)
   ![alt text](B.png)
+- #### Binaria con Rischio (BR)
 - #### Montagna (M)
 
   ![alt text](M.png)
@@ -41,6 +42,12 @@
   ### --Modificatori--
 
   - Approssimazione (1o decimale, 2o decimale, 3o decimale,ecc)
+
+---
+
+## Accorgimenti
+
+- piu alta la fee, maggiore il tempo da prendere in considerazione (per giocare sul realtime servirebbe qualcosa inferiore al 0.05% pre trade)
 
 ---
 
