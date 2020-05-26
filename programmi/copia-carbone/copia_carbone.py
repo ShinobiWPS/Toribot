@@ -6,6 +6,8 @@ from datetime import datetime
 
 import websocket
 
+from costanti.formato_data_ora import FORMATO_DATA_ORA
+
 # ________________roba che serve all'avvio________________
 
 
@@ -15,7 +17,7 @@ def passa_output_al_log_file():
 	    filename="programmi/copia-carbone/da_bitstamp.csv",
 	    filemode="a",
 	    format="%(asctime)s,%(message)s",
-	    datefmt='%d-%m-%Y %H:%M:%S'
+	    datefmt=FORMATO_DATA_ORA
 	)
 
 

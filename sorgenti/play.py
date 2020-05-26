@@ -13,6 +13,7 @@ import utilita.GestoreRapporti as GestoreRapporti
 from _datetime import timedelta
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
 from costanti.dataset_nome_da_usare import DATASET_NOME_DA_USARE
+from costanti.formato_data_ora import FORMATO_DATA_ORA
 from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
 from piattaforme.bitstamp.bitstampRequests import buy, getBalance, sell
 from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
@@ -97,7 +98,7 @@ def dati_statici():
 		frequency=timedelta(minutes=120)
 		for riga in datiStatici:
 			if riga and riga[0]:
-				tradeTime = datetime.strptime(riga[1], '%d-%m-%Y %H:%M:%S')
+				tradeTime = datetime.strptime(riga[1], FORMATO_DATA_ORA)
 				if lastReferenceTime is False : #for first-run-only
 					lastReferenceTime = tradeTime
 					processaNuovoPrezzo(float(riga[0]))
@@ -105,7 +106,7 @@ def dati_statici():
 				pre_time_difference_in_minutes = time_difference / timedelta(minutes=1)
 				time_difference_in_minutes = timedelta(minutes=pre_time_difference_in_minutes)
 				if time_difference_in_minutes >= frequency:
-					lastReferenceTime = datetime.strptime(riga[1], '%d-%m-%Y %H:%M:%S')
+					lastReferenceTime = datetime.strptime(riga[1], FORMATO_DATA_ORA)
 					# GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,"" + str(riga[1]) + " : " + str(riga[0]))
 					processaNuovoPrezzo(float(riga[0]))
 
