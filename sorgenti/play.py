@@ -95,7 +95,7 @@ def dati_statici():
 	with open(f'{DATASET_CARTELLA_PERCORSO}/{DATASET_NOME_DA_USARE}.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		lastReferenceTime= False
-		frequency=timedelta(minutes=120)
+		frequency=timedelta(minutes=0)
 		for riga in datiStatici:
 			if riga and riga[0]:
 				tradeTime = datetime.strptime(riga[1], FORMATO_DATA_ORA)
