@@ -93,7 +93,7 @@ def processaNuovoPrezzo(attuale):
 	if not attuale in ULTIMI_VALORI:
 		strategiaModulo.gestore(attuale)
 		ULTIMI_VALORI.append(attuale)
-		if len(ULTIMI_VALORI) > 5:
+		if len(ULTIMI_VALORI) > NUMERO_ULTIMI_VALORI:
 			ULTIMI_VALORI.pop(0)
 
 
