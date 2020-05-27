@@ -3,7 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-valori.json
 
 # User-specific files
 *.rsuser
@@ -352,3 +351,5 @@ MigrationBackup/
 .ionide/
 
 **/key.py
+valori.json
+**/*copia*.csv
