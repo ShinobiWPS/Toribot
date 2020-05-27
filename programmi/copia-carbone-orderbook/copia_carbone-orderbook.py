@@ -22,7 +22,6 @@ def passa_output_al_log_file():
 
 
 def avvio(argv):
-	print(os.getcwd())
 	passa_output_al_log_file()
 	dati_da_Bitstamp_websocket()
 
@@ -61,7 +60,7 @@ def on_open(ws):
 	})
 	# manda a bitstamp la richiesta di iscriversi al canale di eventi citato sopra
 	ws.send(jsonString)
-	print('Luce verde 🟢🟢🟢')
+	print('Luce verde ')
 	sys.stdout.flush()
 
 
@@ -83,13 +82,12 @@ def on_message(ws, message: str):
 
 
 def on_error(ws, error: str):
-	print(error)
-	print('❌')
+	print('Error:' + error)
 	sys.stdout.flush()
 
 
 def on_close(ws):
-	print("### WebSocketclosed 🔴🔴🔴 ###")
+	print("### WebSocketclosed  ###")
 
 
 avvio(sys.argv[1:])
