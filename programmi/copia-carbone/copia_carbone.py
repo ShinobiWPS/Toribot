@@ -14,7 +14,7 @@ from costanti.formato_data_ora import FORMATO_DATA_ORA
 def passa_output_al_log_file():
 	logging.basicConfig(
 	    level=logging.INFO,
-	    filename="programmi/copia-carbone/da_bitstamp.csv",
+	    filename="programmi/copia-carbone/copia_da_bitstamp.csv",
 	    filemode="a",
 	    format="%(asctime)s,%(message)s",
 	    datefmt=FORMATO_DATA_ORA
