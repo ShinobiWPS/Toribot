@@ -31,6 +31,9 @@ strategiaSigla=sys.argv[1]
 path=f'strategie.{strategiaSigla}'
 strategiaModulo= importlib.import_module(path)
 
+ULTIMI_VALORI = []
+NUMERO_ULTIMI_VALORI = 5
+
 # argv:  gli argomenti tranne il primo perche e' il nome del file
 def avvio(argv):
 	if len(argv) > 0:
@@ -87,7 +90,11 @@ def avvio(argv):
 
 def processaNuovoPrezzo(attuale):
 	# logging.info(attuale)
-	strategiaModulo.gestore(attuale)
+	if not attuale in ULTIMI_VALORI:
+		strategiaModulo.gestore(attuale)
+		ULTIMI_VALORI.append(attuale)
+		if len(ULTIMI_VALORI) > 5:
+			ULTIMI_VALORI.pop(0)
 
 
 # _____________________________________elabora i dati inseriti da noi__________________-
