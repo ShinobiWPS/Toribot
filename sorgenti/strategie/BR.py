@@ -4,7 +4,7 @@ import os
 import sys
 from datetime import datetime
 
-import utilita.GestoreRapporti as GestoreRapporti
+import utilita.gestoreRapporti as gestoreRapporti
 from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
 from piattaforme.bitstamp.bitstampRequests import (buy, getBalance,
                                                    getOrderStatus, sell)
@@ -67,7 +67,7 @@ def compro(soldi, valore_attuale):
 		if "dev" in sys.argv[1:]:
 			cripto_converted = soldi / valore_attuale
 			cripto_feeded = cripto_converted - cripto_converted * FEE / 100
-			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto [" + str(valore_attuale) + "] " +
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto [" + str(valore_attuale) + "] " +
 						str(soldi) + " -> " +
 						str(round(cripto_feeded, 8)))
 			commercialista("valore_acquisto", valore_attuale)
@@ -78,7 +78,7 @@ def compro(soldi, valore_attuale):
 			# balance
 			balance = json.loads(getBalance())
 			if balance:
-				GestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
+				gestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
 				cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
 				soldi_balance = float(balance["eur_available"]) if "eur_available" in balance else None
 				fee = float(balance["xrpeur_fee"]) if "xrpeur_fee" in balance else None
@@ -87,23 +87,23 @@ def compro(soldi, valore_attuale):
 				ultimo_id = ultimo_id_ordine()
 				if ultimo_id:
 					status = json.loads(getOrderStatus(ultimo_id))
-					GestoreRapporti.JsonWrites("log/buy_getOrderStatus.json","w+",status)
+					gestoreRapporti.JsonWrites("log/buy_getOrderStatus.json","w+",status)
 					status = status["status"] if "status" in status else None
 
 				if soldi and soldi_balance and soldi != soldi_balance:
-					GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Aggiunti soldi manualmente: "+str(soldi_balance-soldi))
+					gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Aggiunti soldi manualmente: "+str(soldi_balance-soldi))
 
 				if soldi_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
 					# order
 					soldi_balance_feeded = soldi_balance - ( soldi_balance * fee / 100 )
 					# result = json.loads(buy(round(soldi_balance / valore_attuale,8)))
 					result = json.loads(buy(round(soldi_balance,8)))
-					GestoreRapporti.JsonWrites("log/buy_buy.json","w+",result)
+					gestoreRapporti.JsonWrites("log/buy_buy.json","w+",result)
 					if "id" in result:
 						ultimo_id_ordine(result["id"] if "id" in result else None)
 						prezzo_ordine = float(result["price"]) if "price" in result else None
 
-						GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto [" + str(prezzo_ordine) + "] " +
+						gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto [" + str(prezzo_ordine) + "] " +
 									str(soldi_balance_feeded) + " -> " +
 									str(round(soldi_balance_feeded / prezzo_ordine, 8)))
 						commercialista("valore_acquisto", prezzo_ordine)
@@ -138,7 +138,7 @@ def vendo(cripto, valore_attuale):
 			soldi_feeded = soldi_converted - soldi_converted * FEE / 100
 			# Resetto il valore d'acquisto, dato che non ho più roba
 			commercialista("valore_acquisto", 0)
-			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Vendita [" + str(valore_attuale) + "] " +
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Vendita [" + str(valore_attuale) + "] " +
 						str(cripto) + " -> " +
 						str(round(soldi_feeded, 8)))
 			portafoglio("soldi", round(soldi_feeded, 5))
@@ -147,7 +147,7 @@ def vendo(cripto, valore_attuale):
 			# balance
 			balance = json.loads(getBalance())
 			if balance:
-				GestoreRapporti.JsonWrites("log/sell_balance.json","w+",balance)
+				gestoreRapporti.JsonWrites("log/sell_balance.json","w+",balance)
 				cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
 				soldi_balance = float(balance["eur_available"]) if "eur_available" in balance else None
 				fee = float(balance["xrpeur_fee"]) if "xrpeur_fee" in balance else None
@@ -156,17 +156,17 @@ def vendo(cripto, valore_attuale):
 				ultimo_id = ultimo_id_ordine()
 				if ultimo_id:
 					status = json.loads(getOrderStatus(ultimo_id))
-					GestoreRapporti.JsonWrites("log/sell_getOrderStatus.json","w+",status)
+					gestoreRapporti.JsonWrites("log/sell_getOrderStatus.json","w+",status)
 					status = status["status"] if "status" in status else None
 
 				if cripto and cripto_balance and cripto != cripto_balance:
-					GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Aggiunta cripto manualmente: "+str(cripto_balance-cripto))
+					gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Aggiunta cripto manualmente: "+str(cripto_balance-cripto))
 
 				if cripto_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
 					# order
 					# result = json.loads(sell(round(cripto_balance * valore_attuale,8)))
 					result = json.loads(sell(round(cripto_balance,8)))
-					GestoreRapporti.JsonWrites("log/sell_sell.json","w+",result)
+					gestoreRapporti.JsonWrites("log/sell_sell.json","w+",result)
 					if "id" in result:
 						ultimo_id_ordine(result["id"] if "id" in result else None)
 						prezzo_ordine = float(result["price"]) if "price" in result else None
@@ -176,7 +176,7 @@ def vendo(cripto, valore_attuale):
 
 						# Resetto il valore d'acquisto, dato che non ho più roba
 						commercialista("valore_acquisto", 0)
-						GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Vendita [" + str(prezzo_ordine) + "] " +
+						gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Vendita [" + str(prezzo_ordine) + "] " +
 									str(cripto_balance) + " -> " +
 									str(round(soldi_feeded, 8)))
 						portafoglio("soldi", round(soldi_feeded, 5))

@@ -9,7 +9,7 @@ from datetime import datetime
 
 import websocket
 
-import utilita.GestoreRapporti as GestoreRapporti
+import utilita.gestoreRapporti as gestoreRapporti
 from _datetime import timedelta
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
 from costanti.dataset_nome_da_usare import DATASET_NOME_DA_USARE
@@ -44,7 +44,7 @@ def avvio(argv):
 	dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
 	# pulisco il report prime di scriverci sopra
-	GestoreRapporti.FileWrite(TRADING_REPORT_FILENAME,"")
+	gestoreRapporti.FileWrite(TRADING_REPORT_FILENAME,"")
 
 	if "dev" in argv:
 		cripto, soldi = portafoglio("cripto", 0)
@@ -54,9 +54,9 @@ def avvio(argv):
 	cripto, soldi = portafoglio()
 	if soldi:
 		print("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
-		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
+		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
 	if cripto:
-		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
+		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
 		    dt_string+" Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA)
 		)
 		print("Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA))
@@ -69,7 +69,7 @@ def avvio(argv):
 
 	cripto, soldi = portafoglio()
 	if soldi:
-		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
+		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
 		print("Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
 	if cripto:
 		ultimo_valore, valore_acquisto = commercialista()
@@ -77,11 +77,11 @@ def avvio(argv):
 		    "Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
 		    str(MONETA)
 		)
-		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
+		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
 		    dt_string+" Finisco con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA)
 		)
-		#GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(cripto * (ultimo_valore if ultimo_valore > valore_acquisto else valore_acquisto), 2)) + " " + str(MONETA))
-		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
+		#gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(cripto * (ultimo_valore if ultimo_valore > valore_acquisto else valore_acquisto), 2)) + " " + str(MONETA))
+		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
 		    dt_string+" Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
 		    str(MONETA)
 		)
@@ -114,7 +114,7 @@ def dati_statici():
 				time_difference_in_minutes = timedelta(minutes=pre_time_difference_in_minutes)
 				if time_difference_in_minutes >= frequency:
 					lastReferenceTime = datetime.strptime(riga[1], FORMATO_DATA_ORA)
-					# GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,"" + str(riga[1]) + " : " + str(riga[0]))
+					# gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,"" + str(riga[1]) + " : " + str(riga[0]))
 					processaNuovoPrezzo(float(riga[0]))
 
 
@@ -127,17 +127,17 @@ def dati_da_Bitstamp_websocket():
 		now = datetime.now()
 		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 		cripto, soldi = portafoglio()
-		GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sincronizzo bilancio")
+		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sincronizzo bilancio")
 		balance = json.loads(getBalance())
-		GestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
+		gestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
 		cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
 		soldi_balance = float(balance["eur_available"]) if "eur_available" in balance else None
 		portafoglio("soldi", soldi_balance)
 		if soldi_balance!=soldi:
-			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
 		portafoglio("cripto", cripto_balance)
 		if cripto_balance!=cripto:
-			GestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(cripto_balance-cripto,8))+" "+str(CRIPTOMONETA))
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(cripto_balance-cripto,8))+" "+str(CRIPTOMONETA))
 
 
 		# questo mostra piu informazioni se True
