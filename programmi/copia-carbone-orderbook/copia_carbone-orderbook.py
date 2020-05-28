@@ -9,12 +9,12 @@ import websocket
 from costanti.formato_data_ora import FORMATO_DATA_ORA
 
 # ________________roba che serve all'avvio________________
-
+coppia='xrpeur'
 
 def passa_output_al_log_file():
 	logging.basicConfig(
 	    level=logging.INFO,
-	    filename="programmi/copia-carbone-orderbook/copia_da_bitstamp-orderbook.csv",
+	    filename=f"programmi/copia-carbone-orderbook/copia_da_bitstamp-orderbook-{coppia}.csv",
 	    filemode="a",
 	    format="%(asctime)s,%(message)s",
 	    datefmt=FORMATO_DATA_ORA
@@ -55,7 +55,7 @@ def on_open(ws):
 	jsonString = json.dumps({
 	    "event": "bts:subscribe",
 	    "data": {
-	        "channel": "order_book_xrpeur"
+	        "channel": f"order_book_{coppia}"
 	    }
 	})
 	# manda a bitstamp la richiesta di iscriversi al canale di eventi citato sopra
