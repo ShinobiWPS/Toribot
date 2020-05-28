@@ -36,9 +36,7 @@ NUMERO_ULTIMI_VALORI = 5
 
 # argv:  gli argomenti tranne il primo perche e' il nome del file
 def avvio(argv):
-	if len(argv) > 0:
-		if 'log' in argv:
-			passa_output_al_log_file()
+	passa_output_al_log_file()
 
 	now = datetime.now()
 	dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
