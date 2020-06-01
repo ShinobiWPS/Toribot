@@ -15,11 +15,11 @@
     },
 
     {
-      "name": "Play BR-xrpgbt dev ", //dev:statici +
+      "name": "Play BR-xrpgbp dev ", //dev:statici +
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["BR-xrpgbt", "", "dev"],
+      "args": ["BR-xrpgbp", "", "dev"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },

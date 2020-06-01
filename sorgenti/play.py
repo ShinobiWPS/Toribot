@@ -237,8 +237,7 @@ def ping():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		return 'online', 200
 	return '',404
-"""
-"""
+
 @app.route('/ultimo_valore', methods=['GET'])
 def ultimo_valore():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
@@ -304,7 +303,7 @@ def status():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		global mybot
 		if mybot:
-			return mybot.isAlive(), 200
+			return str(mybot.isAlive()), 200
 		return None, 200
 	return '',404
 
