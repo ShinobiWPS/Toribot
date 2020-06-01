@@ -81,7 +81,7 @@ def compro(soldi, valore_attuale):
 			balance = json.loads(getBalance())
 			if balance:
 				gestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
-				cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
+				#cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
 				soldi_balance = float(balance["gbp_available"]) if "gbp_available" in balance else None
 				fee = float(balance["xrpgbp_fee"]) if "xrpgbp_fee" in balance else None
 
@@ -98,8 +98,8 @@ def compro(soldi, valore_attuale):
 				if soldi_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
 					# order
 					soldi_balance_feeded = soldi_balance - ( soldi_balance * fee / 100 )
-					# result = json.loads(buy(round(soldi_balance / valore_attuale,8)))
-					result = json.loads(buy(round(valore_attuale,5),round(cripto_balance,8)))
+					result = json.loads(buy(round(valore_attuale,5),round(soldi_balance / valore_attuale,8)))
+					#result = json.loads(buy(round(valore_attuale,5),round(cripto_balance,8)))
 					gestoreRapporti.JsonWrites("log/buy_buy.json","w+",result)
 					if "id" in result:
 						ultimo_id_ordine(result["id"] if "id" in result else None)
@@ -167,8 +167,8 @@ def vendo(cripto, valore_attuale):
 
 				if cripto_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
 					# order
-					# result = json.loads(sell(round(cripto_balance * valore_attuale,8)))
-					result = json.loads(sell(round(cripto_balance,8)))
+					result = json.loads(sell(round(valore_attuale,8),round(cripto_balance * valore_attuale,8)))
+					#result = json.loads(sell(round(cripto_balance,8)))
 					gestoreRapporti.JsonWrites("log/sell_sell.json","w+",result)
 					if "id" in result:
 						ultimo_id_ordine(result["id"] if "id" in result else None)
