@@ -97,7 +97,7 @@ def compro(soldi, valore_attuale):
 					# order
 					soldi_balance_feeded = soldi_balance - ( soldi_balance * fee / 100 )
 					# result = json.loads(buy(round(soldi_balance / valore_attuale,8)))
-					result = json.loads(buy(round(soldi_balance,8)))
+					result = json.loads(buy(round(valore_attuale,5),round(cripto_balance,8)))
 					gestoreRapporti.JsonWrites("log/buy_buy.json","w+",result)
 					if "id" in result:
 						ultimo_id_ordine(result["id"] if "id" in result else None)

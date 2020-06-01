@@ -11,20 +11,21 @@ from piattaforme.bitstamp.key import API_SECRET, api_key, client_id
 
 content_type = 'application/x-www-form-urlencoded'
 
-def buy(soldi:float):
-	return buyORsell('buy',str(soldi))
+def buy(price:float,cripto:float):
+	return buyORsell('buy',str(price), str(cripto))
 
-def sell(xrp:float):
-	return buyORsell('sell',str(xrp))
+def sell(price:float,cripto:float):
+	return buyORsell('sell', str(price),str(cripto))
 
 
-def buyORsell(operation:str,soldi:str):
+def buyORsell(operation:str,price:str,cripto:str):
 	"""Make a BUY or SELL request
 
 	Arguments:
 
 		operation {str} -- operazione
-		soldi {str} -- ammontare di XRP
+		price {str} -- prezzo del XRP
+		cripto {str} -- ammontare di XRP
 
 	Raises:
 
@@ -37,7 +38,13 @@ def buyORsell(operation:str,soldi:str):
 	"""
 	timestamp = str(int(round(time.time() * 1000)))
 	nonce = str(uuid.uuid4())
-	payload = {'amount': soldi}
+	payload = {
+		'price':price,
+		'amount':cripto,
+		# vogliamo che si esegua come un instant Order
+		'ioc_order ': 'True',
+		'fok_order ': 'True',
+		}
 	payload_string = urlencode(payload)
 
 	# '' (empty string) in message represents any query parameters or an empty string in case there are none
