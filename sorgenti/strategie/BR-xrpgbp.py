@@ -10,14 +10,16 @@ from piattaforme.bitstamp.bitstampRequests import (buy, getBalance,
                                                    getOrderStatus, sell)
 from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 
-primo_acquisto = True
 # Se Fattore d'approssimazione a 8 Strategia B, se inferiore di 8 strategia B+An
 BR_Fattore_Approssimazionoe = 8
 BR_Fattore_Perdita = -0.01
-FEE = 0.5
+FEE = 0.0
+
+primo_acquisto = True
+closing = False
 
 def gestore(valore_attuale):
-	global primo_acquisto, BR_Fattore_Approssimazionoe
+	global primo_acquisto, closing, BR_Fattore_Approssimazionoe
 	cripto, soldi = portafoglio()
 
 	try:
@@ -25,7 +27,7 @@ def gestore(valore_attuale):
 
 		#_____________________ Comprare _____________________________
 		# Se ho soldi
-		if soldi:
+		if soldi and not closing:
 			ultimo_valore, valore_acquisto = commercialista()
 
 			# Se il valore attuale è maggiore dell'ultimo valore
@@ -43,7 +45,7 @@ def gestore(valore_attuale):
 
 			# Se il valore attuale è maggiore dal valore d'acquisto (in caso opposto perderei i soldi)
 			# if BR_Fattore_Perdita == None or valore_acquisto - round(valore_attuale,BR_Fattore_Approssimazionoe) <= BR_Fattore_Perdita - (cripto*valore_attuale*0.5/100):
-			if cripto*valore_acquisto - cripto*valore_attuale <= BR_Fattore_Perdita - (cripto*valore_attuale*FEE/100*2):
+			if valore_acquisto - valore_attuale <= BR_Fattore_Perdita - (valore_attuale*FEE/100*2):
 				# Se il valore attuale è minore dell'ultimo valore, sta scendendo (forse)
 				if round(valore_attuale,
 				         BR_Fattore_Approssimazionoe) > ultimo_valore:
@@ -79,7 +81,7 @@ def compro(soldi, valore_attuale):
 			balance = json.loads(getBalance())
 			if balance:
 				gestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
-				cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
+				# cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
 				soldi_balance = float(balance["gbp_available"]) if "gbp_available" in balance else None
 				fee = float(balance["xrpgbp_fee"]) if "xrpgbp_fee" in balance else None
 
@@ -117,7 +119,8 @@ def compro(soldi, valore_attuale):
 						# logging.error(result["status"]+": "+result["reason"])
 						logging.error(result)
 	except Exception as e:
-		exc_type, exc_obj, exc_tb = sys.exc_info()
+		# exc_type, exc_obj, exc_tb = sys.exc_info()
+		exc_type, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 		logging.info(e)
 		logging.info(exc_type)
@@ -149,7 +152,7 @@ def vendo(cripto, valore_attuale):
 			if balance:
 				gestoreRapporti.JsonWrites("log/sell_balance.json","w+",balance)
 				cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
-				soldi_balance = float(balance["gbp_available"]) if "gbp_available" in balance else None
+				# soldi_balance = float(balance["gbp_available"]) if "gbp_available" in balance else None
 				fee = float(balance["xrpgbp_fee"]) if "xrpgbp_fee" in balance else None
 
 				# check order status
@@ -189,7 +192,8 @@ def vendo(cripto, valore_attuale):
 						# logging.error(result["status"]+": "+result["reason"])
 						logging.error(result)
 	except Exception as e:
-		exc_type, exc_obj, exc_tb = sys.exc_info()
+		# exc_type, exc_obj, exc_tb = sys.exc_info()
+		exc_type, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 		logging.info(e)
 		logging.info(exc_type)
