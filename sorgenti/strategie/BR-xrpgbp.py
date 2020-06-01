@@ -81,7 +81,7 @@ def compro(soldi, valore_attuale):
 			balance = json.loads(getBalance())
 			if balance:
 				gestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
-				# cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
+				cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
 				soldi_balance = float(balance["gbp_available"]) if "gbp_available" in balance else None
 				fee = float(balance["xrpgbp_fee"]) if "xrpgbp_fee" in balance else None
 
