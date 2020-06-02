@@ -375,7 +375,7 @@ if __name__ == "__main__":
 		mybot = threading.Thread(target=avvio, daemon=True)
 		mybot.start()
 
-		tg_bot = TelegramBot(True)
+		tg_bot = TelegramBot(False)
 
 		app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False, threaded=True)
 		
