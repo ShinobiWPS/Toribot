@@ -59,6 +59,18 @@
 
 ---
 
+## Telegram bot
+
+- /balance - Bilancio
+- /status - verifica che il websocket e la strategia siano in esecuzione
+- /stop_toribot - Dice alla strategia di vendere e non ricomprare più
+- /start_toribot - Avvia "Avvio()"
+- /stop
+- /start - Tuo ID
+- /shutdown - spegne tutto
+
+---
+
 ## VSCode
 
 - il file .env con il vscode workspace.json sono necessari solo temporaneamente per ovviare al bug di intelliCode (a volte mostra import irrisolti, ma sono falsi negativi) perche usa una preview di Microsoft Python Language Analisys
