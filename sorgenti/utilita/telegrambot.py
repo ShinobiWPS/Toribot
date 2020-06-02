@@ -29,12 +29,13 @@ class TelegramBot(object):
 
 	_offset = 0
 
-	def __init__(self):
+	def __init__(self, isLoop = False):
 		self.tg_bot = telepot.Bot(self.token)
-		MessageLoop(self.tg_bot, {
-					'chat': self.messageHandler,
-                  	'callback_query': self.callbackHandler
-                  }).run_as_thread()
+		if isLoop:
+			MessageLoop(self.tg_bot, {
+						'chat': self.messageHandler,
+        	          	'callback_query': self.callbackHandler
+        	          }).run_as_thread()
 
 
 	def __del__(self):

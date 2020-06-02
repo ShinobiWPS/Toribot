@@ -5,14 +5,16 @@ import sys
 from datetime import datetime
 
 import utilita.gestoreRapporti as gestoreRapporti
+from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
 from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
 from piattaforme.bitstamp.bitstampRequests import (buy, getBalance,
                                                    getOrderStatus, sell)
 from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
+from utilita.telegramBot import TelegramBot
 
 # Se Fattore d'approssimazione a 8 Strategia B, se inferiore di 8 strategia B+An
 BR_Fattore_Approssimazionoe = 8
-BR_Fattore_Perdita = -0.01
+BR_Fattore_Perdita = 0.01
 FEE = 0.0
 
 primo_acquisto = True
@@ -62,7 +64,13 @@ def gestore(valore_attuale):
 
 def compro(soldi, valore_attuale):
 
+
+
 	try:
+
+		tg_bot = TelegramBot()
+
+
 		now = datetime.now()
 		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
@@ -116,6 +124,9 @@ def compro(soldi, valore_attuale):
 						if soldi_balance:
 							portafoglio("soldi", soldi_balance)
 
+						if tg_bot:
+							tg_bot.sendMessage(TELEGRAM_ID,result)
+
 						# logging.error(result["status"]+": "+result["reason"])
 						logging.error(result)
 	except Exception as e:
@@ -131,6 +142,10 @@ def compro(soldi, valore_attuale):
 def vendo(cripto, valore_attuale):
 
 	try:
+
+
+		tg_bot = TelegramBot()
+
 
 		now = datetime.now()
 		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -187,6 +202,10 @@ def vendo(cripto, valore_attuale):
 					else:
 						if cripto_balance:
 							portafoglio("cripto", cripto_balance)
+
+						if tg_bot:
+							tg_bot.sendMessage(TELEGRAM_ID,result)
+
 
 						# logging.error(result["status"]+": "+result["reason"])
 						logging.error(result)
