@@ -331,7 +331,7 @@ def status():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		global mybot
 		if mybot:
-			return str(mybot.isAlive() or isOpenWS), 200
+			return str(mybot.is_alive() or isOpenWS), 200
 		return None, 200
 	return '',404
 
