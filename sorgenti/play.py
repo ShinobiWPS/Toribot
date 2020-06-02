@@ -28,14 +28,14 @@ from utilita.telegramBot import TelegramBot
 CRIPTOVALUTA = "Ripple"
 CRIPTOMONETA = "XRP"
 VALUTA = "Euro"
-MONETA = VALUTA[0:3] 
+MONETA = VALUTA[0:3]
 
 
 # Inizializzo API
 app = Flask(__name__)
 CORS(app)
 
-# Inizializzo 
+# Inizializzo
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.WARNING)
 
@@ -271,7 +271,7 @@ def ultimo_valore():
 		ultimo_valore = commercialista()[0]
 		return str(ultimo_valore), 200
 	return '',404
-	
+
 @app.route('/imposta_ultimo_valore', methods=['GET'])
 def imposta_ultimo_valore():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
@@ -349,7 +349,7 @@ def stop():
 def start_as_daemon():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		global STOP, mybot
-		# resetta i vari stop	
+		# resetta i vari stop
 		STOP = False
 		strategiaModulo.closing = False
 		mybot = threading.Thread(target=avvio, daemon=True)
@@ -378,7 +378,7 @@ if __name__ == "__main__":
 		tg_bot = TelegramBot(False)
 
 		app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False, threaded=True)
-		
+
 	except Exception as ex:
 		logging.error(ex)
 		if tg_bot:
