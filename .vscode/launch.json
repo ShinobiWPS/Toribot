@@ -19,7 +19,16 @@
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["BR-xrpgbp", "", "dev"],
+      "args": ["BR-xrpgbp", "dev"],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Play BR-xrpgbp ", //dev:statici +
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["BR-xrpgbp"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },
