@@ -119,8 +119,7 @@ def compro(soldi, valore_attuale):
 						# logging.error(result["status"]+": "+result["reason"])
 						logging.error(result)
 	except Exception as e:
-		# exc_type, exc_obj, exc_tb = sys.exc_info()
-		exc_type, exc_tb = sys.exc_info()
+		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 		logging.info(e)
 		logging.info(exc_type)
@@ -192,8 +191,7 @@ def vendo(cripto, valore_attuale):
 						# logging.error(result["status"]+": "+result["reason"])
 						logging.error(result)
 	except Exception as e:
-		# exc_type, exc_obj, exc_tb = sys.exc_info()
-		exc_type, exc_tb = sys.exc_info()
+		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 		logging.info(e)
 		logging.info(exc_type)

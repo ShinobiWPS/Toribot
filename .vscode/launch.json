@@ -15,7 +15,7 @@
     },
 
     {
-      "name": "Play BR-xrpgbp dev ", //dev:statici +
+      "name": "Play BR-xrpgbp dev", //dev:statici +
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",

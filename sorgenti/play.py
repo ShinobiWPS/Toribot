@@ -10,12 +10,12 @@ import time
 from datetime import datetime
 
 import websocket
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, request
 from flask_cors import CORS
 
 import utilita.gestoreRapporti as gestoreRapporti
 from _datetime import timedelta
-from costanti.api import API_TOKEN_HASH
+from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
 from costanti.dataset_nome_da_usare import DATASET_NOME_DA_USARE
 from costanti.formato_data_ora import FORMATO_DATA_ORA
@@ -23,6 +23,7 @@ from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
 from piattaforme.bitstamp.bitstampRequests import buy, getBalance, sell
 from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita.log import passa_output_al_log_file
+from utilita.telegramBot import TelegramBot
 
 CRIPTOVALUTA = "Ripple"
 CRIPTOMONETA = "XRP"
@@ -45,6 +46,8 @@ STOP = False
 # ______________________________________roba che serve all'avvio____________________
 ws = None
 mybot = None
+tg_bot = None
+isOpenWS = False
 strategiaSigla=sys.argv[1]
 # no error handling on purpose,
 # we want to crash the bot if a correct strategy name it's not provided
@@ -55,56 +58,67 @@ ULTIMI_VALORI = []
 NUMERO_ULTIMI_VALORI = 5
 
 def avvio():
-	# argv:  gli argomenti tranne il primo perche e' il nome del file
-	argv = sys.argv[1:]
-	passa_output_al_log_file()
+	try:
+		# argv:  gli argomenti tranne il primo perche e' il nome del file
+		argv = sys.argv[1:]
+		passa_output_al_log_file()
 
-	now = datetime.now()
-	dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+		now = datetime.now()
+		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
-	# pulisco il report prime di scriverci sopra
-	gestoreRapporti.FileWrite(TRADING_REPORT_FILENAME,"")
+		# pulisco il report prime di scriverci sopra
+		gestoreRapporti.FileWrite(TRADING_REPORT_FILENAME,"")
 
-	if "dev" in argv:
-		portafoglio("cripto", 0)
-		portafoglio("soldi", 100)
-		commercialista("ultimo_valore", 0)
-		commercialista("valore_acquisto", 0)
-	cripto, soldi = portafoglio()
-	if soldi:
-		print("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
-		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
-	if cripto:
-		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
-		    dt_string+" Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA)
-		)
-		print("Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA))
-	sys.stdout.flush()
+		if "dev" in argv:
+			portafoglio("cripto", 0)
+			portafoglio("soldi", 100)
+			commercialista("ultimo_valore", 0)
+			commercialista("valore_acquisto", 0)
+		cripto, soldi = portafoglio()
+		if soldi:
+			print("Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Inizio con " + str(round(soldi, 2)) + " " + str(MONETA))
+		if cripto:
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
+			    dt_string+" Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA)
+			)
+			print("Inizio con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA))
+		sys.stdout.flush()
 
-	if "dev" in argv:
-		dati_statici()
-	else:
-		dati_da_Bitstamp_websocket()
+		if "dev" in argv:
+			dati_statici()
+		else:
+			dati_da_Bitstamp_websocket()
 
-	cripto, soldi = portafoglio()
-	if soldi:
-		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
-		print("Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
-	if cripto:
-		ultimo_valore = commercialista()[0]
-		print(
-		    "Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
-		    str(MONETA)
-		)
-		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
-		    dt_string+" Finisco con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA)
-		)
-		#gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(cripto * (ultimo_valore if ultimo_valore > valore_acquisto else valore_acquisto), 2)) + " " + str(MONETA))
-		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
-		    dt_string+" Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
-		    str(MONETA)
-		)
-	sys.stdout.flush()
+		cripto, soldi = portafoglio()
+		if soldi:
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
+			print("Finisco con " + str(round(soldi, 2)) + " " + str(MONETA))
+		if cripto:
+			ultimo_valore = commercialista()[0]
+			print(
+			    "Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
+			    str(MONETA)
+			)
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
+			    dt_string+" Finisco con " + str(round(cripto, 3)) + " " + str(CRIPTOMONETA)
+			)
+			#gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Finisco con " + str(round(cripto * (ultimo_valore if ultimo_valore > valore_acquisto else valore_acquisto), 2)) + " " + str(MONETA))
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,
+			    dt_string+" Finisco con " + str(round(cripto * ultimo_valore, 2)) + " " +
+			    str(MONETA)
+			)
+
+	except Exception as ex:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+		print(ex, exc_type, fname, exc_tb.tb_lineno)
+		logging.error(ex)
+
+	finally:
+		if tg_bot and "dev" in argv:
+			tg_bot.sendMessage(TELEGRAM_ID,"Ended")
+		sys.stdout.flush()
 
 
 def processaNuovoPrezzo(attuale):
@@ -180,9 +194,15 @@ def dati_da_Bitstamp_websocket():
 		ws.run_forever()
 	except KeyboardInterrupt:
 		ws.close()
+	except Exception as ex:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+		print(ex, exc_type, fname, exc_tb.tb_lineno)
+		logging.error(ex)
 
 
 def on_open(_ws):
+	global isOpenWS
 	"""Funzione all'aggancio del WebSocket
 
 	Arguments:
@@ -197,6 +217,7 @@ def on_open(_ws):
 	})
 	# manda a bitstamp la richiesta di iscriversi al canale di eventi 'live_trades_xrpeur'
 	_ws.send(jsonString)
+	isOpenWS = True
 	print('Luce verde')
 
 
@@ -216,10 +237,16 @@ def on_message(_ws, message: str):
 
 
 def on_error(_ws, error: str):
+	global isOpenWS
+	isOpenWS = False
 	print(error)
 
 
 def on_close(_ws):
+	global isOpenWS
+	isOpenWS = False
+	if tg_bot:
+		tg_bot.sendMessage(TELEGRAM_ID,"WebSocket closed")
 	print("### WebSocketclosed ###")
 
 
@@ -300,10 +327,11 @@ def imposta_bilancio():
 
 @app.route('/status', methods=['GET'])
 def status():
+	global isOpenWS
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		global mybot
 		if mybot:
-			return str(mybot.isAlive()), 200
+			return str(mybot.isAlive() or isOpenWS), 200
 		return None, 200
 	return '',404
 
@@ -314,17 +342,18 @@ def stop():
 		STOP = True
 		# comunica alla strategie di tirare i remi in barca
 		strategiaModulo.closing = True
-		return 'Stopped', 200
+		return 'Stopping', 200
 	return '',404
 
 @app.route('/start', methods=['GET'])
 def start_as_daemon():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
-		global STOP
+		global STOP, mybot
 		# resetta i vari stop	
 		STOP = False
 		strategiaModulo.closing = False
-		threading.Thread(target=avvio, daemon=True).start()
+		mybot = threading.Thread(target=avvio, daemon=True)
+		mybot.start()
 		return 'Started', 200
 	return '',404
 
@@ -346,12 +375,17 @@ if __name__ == "__main__":
 		mybot = threading.Thread(target=avvio, daemon=True)
 		mybot.start()
 
+		tg_bot = TelegramBot()
+
 		app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False, threaded=True)
 		
 	except Exception as ex:
 		logging.error(ex)
+		if tg_bot:
+			tg_bot.sendMessage(TELEGRAM_ID,"Error, closing")
 	finally:
 		STOP = True
 		strategiaModulo.closing = True
+
 		if ws:
 			ws.close()
