@@ -16,6 +16,9 @@ from flask_cors import CORS
 import utilita.gestoreRapporti as gestoreRapporti
 from _datetime import timedelta
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
+from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME,
+                                      VALUTA_DA_USARE_CRIPTO,
+                                      VALUTA_DA_USARE_SOLDI)
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
 from costanti.dataset_nome_da_usare import DATASET_NOME_DA_USARE
 from costanti.formato_data_ora import FORMATO_DATA_ORA
@@ -25,10 +28,10 @@ from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita.log import passa_output_al_log_file
 from utilita.telegramBot import TelegramBot
 
-CRIPTOVALUTA = "Ripple"
-CRIPTOMONETA = "XRP"
-VALUTA = "Euro"
-MONETA = VALUTA[0:3]
+CRIPTOVALUTA = "Criptomoneta"
+CRIPTOMONETA = VALUTA_DA_USARE_CRIPTO
+VALUTA = "Soldi"
+MONETA = VALUTA_DA_USARE_SOLDI
 
 
 # Inizializzo API
@@ -172,8 +175,8 @@ def dati_da_Bitstamp_websocket():
 		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sincronizzo bilancio")
 		balance = json.loads(getBalance())
 		gestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
-		cripto_balance = float(balance["xrp_available"]) if "xrp_available" in balance else None
-		soldi_balance = float(balance["eur_available"]) if "eur_available" in balance else None
+		cripto_balance = float(balance[f"{VALUTA_DA_USARE_CRIPTO}_available"]) if f"{VALUTA_DA_USARE_CRIPTO}_available" in balance else None
+		soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_available"]) if f"{VALUTA_DA_USARE_SOLDI}_available" in balance else None
 		portafoglio("soldi", soldi_balance)
 		if soldi_balance!=soldi:
 			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
@@ -212,10 +215,10 @@ def on_open(_ws):
 	jsonString = json.dumps({
 	    "event": "bts:subscribe",
 	    "data": {
-	        "channel": "live_trades_xrpeur"
+	        "channel": f"live_trades_{COPPIA_DA_USARE_NOME}"
 	    }
 	})
-	# manda a bitstamp la richiesta di iscriversi al canale di eventi 'live_trades_xrpeur'
+	# manda a bitstamp la richiesta di iscriversi al canale di eventi sopra citato
 	_ws.send(jsonString)
 	isOpenWS = True
 	print('Luce verde')
@@ -229,11 +232,6 @@ def on_message(_ws, message: str):
 		# questo print serve solo a noi per lavorare
 		attuale = messageDict['data']['price']
 		processaNuovoPrezzo(attuale)
-	"""
-		esito = seComprareOVendere(datiDaMessage) -> {azione: compra, quantiXRP: 24} || {}
-		if esito != {}
-			compra(esito)
-		"""
 
 
 def on_error(_ws, error: str):

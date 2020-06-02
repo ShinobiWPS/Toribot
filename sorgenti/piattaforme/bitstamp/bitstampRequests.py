@@ -7,6 +7,9 @@ from urllib.parse import urlencode
 
 import requests
 
+from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME,
+                                      VALUTA_DA_USARE_CRIPTO,
+                                      VALUTA_DA_USARE_SOLDI)
 from piattaforme.bitstamp.key import API_SECRET, api_key, client_id
 
 content_type = 'application/x-www-form-urlencoded'
@@ -24,8 +27,8 @@ def buyORsell(operation:str,price:str,cripto:str):
 	Arguments:
 
 		operation {str} -- operazione
-		price {str} -- prezzo del XRP
-		cripto {str} -- ammontare di XRP
+		price {str} -- prezzo della criptovaluta
+		cripto {str} -- ammontare di criptovaluta
 
 	Raises:
 
@@ -51,7 +54,7 @@ def buyORsell(operation:str,price:str,cripto:str):
 	message = 'BITSTAMP ' + api_key + \
 			 'POST' + \
 			 'www.bitstamp.net' + \
-			 f'/api/v2/{operation}/instant/xrpeur/' + \
+			 f'/api/v2/{operation}/limit/{COPPIA_DA_USARE_NOME}/' + \
 			 '' + \
 			 content_type + \
 			 nonce + \
@@ -70,7 +73,7 @@ def buyORsell(operation:str,price:str,cripto:str):
 		'Content-Type': content_type
 	}
 	r = requests.post(
-		f'https://www.bitstamp.net/api/v2/{operation}/instant/xrpeur/',
+		f'https://www.bitstamp.net/api/v2/{operation}/instant/{COPPIA_DA_USARE_NOME}/',
 		headers=headers,
 		data=payload_string
 	)
@@ -89,15 +92,15 @@ def buyORsell(operation:str,price:str,cripto:str):
 		raise Exception('Signatures do not match')
 
 	print(r.content)
-	# ON BUY ERROR: {"status": "error", "reason": {"__all__": ["You have only 0.00000 EUR available. Check your account balance for details."]}}
+	# ON BUY ERROR: {"status": "error", "reason": {"__all__": ["You have only 0.00000 {SOLDI}} available. Check your account balance for details."]}}
 	# todo- ON SELL ERROR:
 	return r.content
 
 def getBalance():
-	"""Ottieni XRP ed EUR disponibili
+	"""Ottieni Cripto ed Soldi disponibili
 
 	Returns:
-		list -- array di XRP,EUR disponibili
+		list -- array di Cripto,Soldi disponibili
 	"""
 	timestamp = str(int(round(time.time() * 1000)))
 	nonce = str(uuid.uuid4())
@@ -134,10 +137,10 @@ def getBalance():
 	return r.content
 
 def getOrderStatus(order_id):
-	"""Ottieni XRP ed EUR disponibili
+	"""Ottieni Cripto ed Soldi disponibili
 
 	Returns:
-		list -- array di XRP,EUR disponibili
+		list -- array di Cripto,Soldi disponibili
 	"""
 	timestamp = str(int(round(time.time() * 1000)))
 	nonce = str(uuid.uuid4())

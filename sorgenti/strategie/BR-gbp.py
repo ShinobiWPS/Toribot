@@ -6,6 +6,9 @@ from datetime import datetime
 
 import utilita.gestoreRapporti as gestoreRapporti
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
+from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME,
+                                      VALUTA_DA_USARE_CRIPTO,
+                                      VALUTA_DA_USARE_SOLDI)
 from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
 from piattaforme.bitstamp.bitstampRequests import (buy, getBalance,
                                                    getOrderStatus, sell)
@@ -19,6 +22,8 @@ FEE = 0.0
 
 primo_acquisto = True
 closing = False
+
+
 
 def gestore(valore_attuale):
 	global primo_acquisto, closing, BR_Fattore_Approssimazionoe
@@ -89,9 +94,9 @@ def compro(soldi, valore_attuale):
 			balance = json.loads(getBalance())
 			if balance:
 				gestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
-				#cripto_balance = float(balance["btc_available"]) if "btc_available" in balance else None
-				soldi_balance = float(balance["gbp_available"]) if "gbp_available" in balance else None
-				fee = float(balance["btcgbp_fee"]) if "btcgbp_fee" in balance else None
+				#cripto_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}available"]) if f"{VALUTA_DA_USARE_CRIPTO}_available" in balance else None
+				soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_available"]) if f"{VALUTA_DA_USARE_SOLDI}_available" in balance else None
+				fee = float(balance[f"{COPPIA_DA_USARE_NOME}_fee"]) if f"{COPPIA_DA_USARE_NOME}_fee" in balance else None
 
 				# check order status
 				ultimo_id = ultimo_id_ordine()
@@ -125,7 +130,7 @@ def compro(soldi, valore_attuale):
 							portafoglio("soldi", soldi_balance)
 
 						if tg_bot:
-							tg_bot.sendMessage(TELEGRAM_ID,result)
+							tg_bot.sendMessage(TELEGRAM_ID, result['reason']['__all__'][0]) #todo- printa tutti i reason
 
 						# logging.error(result["status"]+": "+result["reason"])
 						logging.error(result)
@@ -165,9 +170,9 @@ def vendo(cripto, valore_attuale):
 			balance = json.loads(getBalance())
 			if balance:
 				gestoreRapporti.JsonWrites("log/sell_balance.json","w+",balance)
-				cripto_balance = float(balance["btc_available"]) if "btc_available" in balance else None
-				# soldi_balance = float(balance["gbp_available"]) if "gbp_available" in balance else None
-				fee = float(balance["btcgbp_fee"]) if "btcgbp_fee" in balance else None
+				cripto_balance = float(balance[f"{VALUTA_DA_USARE_CRIPTO}_available"]) if f"{VALUTA_DA_USARE_CRIPTO}_available" in balance else None
+				# soldi_balance = float(balance[f"VALUTA_USATASOLDI_available"]) if f"VALUTA_USATASOLDI_available" in balance else None
+				fee = float(balance[f"{COPPIA_DA_USARE_NOME}_fee"]) if f"{COPPIA_DA_USARE_NOME}_fee" in balance else None
 
 				# check order status
 				ultimo_id = ultimo_id_ordine()
@@ -204,7 +209,7 @@ def vendo(cripto, valore_attuale):
 							portafoglio("cripto", cripto_balance)
 
 						if tg_bot:
-							tg_bot.sendMessage(TELEGRAM_ID,result)
+							tg_bot.sendMessage(TELEGRAM_ID,result['reason']['__all__'][0]) #tod- same as above
 
 
 						# logging.error(result["status"]+": "+result["reason"])

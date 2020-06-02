@@ -15,20 +15,20 @@
     },
 
     {
-      "name": "Play BR-xrpgbp dev", //dev:statici +
+      "name": "Play BR-gbp dev", //dev:statici +
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["BR-xrpgbp", "dev"],
+      "args": ["BR-gbp", "dev"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "Play BR-xrpgbp ", //dev:statici +
+      "name": "Play BR-gbp ", //dev:statici +
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["BR-xrpgbp"],
+      "args": ["BR-gbp"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },
