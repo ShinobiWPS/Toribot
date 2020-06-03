@@ -17,7 +17,7 @@ from utilita.telegramBot import TelegramBot
 
 # Se Fattore d'approssimazione a 8 Strategia B, se inferiore di 8 strategia B+An
 BR_Fattore_Approssimazionoe = 8
-BR_Fattore_Perdita = 0.01
+BR_Fattore_Perdita = 10
 FEE = 0.0
 
 primo_acquisto = True
@@ -82,9 +82,9 @@ def compro(soldi, valore_attuale):
 		if "dev" in sys.argv[1:]:
 			cripto_converted = soldi / valore_attuale
 			cripto_feeded = cripto_converted - cripto_converted * FEE / 100
-			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto [" + str(valore_attuale) + "] " +
-						str(soldi) + " -> " +
-						str(round(cripto_feeded, 8)))
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto al prezzo di [" + str(valore_attuale) + "] usando " +
+						str(soldi) + VALUTA_DA_USARE_SOLDI +" -> " +
+						str(round(cripto_feeded, 8)) + " " + VALUTA_DA_USARE_CRIPTO)
 			commercialista("valore_acquisto", valore_attuale)
 			portafoglio("cripto", round(cripto_feeded, 8))
 			portafoglio("soldi", 0)
@@ -94,8 +94,8 @@ def compro(soldi, valore_attuale):
 			balance = json.loads(getBalance())
 			if balance:
 				gestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
-				#cripto_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}available"]) if f"{VALUTA_DA_USARE_CRIPTO}_available" in balance else None
-				soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_available"]) if f"{VALUTA_DA_USARE_SOLDI}_available" in balance else None
+				#cripto_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}balance"]) if f"{VALUTA_DA_USARE_CRIPTO}_balance" in balance else None
+				soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_balance"]) if f"{VALUTA_DA_USARE_SOLDI}_balance" in balance else None
 				fee = float(balance[f"{COPPIA_DA_USARE_NOME}_fee"]) if f"{COPPIA_DA_USARE_NOME}_fee" in balance else None
 
 				# check order status
@@ -114,13 +114,15 @@ def compro(soldi, valore_attuale):
 					result = json.loads(buy(round(valore_attuale,5),round(soldi_balance / valore_attuale,8)))
 					#result = json.loads(buy(round(valore_attuale,5),round(cripto_balance,8)))
 					gestoreRapporti.JsonWrites("log/buy_buy.json","w+",result)
+					print(">>> Buy result:")
+					print(result)
 					if "id" in result:
 						ultimo_id_ordine(result["id"] if "id" in result else None)
 						prezzo_ordine = float(result["price"]) if "price" in result else None
 
-						gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto [" + str(prezzo_ordine) + "] " +
-									str(soldi_balance_feeded) + " -> " +
-									str(round(soldi_balance_feeded / prezzo_ordine, 8)))
+						gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto al prezzo di [" + str(prezzo_ordine) + "] usando" +
+									str(soldi_balance_feeded)+ VALUTA_DA_USARE_SOLDI + " -> " +
+									str(round(soldi_balance_feeded / prezzo_ordine, 8))+ " " + VALUTA_DA_USARE_CRIPTO)
 						commercialista("valore_acquisto", prezzo_ordine)
 						portafoglio("cripto", round(soldi_balance_feeded / prezzo_ordine, 8))
 						portafoglio("soldi", 0)
@@ -160,9 +162,9 @@ def vendo(cripto, valore_attuale):
 			soldi_feeded = soldi_converted - soldi_converted * FEE / 100
 			# Resetto il valore d'acquisto, dato che non ho più roba
 			commercialista("valore_acquisto", 0)
-			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Vendita [" + str(valore_attuale) + "] " +
-						str(cripto) + " -> " +
-						str(round(soldi_feeded, 8)))
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Vendita al prezzo di [" + str(valore_attuale) + "] usando " +
+						str(cripto) + VALUTA_DA_USARE_CRIPTO + " -> " +
+						str(round(soldi_feeded, 8))+  VALUTA_DA_USARE_SOLDI)
 			portafoglio("soldi", round(soldi_feeded, 5))
 			portafoglio("cripto", 0)
 		else:
@@ -170,8 +172,8 @@ def vendo(cripto, valore_attuale):
 			balance = json.loads(getBalance())
 			if balance:
 				gestoreRapporti.JsonWrites("log/sell_balance.json","w+",balance)
-				cripto_balance = float(balance[f"{VALUTA_DA_USARE_CRIPTO}_available"]) if f"{VALUTA_DA_USARE_CRIPTO}_available" in balance else None
-				# soldi_balance = float(balance[f"VALUTA_USATASOLDI_available"]) if f"VALUTA_USATASOLDI_available" in balance else None
+				cripto_balance = float(balance[f"{VALUTA_DA_USARE_CRIPTO}_balance"]) if f"{VALUTA_DA_USARE_CRIPTO}_balance" in balance else None
+				# soldi_balance = float(balance[f"VALUTA_USATASOLDI_balance"]) if f"VALUTA_USATASOLDI_balance" in balance else None
 				fee = float(balance[f"{COPPIA_DA_USARE_NOME}_fee"]) if f"{COPPIA_DA_USARE_NOME}_fee" in balance else None
 
 				# check order status
@@ -186,7 +188,9 @@ def vendo(cripto, valore_attuale):
 
 				if cripto_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
 					# order
-					result = json.loads(sell(round(valore_attuale,8),round(cripto_balance * valore_attuale,8)))
+					result = json.loads(sell(round(valore_attuale,8),round(cripto_balance,8)))
+					print(">>> Sell result:")
+					print(result)
 					#result = json.loads(sell(round(cripto_balance,8)))
 					gestoreRapporti.JsonWrites("log/sell_sell.json","w+",result)
 					if "id" in result:
@@ -198,9 +202,9 @@ def vendo(cripto, valore_attuale):
 
 						# Resetto il valore d'acquisto, dato che non ho più roba
 						commercialista("valore_acquisto", 0)
-						gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Vendita [" + str(prezzo_ordine) + "] " +
-									str(cripto_balance) + " -> " +
-									str(round(soldi_feeded, 8)))
+						gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Vendita al prezzo di [" + str(prezzo_ordine) + "] usando " +
+									str(cripto_balance) +VALUTA_DA_USARE_CRIPTO + " -> " +
+									str(round(soldi_feeded, 8))+ VALUTA_DA_USARE_SOLDI)
 						portafoglio("soldi", round(soldi_feeded, 5))
 						portafoglio("cripto", 0)
 
