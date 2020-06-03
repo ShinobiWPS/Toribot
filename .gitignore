@@ -353,3 +353,4 @@ MigrationBackup/
 **/key.py
 valori.json
 **/*copia*.csv
+**/nohup.out
