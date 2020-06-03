@@ -24,7 +24,7 @@
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "Play BR-gbp ", //dev:statici +
+      "name": "Play BR-gbp ",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
