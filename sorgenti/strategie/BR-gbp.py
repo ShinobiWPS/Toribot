@@ -140,7 +140,7 @@ def compro(soldi, valore_attuale):
 		logging.info(e)
 		logging.info(exc_type)
 		logging.info(fname)
-		logging.info(exc_tb.tb_lineno)
+		logging.info(f'Line: {exc_tb.tb_lineno}')
 		print(e, exc_type, fname, exc_tb.tb_lineno)
 
 
@@ -220,5 +220,5 @@ def vendo(cripto, valore_attuale):
 		logging.info(e)
 		logging.info(exc_type)
 		logging.info(fname)
-		logging.info(exc_tb.tb_lineno)
+		logging.info(f'Line: {exc_tb.tb_lineno}')
 		print(e, exc_type, fname, exc_tb.tb_lineno)
