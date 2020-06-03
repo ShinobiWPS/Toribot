@@ -22,6 +22,8 @@ FEE = 0.0
 
 primo_acquisto = True
 closing = False
+force_sell = False
+force_buy = False
 
 
 
@@ -59,6 +61,14 @@ def gestore(valore_attuale):
 					# Vendo
 					vendo(cripto, valore_attuale)
 		#_______FINE STRATEGIA_____________________________________
+		
+		cripto, soldi = portafoglio()
+		if soldi and force_buy:
+			compro(soldi, valore_attuale)
+		if cripto and force_sell:
+			vendo(cripto, valore_attuale)
+
+
 	except Exception as e:
 		raise e
 	finally:

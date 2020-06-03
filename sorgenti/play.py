@@ -23,7 +23,7 @@ from costanti.dataset import DATASET_CARTELLA_PERCORSO
 from costanti.dataset_nome_da_usare import DATASET_NOME_DA_USARE
 from costanti.formato_data_ora import FORMATO_DATA_ORA
 from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
-from piattaforme.bitstamp.bitstampRequests import buy, getBalance, sell
+from piattaforme.bitstamp.bitstampRequests import getBalance
 from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita.log import passa_output_al_log_file
 from utilita.telegramBot import TelegramBot
@@ -174,7 +174,7 @@ def dati_da_Bitstamp_websocket():
 		cripto, soldi = portafoglio()
 		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sincronizzo bilancio")
 		balance = json.loads(getBalance())
-		gestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
+		gestoreRapporti.JsonWrites("log/sync_balance.json","w+",balance)
 		cripto_balance = float(balance[f"{VALUTA_DA_USARE_CRIPTO}_balance"]) if f"{VALUTA_DA_USARE_CRIPTO}_balance" in balance else None
 		soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_balance"]) if f"{VALUTA_DA_USARE_SOLDI}_balance" in balance else None
 		portafoglio("soldi", soldi_balance)
@@ -293,6 +293,27 @@ def imposta_valore_acquisto():
 			return str(valore_acquisto), 200
 	return '',404
 
+@app.route('/forza_bilancio', methods=['GET'])
+def forza_bilancio():
+	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
+		# balance
+		now = datetime.now()
+		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+		cripto, soldi = portafoglio()
+		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sincronizzo bilancio")
+		balance = json.loads(getBalance())
+		gestoreRapporti.JsonWrites("log/sync_balance.json","w+",balance)
+		cripto_balance = float(balance[f"{VALUTA_DA_USARE_CRIPTO}_balance"]) if f"{VALUTA_DA_USARE_CRIPTO}_balance" in balance else None
+		soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_balance"]) if f"{VALUTA_DA_USARE_SOLDI}_balance" in balance else None
+		portafoglio("soldi", soldi_balance)
+		if soldi_balance!=soldi:
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
+		portafoglio("cripto", cripto_balance)
+		if cripto_balance!=cripto:
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(cripto_balance-cripto,8))+" "+str(CRIPTOMONETA))
+		return str(str(soldi_balance)+" "+MONETA if soldi_balance else str(cripto_balance)+" "+CRIPTOMONETA), 200
+	return '',404
+
 @app.route('/bilancio', methods=['GET'])
 def bilancio():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
@@ -334,13 +355,29 @@ def status():
 	return '',404
 
 @app.route('/stop', methods=['GET'])
-def stop():
+def send_stop():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		global STOP
 		STOP = True
 		# comunica alla strategie di tirare i remi in barca
 		strategiaModulo.closing = True
 		return 'Stopping', 200
+	return '',404
+
+@app.route('/buy', methods=['GET'])
+def send_buy():
+	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
+		# comunica alla strategie di comprare
+		strategiaModulo.force_buy = True
+		return 'Buying', 200
+	return '',404
+
+@app.route('/sell', methods=['GET'])
+def send_sell():
+	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
+		# comunica alla strategie di comprare
+		strategiaModulo.force_sell = True
+		return 'Selling', 200
 	return '',404
 
 @app.route('/start', methods=['GET'])
@@ -359,7 +396,7 @@ def start_as_daemon():
 def shutdown():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		# stop running process
-		stop()
+		send_stop()
 		# close api app
 		func = request.environ.get('werkzeug.server.shutdown')
 		func()
