@@ -175,8 +175,8 @@ def dati_da_Bitstamp_websocket():
 		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sincronizzo bilancio")
 		balance = json.loads(getBalance())
 		gestoreRapporti.JsonWrites("log/buy_balance.json","w+",balance)
-		cripto_balance = float(balance[f"{VALUTA_DA_USARE_CRIPTO}_available"]) if f"{VALUTA_DA_USARE_CRIPTO}_available" in balance else None
-		soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_available"]) if f"{VALUTA_DA_USARE_SOLDI}_available" in balance else None
+		cripto_balance = float(balance[f"{VALUTA_DA_USARE_CRIPTO}_balance"]) if f"{VALUTA_DA_USARE_CRIPTO}_balance" in balance else None
+		soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_balance"]) if f"{VALUTA_DA_USARE_SOLDI}_balance" in balance else None
 		portafoglio("soldi", soldi_balance)
 		if soldi_balance!=soldi:
 			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
