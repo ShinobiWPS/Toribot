@@ -94,10 +94,13 @@ def compro(soldi, valore_attuale):
 					gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Aggiunti soldi manualmente: "+str(soldi_balance-soldi))
 
 				if soldi_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
+
 					# order
 					soldi_balance_feeded = soldi_balance - ( soldi_balance * fee / 100 )
 					# result = json.loads(buy(round(soldi_balance / valore_attuale,8)))
 					result = json.loads(buy(round(soldi_balance,8)))
+
+
 					gestoreRapporti.JsonWrites("log/buy_buy.json","w+",result)
 					if "id" in result:
 						ultimo_id_ordine(result["id"] if "id" in result else None)

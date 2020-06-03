@@ -68,14 +68,8 @@ def gestore(valore_attuale):
 
 
 def compro(soldi, valore_attuale):
-
-
-
 	try:
-
 		tg_bot = TelegramBot()
-
-
 		now = datetime.now()
 		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
@@ -109,10 +103,12 @@ def compro(soldi, valore_attuale):
 					gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Aggiunti soldi manualmente: "+str(soldi_balance-soldi))
 
 				if soldi_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
+
 					# order
 					soldi_balance_feeded = soldi_balance - ( soldi_balance * fee / 100 )
-					result = json.loads(buy(round(valore_attuale,5),round(soldi_balance / valore_attuale,8)))
-					#result = json.loads(buy(round(valore_attuale,5),round(cripto_balance,8)))
+					#result = json.loads(buy(round(valore_attuale,5),round(soldi_balance / valore_attuale,8)))
+					result = json.loads(buy(round(soldi_balance,8)))
+
 					gestoreRapporti.JsonWrites("log/buy_buy.json","w+",result)
 					print(">>> Buy result:")
 					print(result)
@@ -120,7 +116,7 @@ def compro(soldi, valore_attuale):
 						ultimo_id_ordine(result["id"] if "id" in result else None)
 						prezzo_ordine = float(result["price"]) if "price" in result else None
 
-						gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto al prezzo di [" + str(prezzo_ordine) + "] usando" +
+						gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Acquisto al prezzo di [" + str(prezzo_ordine) + "] usando " +
 									str(soldi_balance_feeded)+ VALUTA_DA_USARE_SOLDI + " -> " +
 									str(round(soldi_balance_feeded / prezzo_ordine, 8))+ " " + VALUTA_DA_USARE_CRIPTO)
 						commercialista("valore_acquisto", prezzo_ordine)
@@ -188,10 +184,10 @@ def vendo(cripto, valore_attuale):
 
 				if cripto_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
 					# order
-					result = json.loads(sell(round(valore_attuale,8),round(cripto_balance,8)))
+					#result = json.loads(sell(round(cripto_balance,8)))
+					result = json.loads(sell(round(cripto_balance,8)))
 					print(">>> Sell result:")
 					print(result)
-					#result = json.loads(sell(round(cripto_balance,8)))
 					gestoreRapporti.JsonWrites("log/sell_sell.json","w+",result)
 					if "id" in result:
 						ultimo_id_ordine(result["id"] if "id" in result else None)

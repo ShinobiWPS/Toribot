@@ -15,14 +15,14 @@ from piattaforme.bitstamp.key import API_SECRET, api_key, client_id
 
 content_type = 'application/x-www-form-urlencoded'
 
-def buy(price:float,cripto:float):
-	return buyORsell('buy',str(price), str(cripto))
+def buy(soldi:float):
+	return buyORsell('buy',str(soldi))
 
-def sell(price:float,cripto:float):
-	return buyORsell('sell', str(price),str(cripto))
+def sell(cripto:float):
+	return buyORsell('sell', str(cripto))
 
 
-def buyORsell(operation:str,price:str,cripto:str):
+def buyORsell(operation:str,soldi:str):
 	"""Make a BUY or SELL request
 
 	Arguments:
@@ -43,13 +43,13 @@ def buyORsell(operation:str,price:str,cripto:str):
 	timestamp = str(int(round(time.time() * 1000)))
 	nonce = str(uuid.uuid4())
 	payload = {
-		'price':price,
-		'amount':cripto,
+		'amount':soldi,
+		#'amount':cripto,
 		# vogliamo che si esegua come un instant Order
 		#'ioc_order ': True,
-		'fok_order ': True,
-		'fok_order ': 'True',
-		'fok_order ': 'true',
+		#'fok_order ': True,
+		#'fok_order ': 'true',
+		#'fok_order ': 'True',
 		}
 	print('>>>>>>payload')
 	print(payload)
@@ -59,7 +59,7 @@ def buyORsell(operation:str,price:str,cripto:str):
 	message = 'BITSTAMP ' + api_key + \
 			 'POST' + \
 			 'www.bitstamp.net' + \
-			 f'/api/v2/{operation}/{COPPIA_DA_USARE_NOME}/' + \
+			 f'/api/v2/{operation}/instant/{COPPIA_DA_USARE_NOME}/' + \
 			 '' + \
 			 content_type + \
 			 nonce + \
@@ -78,7 +78,7 @@ def buyORsell(operation:str,price:str,cripto:str):
 		'Content-Type': content_type
 	}
 	r = requests.post(
-		f'https://www.bitstamp.net/api/v2/{operation}/{COPPIA_DA_USARE_NOME}/',
+		f'https://www.bitstamp.net/api/v2/{operation}/instant/{COPPIA_DA_USARE_NOME}/',
 		headers=headers,
 		data=payload_string
 	)
