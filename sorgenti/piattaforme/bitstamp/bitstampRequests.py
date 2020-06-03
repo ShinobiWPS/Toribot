@@ -46,16 +46,20 @@ def buyORsell(operation:str,price:str,cripto:str):
 		'price':price,
 		'amount':cripto,
 		# vogliamo che si esegua come un instant Order
-		'ioc_order ': 'True',
+		#'ioc_order ': True,
+		'fok_order ': True,
 		'fok_order ': 'True',
+		'fok_order ': 'true',
 		}
+	print('>>>>>>payload')
+	print(payload)
 	payload_string = urlencode(payload)
 
 	# '' (empty string) in message represents any query parameters or an empty string in case there are none
 	message = 'BITSTAMP ' + api_key + \
 			 'POST' + \
 			 'www.bitstamp.net' + \
-			 f'/api/v2/{operation}/limit/{COPPIA_DA_USARE_NOME}/' + \
+			 f'/api/v2/{operation}/{COPPIA_DA_USARE_NOME}/' + \
 			 '' + \
 			 content_type + \
 			 nonce + \
@@ -74,7 +78,7 @@ def buyORsell(operation:str,price:str,cripto:str):
 		'Content-Type': content_type
 	}
 	r = requests.post(
-		f'https://www.bitstamp.net/api/v2/{operation}/instant/{COPPIA_DA_USARE_NOME}/',
+		f'https://www.bitstamp.net/api/v2/{operation}/{COPPIA_DA_USARE_NOME}/',
 		headers=headers,
 		data=payload_string
 	)
@@ -94,7 +98,7 @@ def buyORsell(operation:str,price:str,cripto:str):
 		raise Exception('Signatures do not match')
 
 	print(r.content)
-	# ON BUY ERROR: {"status": "error", "reason": {"__all__": ["You have only 0.00000 {SOLDI}} available. Check your account balance for details."]}}
+	# ON BUY ERROR: {"status": "error", "reason": {"__all__": ["You have only 0.00000 {SOLDI}} balance. Check your account balance for details."]}}
 	# todo- ON SELL ERROR:
 	return r.content
 
