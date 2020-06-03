@@ -364,7 +364,7 @@ def send_stop():
 		return 'Stopping', 200
 	return '',404
 
-@app.route('/buy', methods=['GET'])
+@app.route('/ask_buy', methods=['GET'])
 def send_buy():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		# comunica alla strategie di comprare
@@ -372,11 +372,29 @@ def send_buy():
 		return 'Buying', 200
 	return '',404
 
-@app.route('/sell', methods=['GET'])
+@app.route('/ask_sell', methods=['GET'])
 def send_sell():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		# comunica alla strategie di comprare
 		strategiaModulo.force_sell = True
+		return 'Selling', 200
+	return '',404
+
+@app.route('/force_buy', methods=['GET'])
+def force_buy():
+	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
+		cripto, soldi = portafoglio()
+		ultimo_valore = commercialista()[0]
+		strategiaModulo.compro(soldi, ultimo_valore)
+		return 'Buying', 200
+	return '',404
+
+@app.route('/force_sell', methods=['GET'])
+def force_sell():
+	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
+		cripto, soldi = portafoglio()
+		ultimo_valore = commercialista()[0]
+		strategiaModulo.vendi(cripto, ultimo_valore)
 		return 'Selling', 200
 	return '',404
 
