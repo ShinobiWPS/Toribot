@@ -22,7 +22,7 @@ def sell(cripto:float):
 	return buyORsell('sell', str(cripto))
 
 
-def buyORsell(operation:str,soldi:str):
+def buyORsell(operation:str,soldiOrCripto:str):
 	"""Make a BUY or SELL request
 
 	Arguments:
@@ -43,16 +43,15 @@ def buyORsell(operation:str,soldi:str):
 	timestamp = str(int(round(time.time() * 1000)))
 	nonce = str(uuid.uuid4())
 	payload = {
-		'amount':soldi,
+		'amount':soldiOrCripto,
 		#'amount':cripto,
 		# vogliamo che si esegua come un instant Order
 		#'ioc_order ': True,
 		#'fok_order ': True,
 		#'fok_order ': 'true',
 		#'fok_order ': 'True',
-		}
-	print('>>>>>>payload')
-	print(payload)
+	}
+
 	payload_string = urlencode(payload)
 
 	# '' (empty string) in message represents any query parameters or an empty string in case there are none
@@ -85,7 +84,6 @@ def buyORsell(operation:str,soldi:str):
 
 
 	if not r.status_code == 200:
-		print(r.content)
 		logging.info(r.content['reason'])
 		raise Exception('Status code not 200')
 
@@ -97,7 +95,7 @@ def buyORsell(operation:str,soldi:str):
 	if not r.headers.get('X-Server-Auth-Signature') == signature_check:
 		raise Exception('Signatures do not match')
 
-	print(r.content)
+
 	# ON BUY ERROR: {"status": "error", "reason": {"__all__": ["You have only 0.00000 {SOLDI}} balance. Check your account balance for details."]}}
 	# todo- ON SELL ERROR:
 	return r.content
