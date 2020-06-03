@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import logging
 import sys
 import time
 import uuid
@@ -81,6 +82,7 @@ def buyORsell(operation:str,price:str,cripto:str):
 
 	if not r.status_code == 200:
 		print(r.content)
+		logging.info(r.content['reason'])
 		raise Exception('Status code not 200')
 
 	string_to_sign = (nonce + timestamp + r.headers.get('Content-Type')
