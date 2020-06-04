@@ -55,6 +55,8 @@ strategiaSigla=sys.argv[1]
 # no error handling on purpose,
 # we want to crash the bot if a correct strategy name it's not provided
 path=f'strategie.{strategiaSigla}'
+CANALE='order_book'
+#CANALE='live_trades'
 strategiaModulo= importlib.import_module(path)
 
 ULTIMI_VALORI = []
@@ -206,6 +208,7 @@ def dati_da_Bitstamp_websocket():
 
 def on_open(_ws):
 	global isOpenWS
+	global CANALE
 	"""Funzione all'aggancio del WebSocket
 
 	Arguments:
@@ -215,7 +218,7 @@ def on_open(_ws):
 	jsonString = json.dumps({
 	    "event": "bts:subscribe",
 	    "data": {
-	        "channel": f"live_trades_{COPPIA_DA_USARE_NOME}"
+	        "channel": f"{CANALE}_{COPPIA_DA_USARE_NOME}"
 	    }
 	})
 	# manda a bitstamp la richiesta di iscriversi al canale di eventi sopra citato
@@ -225,13 +228,17 @@ def on_open(_ws):
 
 
 def on_message(_ws, message: str):
+	global CANALE
 	# la stringa message ha la stesso formato di un json quindi possiamo passarlo come tale per ottenere il Dict
 	messageDict = json.loads(message)
 	# PARE che appena si aggancia il socket manda un messaggio vuoto che fa crashare il bot
 	if messageDict['data'] != {}:
-		# questo print serve solo a noi per lavorare
-		attuale = messageDict['data']['price']
-		processaNuovoPrezzo(attuale)
+		if CANALE is 'order_book':
+			strategiaModulo.gestore(messageDict) # stato dell'orderbook
+		else:
+			attuale = messageDict['data']['price']
+			processaNuovoPrezzo(attuale)
+
 
 
 def on_error(_ws, error: str):
