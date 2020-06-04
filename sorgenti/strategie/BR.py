@@ -91,7 +91,7 @@ def compro(soldi, valore_attuale):
 					status = status["status"] if "status" in status else None
 
 				if soldi and soldi_balance and soldi != soldi_balance:
-					gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Aggiunti soldi manualmente: "+str(soldi_balance-soldi))
+					gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Discrepanza!: "+str(soldi_balance-soldi))
 
 				if soldi_balance and ( not ultimo_id or not status or ( status and status.lower() == "finished")):
 

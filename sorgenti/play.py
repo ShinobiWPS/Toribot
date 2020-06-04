@@ -179,10 +179,10 @@ def dati_da_Bitstamp_websocket():
 		soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_balance"]) if f"{VALUTA_DA_USARE_SOLDI}_balance" in balance else None
 		portafoglio("soldi", soldi_balance)
 		if soldi_balance!=soldi:
-			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sync balance: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
 		portafoglio("cripto", cripto_balance)
 		if cripto_balance!=cripto:
-			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(cripto_balance-cripto,8))+" "+str(CRIPTOMONETA))
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sync balance: "+str(round(cripto_balance-cripto,8))+" "+str(CRIPTOMONETA))
 
 
 		# questo mostra piu informazioni se True
@@ -307,10 +307,10 @@ def forza_bilancio():
 		soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_balance"]) if f"{VALUTA_DA_USARE_SOLDI}_balance" in balance else None
 		portafoglio("soldi", soldi_balance)
 		if soldi_balance!=soldi:
-			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sync balance: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
 		portafoglio("cripto", cripto_balance)
 		if cripto_balance!=cripto:
-			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Rilevata discrepanza: "+str(round(cripto_balance-cripto,8))+" "+str(CRIPTOMONETA))
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sync balance: "+str(round(cripto_balance-cripto,8))+" "+str(CRIPTOMONETA))
 		return str(str(soldi_balance)+" "+MONETA if soldi_balance else str(cripto_balance)+" "+CRIPTOMONETA), 200
 	return '',404
 
