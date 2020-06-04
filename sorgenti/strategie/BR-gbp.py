@@ -54,14 +54,14 @@ def gestore(valore_attuale):
 
 			# Se il valore attuale è maggiore dal valore d'acquisto (in caso opposto perderei i soldi)
 			# if BR_Fattore_Perdita == None or valore_acquisto - round(valore_attuale,BR_Fattore_Approssimazionoe) <= BR_Fattore_Perdita - (cripto*valore_attuale*0.5/100):
-			if valore_acquisto - valore_attuale <= BR_Fattore_Perdita - (valore_attuale*FEE/100*2):
+			if valore_acquisto < valore_attuale :
+			#if valore_acquisto - valore_attuale <= BR_Fattore_Perdita - (valore_attuale*FEE/100*2):
 				# Se il valore attuale è minore dell'ultimo valore, sta scendendo (forse)
-				if round(valore_attuale,
-				         BR_Fattore_Approssimazionoe) > ultimo_valore:
+				#if round(valore_attuale,BR_Fattore_Approssimazionoe) > ultimo_valore:
 					# Vendo
-					vendo(cripto, valore_attuale)
+				vendo(cripto, valore_attuale)
 		#_______FINE STRATEGIA_____________________________________
-		
+
 		cripto, soldi = portafoglio()
 		if soldi and force_buy:
 			compro(soldi, valore_attuale)
