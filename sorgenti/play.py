@@ -17,8 +17,8 @@ import utilita.gestoreRapporti as gestoreRapporti
 from _datetime import timedelta
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
 from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME,
-                                      VALUTA_DA_USARE_CRIPTO,
-                                      VALUTA_DA_USARE_SOLDI)
+                                      VALUTA_CRIPTO,
+                                      VALUTA_SOLDI)
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
 from costanti.dataset_nome_da_usare import DATASET_NOME_DA_USARE
 from costanti.formato_data_ora import FORMATO_DATA_ORA
@@ -29,9 +29,9 @@ from utilita.log import passa_output_al_log_file
 from utilita.telegramBot import TelegramBot
 
 CRIPTOVALUTA = "Criptomoneta"
-CRIPTOMONETA = VALUTA_DA_USARE_CRIPTO
+CRIPTOMONETA = VALUTA_CRIPTO
 VALUTA = "Soldi"
-MONETA = VALUTA_DA_USARE_SOLDI
+MONETA = VALUTA_SOLDI
 
 
 # Inizializzo API
@@ -177,8 +177,8 @@ def dati_da_Bitstamp_websocket():
 		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sincronizzo bilancio")
 		balance = json.loads(getBalance())
 		gestoreRapporti.JsonWrites("log/sync_balance.json","w+",balance)
-		cripto_balance = float(balance[f"{VALUTA_DA_USARE_CRIPTO}_balance"]) if f"{VALUTA_DA_USARE_CRIPTO}_balance" in balance else None
-		soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_balance"]) if f"{VALUTA_DA_USARE_SOLDI}_balance" in balance else None
+		cripto_balance = float(balance[f"{VALUTA_CRIPTO}_balance"]) if f"{VALUTA_CRIPTO}_balance" in balance else None
+		soldi_balance = float(balance[f"{VALUTA_SOLDI}_balance"]) if f"{VALUTA_SOLDI}_balance" in balance else None
 		portafoglio("soldi", soldi_balance)
 		if soldi_balance!=soldi:
 			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sync balance: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
@@ -310,8 +310,8 @@ def forza_bilancio():
 		gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sincronizzo bilancio")
 		balance = json.loads(getBalance())
 		gestoreRapporti.JsonWrites("log/sync_balance.json","w+",balance)
-		cripto_balance = float(balance[f"{VALUTA_DA_USARE_CRIPTO}_balance"]) if f"{VALUTA_DA_USARE_CRIPTO}_balance" in balance else None
-		soldi_balance = float(balance[f"{VALUTA_DA_USARE_SOLDI}_balance"]) if f"{VALUTA_DA_USARE_SOLDI}_balance" in balance else None
+		cripto_balance = float(balance[f"{VALUTA_CRIPTO}_balance"]) if f"{VALUTA_CRIPTO}_balance" in balance else None
+		soldi_balance = float(balance[f"{VALUTA_SOLDI}_balance"]) if f"{VALUTA_SOLDI}_balance" in balance else None
 		portafoglio("soldi", soldi_balance)
 		if soldi_balance!=soldi:
 			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sync balance: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))

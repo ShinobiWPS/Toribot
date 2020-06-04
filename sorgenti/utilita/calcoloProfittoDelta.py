@@ -3,8 +3,8 @@ buy_price = float(0.18065)
 amount=float(100.00000000)
 
 #delta for profit
-spread = float(0.00182)
-# XRPspread = float(0.00182)
+delta = float(0.00182) #e' circa il 1.05% del buy_price
+# XRPdelta = float(0.00182)
 
 #buy/bid
 
@@ -16,7 +16,7 @@ buy_expanse = cost + buy_fee
 
 
 #sell/ask
-sell_price = buy_price+spread
+sell_price = buy_price+delta
 income = sell_price*amount
 sell_fee= (income/100)*0.5
 sell_expanse=income-sell_fee

@@ -8,12 +8,14 @@ from urllib.parse import urlencode
 
 import requests
 
-from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME,
-                                      VALUTA_DA_USARE_CRIPTO,
-                                      VALUTA_DA_USARE_SOLDI)
+from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME, VALUTA_CRIPTO,
+                                      VALUTA_SOLDI)
 from piattaforme.bitstamp.key import API_SECRET, api_key, client_id
 
 content_type = 'application/x-www-form-urlencoded'
+
+
+
 
 def buy(price:float,cripto:float):
 	return buyORsell('buy',str(price), str(cripto))
@@ -46,7 +48,7 @@ def buyORsell(operation:str,price:str,cripto:str):
 		'price':price,
 		'amount':cripto,
 		# vogliamo che si esegua istaneamente
-		#'ioc_order ': True,
+		'ioc_order ': True,
 		'fok_order ': True, # [e totalmente]
 	}
 
@@ -139,10 +141,10 @@ def getBalance():
 	return r.content
 
 def getOrderStatus(order_id):
-	"""Ottieni Cripto ed Soldi disponibili
+	"""Ottieni Cripto e Soldi disponibili
 
 	Returns:
-		list -- array di Cripto,Soldi disponibili
+		list -- array di Cripto e Soldi disponibili
 	"""
 	timestamp = str(int(round(time.time() * 1000)))
 	nonce = str(uuid.uuid4())
