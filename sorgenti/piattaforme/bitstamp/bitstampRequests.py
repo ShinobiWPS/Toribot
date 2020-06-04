@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import logging
 import sys
 import time
 import uuid
@@ -7,6 +8,9 @@ from urllib.parse import urlencode
 
 import requests
 
+from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME,
+                                      VALUTA_DA_USARE_CRIPTO,
+                                      VALUTA_DA_USARE_SOLDI)
 from piattaforme.bitstamp.key import API_SECRET, api_key, client_id
 
 content_type = 'application/x-www-form-urlencoded'
@@ -14,17 +18,18 @@ content_type = 'application/x-www-form-urlencoded'
 def buy(soldi:float):
 	return buyORsell('buy',str(soldi))
 
-def sell(xrp:float):
-	return buyORsell('sell',str(xrp))
+def sell(cripto:float):
+	return buyORsell('sell', str(cripto))
 
 
-def buyORsell(operation:str,soldi:str):
+def buyORsell(operation:str,soldiOrCripto:str):
 	"""Make a BUY or SELL request
 
 	Arguments:
 
 		operation {str} -- operazione
-		soldi {str} -- ammontare di XRP
+		price {str} -- prezzo della criptovaluta
+		cripto {str} -- ammontare di criptovaluta
 
 	Raises:
 
@@ -37,14 +42,23 @@ def buyORsell(operation:str,soldi:str):
 	"""
 	timestamp = str(int(round(time.time() * 1000)))
 	nonce = str(uuid.uuid4())
-	payload = {'amount': soldi}
+	payload = {
+		'amount':soldiOrCripto,
+		#'amount':cripto,
+		# vogliamo che si esegua come un instant Order
+		#'ioc_order ': True,
+		#'fok_order ': True,
+		#'fok_order ': 'true',
+		#'fok_order ': 'True',
+	}
+
 	payload_string = urlencode(payload)
 
 	# '' (empty string) in message represents any query parameters or an empty string in case there are none
 	message = 'BITSTAMP ' + api_key + \
 			 'POST' + \
 			 'www.bitstamp.net' + \
-			 f'/api/v2/{operation}/instant/xrpeur/' + \
+			 f'/api/v2/{operation}/instant/{COPPIA_DA_USARE_NOME}/' + \
 			 '' + \
 			 content_type + \
 			 nonce + \
@@ -63,14 +77,14 @@ def buyORsell(operation:str,soldi:str):
 		'Content-Type': content_type
 	}
 	r = requests.post(
-		f'https://www.bitstamp.net/api/v2/{operation}/instant/xrpeur/',
+		f'https://www.bitstamp.net/api/v2/{operation}/instant/{COPPIA_DA_USARE_NOME}/',
 		headers=headers,
 		data=payload_string
 	)
 
 
 	if not r.status_code == 200:
-		print(r.content)
+		logging.info(r.content['reason'])
 		raise Exception('Status code not 200')
 
 	string_to_sign = (nonce + timestamp + r.headers.get('Content-Type')
@@ -81,16 +95,16 @@ def buyORsell(operation:str,soldi:str):
 	if not r.headers.get('X-Server-Auth-Signature') == signature_check:
 		raise Exception('Signatures do not match')
 
-	print(r.content)
-	# ON BUY ERROR: {"status": "error", "reason": {"__all__": ["You have only 0.00000 EUR available. Check your account balance for details."]}}
+
+	# ON BUY ERROR: {"status": "error", "reason": {"__all__": ["You have only 0.00000 {SOLDI}} balance. Check your account balance for details."]}}
 	# todo- ON SELL ERROR:
 	return r.content
 
 def getBalance():
-	"""Ottieni XRP ed EUR disponibili
+	"""Ottieni Cripto ed Soldi disponibili
 
 	Returns:
-		list -- array di XRP,EUR disponibili
+		list -- array di Cripto,Soldi disponibili
 	"""
 	timestamp = str(int(round(time.time() * 1000)))
 	nonce = str(uuid.uuid4())
@@ -127,10 +141,10 @@ def getBalance():
 	return r.content
 
 def getOrderStatus(order_id):
-	"""Ottieni XRP ed EUR disponibili
+	"""Ottieni Cripto ed Soldi disponibili
 
 	Returns:
-		list -- array di XRP,EUR disponibili
+		list -- array di Cripto,Soldi disponibili
 	"""
 	timestamp = str(int(round(time.time() * 1000)))
 	nonce = str(uuid.uuid4())

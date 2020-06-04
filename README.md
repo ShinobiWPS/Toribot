@@ -2,7 +2,10 @@
 
 ## Install
 
-`pip install -r requirements.txt`
+- `pip install -r requirements.txt`
+- crea un file chiamato `key.py` affianco a `bitstampRequests.py` e dentro inserisci i valori necessari
+- inserire l'ID del proprio user di telegram nell apposito file `api.py`
+- al momento non e' previsto avere un bot di telegram personale,quindi lo avviamo con `False` affinche le notifiche di eventi giungano lo stesso ma con la pecca di non poter usare i comandi
 
 ---
 
@@ -56,6 +59,18 @@
 ## Accorgimenti
 
 - maggiore la fee, maggiore il tempo da prendere in considerazione (per giocare sul realtime/minuto servirebbe qualcosa non superiore al 0.1% per trade)
+
+---
+
+## Telegram bot
+
+- /balance - Bilancio
+- /status - verifica che il websocket e la strategia siano in esecuzione
+- /stop_toribot - Dice alla strategia di vendere e non ricomprare più
+- /start_toribot - Avvia "Avvio()"
+- /stop
+- /start - Tuo ID
+- /shutdown - spegne tutto
 
 ---
 

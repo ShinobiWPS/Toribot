@@ -15,6 +15,25 @@
     },
 
     {
+      "name": "Play BR-gbp dev", //dev:statici +
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["BR-gbp", "dev"],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Play BR-gbp ",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sorgenti/play.py",
+      "args": ["BR-gbp"],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+
+    {
       "name": "Play BR dev ", //dev:statici +
       "type": "python",
       "request": "launch",
