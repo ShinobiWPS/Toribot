@@ -7,9 +7,8 @@
   "todo-tree.general.tags": ["BUG", "HACK", "FIXME", "TODO", "XXX", "todo"],
   "editor.detectIndentation": false,
   "editor.formatOnSave": true,
-  "python.formatting.provider": "yapf",
   "python.formatting.yapfArgs": [
-    "--style={based_on_style: pep8, COLUMN_LIMIT=80, SPLIT_BEFORE_DOT=true,DEDENT_CLOSING_BRACKETS=true,COALESCE_BRACKETS=true,USE_TABS=TRUE,CONTINUATION_ALIGN_STYLE=tabs}"
+    "--style={based_on_style: facebook, COLUMN_LIMIT=80, SPLIT_BEFORE_DOT=true,DEDENT_CLOSING_BRACKETS=true,COALESCE_BRACKETS=true,USE_TABS=true,CONTINUATION_ALIGN_STYLE=tabs,ARITHMETIC_PRECEDENCE_INDICATION=true,SPACES_AROUND_DICT_DELIMITERS=true,SPACES_AROUND_LIST_DELIMITERS=true,SPACES_AROUND_SUBSCRIPT_COLON=true,SPACES_AROUND_TUPLE_DELIMITERS=true,SPACES_BEFORE_COMMENT=true,SPACE_BETWEEN_ENDING_COMMA_AND_CLOSING_BRACKET=true,SPACE_INSIDE_BRACKETS=true,ALIGN_CLOSING_BRACKET_WITH_VISUAL_INDENT=true,ALLOW_SPLIT_BEFORE_DEFAULT_OR_NAMED_ASSIGNS=true,BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF=true,EACH_DICT_ENTRY_ON_SEPARATE_LINE=true,FORCE_MULTILINE_DICT=true,INDENT_CLOSING_BRACKETS=true}"
   ],
   "files.exclude": {
     "**/__pycache__": true,
@@ -19,5 +18,6 @@
     "source.organizeImports": true
   },
   "todo-tree.filtering.useBuiltInExcludes": "file and search excludes",
-  "todo-tree.filtering.excludeGlobs": ["**/env"]
+  "todo-tree.filtering.excludeGlobs": ["**/env"],
+  "python.formatting.provider": "yapf"
 }
