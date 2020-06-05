@@ -16,14 +16,14 @@ from flask_cors import CORS
 import utilita.gestoreRapporti as gestoreRapporti
 from _datetime import timedelta
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME,
-                                      VALUTA_CRIPTO,
+from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME, VALUTA_CRIPTO,
                                       VALUTA_SOLDI)
 from costanti.dataset import DATASET_CARTELLA_PERCORSO
 from costanti.dataset_nome_da_usare import DATASET_NOME_DA_USARE
 from costanti.formato_data_ora import FORMATO_DATA_ORA
 from costanti.log_cartella_percorso import TRADING_REPORT_FILENAME
 from piattaforme.bitstamp.bitstampRequests import getBalance
+from strategie.BL import forOrderCheck
 from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita.log import passa_output_al_log_file
 from utilita.telegramBot import TelegramBot
@@ -51,12 +51,12 @@ ws = None
 mybot = None
 tg_bot = None
 isOpenWS = False
-strategiaSigla=sys.argv[1]
+strategiaSigla = sys.argv[1]
 # no error handling on purpose,
 # we want to crash the bot if a correct strategy name it's not provided
-path=f'strategie.{strategiaSigla}'
-CANALE='order_book'
-#CANALE='live_trades'
+path = f'strategie.{strategiaSigla}'
+#CANALE='order_book'
+CANALE = 'live_trades'
 strategiaModulo= importlib.import_module(path)
 
 ULTIMI_VALORI = []
@@ -126,8 +126,12 @@ def avvio():
 		sys.stdout.flush()
 
 
-def processaNuovoPrezzo(attuale):
+def processaNuovoTrade(data):
+	attuale = data['price']
 	# logging.info(attuale)
+	if strategiaSigla is 'BL':
+		forOrderCheck(data)
+
 	if not attuale in ULTIMI_VALORI:
 		strategiaModulo.gestore(attuale)
 		ULTIMI_VALORI.append(attuale)
@@ -141,7 +145,7 @@ def dati_statici():
 	with open(f'{DATASET_CARTELLA_PERCORSO}/{DATASET_NOME_DA_USARE}.csv') as csvFile:
 		datiStatici = csv.reader(csvFile)
 		lastReferenceTime= False
-		frequency=timedelta(minutes=0)
+		frequency = timedelta(minutes = 0)
 		for riga in datiStatici:
 			# se hai ricevuto il comando di stoppare
 			if STOP:
@@ -154,14 +158,14 @@ def dati_statici():
 				tradeTime = datetime.strptime(riga[1], FORMATO_DATA_ORA)
 				if lastReferenceTime is False : #for first-run-only
 					lastReferenceTime = tradeTime
-					processaNuovoPrezzo(float(riga[0]))
+					processaNuovoTrade(float(riga[0]))
 				time_difference = tradeTime - lastReferenceTime
 				pre_time_difference_in_minutes = time_difference / timedelta(minutes=1)
 				time_difference_in_minutes = timedelta(minutes=pre_time_difference_in_minutes)
 				if time_difference_in_minutes >= frequency:
 					lastReferenceTime = datetime.strptime(riga[1], FORMATO_DATA_ORA)
 					# gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,"" + str(riga[1]) + " : " + str(riga[0]))
-					processaNuovoPrezzo(float(riga[0]))
+					processaNuovoTrade(float(riga[0]))
 
 
 # ______________________________________parte con dati websocket______________________________________
@@ -180,7 +184,7 @@ def dati_da_Bitstamp_websocket():
 		cripto_balance = float(balance[f"{VALUTA_CRIPTO}_balance"]) if f"{VALUTA_CRIPTO}_balance" in balance else None
 		soldi_balance = float(balance[f"{VALUTA_SOLDI}_balance"]) if f"{VALUTA_SOLDI}_balance" in balance else None
 		portafoglio("soldi", soldi_balance)
-		if soldi_balance!=soldi:
+		if soldi_balance != soldi:
 			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME,dt_string+" Sync balance: "+str(round(soldi_balance-soldi,5))+" "+str(MONETA))
 		portafoglio("cripto", cripto_balance)
 		if cripto_balance!=cripto:
@@ -233,11 +237,7 @@ def on_message(_ws, message: str):
 	messageDict = json.loads(message)
 	# PARE che appena si aggancia il socket manda un messaggio vuoto che fa crashare il bot
 	if messageDict['data'] != {}:
-		if CANALE is 'order_book':
-			strategiaModulo.gestore(messageDict) # stato dell'orderbook
-		else:
-			attuale = messageDict['data']['price']
-			processaNuovoPrezzo(attuale)
+		processaNuovoTrade(messageDict['data'])
 
 
 
