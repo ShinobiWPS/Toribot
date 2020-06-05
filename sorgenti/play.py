@@ -51,12 +51,12 @@ ws = None
 mybot = None
 tg_bot = None
 isOpenWS = False
-strategiaSigla = sys.argv[1]
 # no error handling on purpose,
 # we want to crash the bot if a correct strategy name it's not provided
-path = f'strategie.{strategiaSigla}'
 # CANALE='order_book'
 CANALE = 'live_trades'
+strategiaSigla = sys.argv[1]
+path = f'strategie.{strategiaSigla}'
 strategiaModulo = importlib.import_module(path)
 
 ULTIMI_VALORI = []
