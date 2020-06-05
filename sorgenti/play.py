@@ -139,7 +139,6 @@ def processaNuovoTrade(data):
 		forOrderCheck(data)
 
 	if not attuale in ULTIMI_VALORI:
-		strategiaModulo.gestore(attuale)
 		ULTIMI_VALORI.append(attuale)
 		if len(ULTIMI_VALORI) > NUMERO_ULTIMI_VALORI:
 			ULTIMI_VALORI.pop(0)
@@ -265,6 +264,99 @@ def on_close(_ws):
 	if tg_bot:
 		tg_bot.sendMessage(TELEGRAM_ID, "WebSocket closed")
 	print("### WebSocketclosed ###")
+
+
+
+def startOrderbook(parameter_list):
+	#todo- copia codice websocket gia in uso con canale diverso e message che passa orderbook al gestore di BL
+	global ws
+	try:
+		ultimo_id_ordine(0)
+
+		# balance
+		now = datetime.now()
+		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+		cripto, soldi = portafoglio()
+		gestoreRapporti.FileAppend(
+			TRADING_REPORT_FILENAME, dt_string+" Sincronizzo bilancio")
+		balance = json.loads(getBalance())
+		gestoreRapporti.JsonWrites("log/sync_balance.json", "w+", balance)
+		cripto_balance = float(
+			balance[f"{VALUTA_CRIPTO}_balance"]) if f"{VALUTA_CRIPTO}_balance" in balance else None
+		soldi_balance = float(
+			balance[f"{VALUTA_SOLDI}_balance"]) if f"{VALUTA_SOLDI}_balance" in balance else None
+		portafoglio("soldi", soldi_balance)
+		if soldi_balance != soldi:
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME, dt_string +
+									   " Sync balance: "+str(round(soldi_balance-soldi, 5))+" "+str(MONETA))
+		portafoglio("cripto", cripto_balance)
+		if cripto_balance != cripto:
+			gestoreRapporti.FileAppend(TRADING_REPORT_FILENAME, dt_string+" Sync balance: "+str(
+				round(cripto_balance-cripto, 8))+" "+str(CRIPTOMONETA))
+
+		# questo mostra piu informazioni se True
+		websocket.enableTrace(False)
+		ws = websocket.WebSocketApp(
+			"wss://ws.bitstamp.net",
+			on_message=OB_on_message,
+			on_error=OB_on_error,
+			on_close=OB_on_close
+		)
+		ws.OB_on_open = on_open
+		ws.run_forever()
+	except KeyboardInterrupt:
+		ws.close()
+	except Exception as ex:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+		print(ex, exc_type, fname, exc_tb.tb_lineno)
+		logging.error(ex)
+
+
+def OB_on_open(_ws):
+	global isOpenWS_OB
+	global CANALE
+	"""Funzione all'aggancio del WebSocket
+
+	Arguments:
+
+		ws {tipo_boh} -- sono dei caratteri apparentemente inutili
+																	"""
+	jsonString = json.dumps({
+		"event": "bts:subscribe",
+		"data": {
+			"channel": f"{CANALE}_{COPPIA_DA_USARE_NOME}"
+		}
+	})
+	# manda a bitstamp la richiesta di iscriversi al canale di eventi sopra citato
+	_ws.send(jsonString)
+	isOpenWS_OB = True
+	print('Luce verde')
+
+
+def OB_on_message(_ws, message: str):
+	global CANALE
+	# la stringa message ha la stesso formato di un json quindi possiamo passarlo come tale per ottenere il Dict
+	messageDict = json.loads(message)
+	# PARE che appena si aggancia il socket manda un messaggio vuoto che fa crashare il bot
+	if messageDict['data']:
+		strategiaModulo.gestore(messageDict['data'])
+
+
+def OB_on_error(_ws, error: str):
+	global isOpenWS_OB
+	isOpenWS = False
+	print(error)
+
+
+def OB_on_close(_ws):
+	global isOpenWS_OB
+	isOpenWS = False
+	if tg_bot:
+		tg_bot.sendMessage(TELEGRAM_ID, "WebSocket OB closed")
+	print("### WebSocket OB closed ###")
+
+
 
 
 # ______________________________________API______________________________________
