@@ -51,9 +51,9 @@ def makeRequest(operation = None, buyOrSell = None, amount = None, price = None,
 
 	payload = {}
 	operation_string = ""
-	bos = None
+	bos = ""
 	api_version = 2
-	content_type = None
+	content_type = ""
 
 	if not operation:
 		raise Exception("Parameter missing")
@@ -132,7 +132,7 @@ def makeRequest(operation = None, buyOrSell = None, amount = None, price = None,
 		message = 'BITSTAMP ' + API_KEY + \
 				'POST' + \
 				'www.bitstamp.net' + \
-				f'/api/v2/{operation_string}{bos}/{COPPIA_DA_USARE_NOME}/' + \
+				f'/api/v2/{operation_string}'+(f'{bos}/{COPPIA_DA_USARE_NOME}/' if bos else '') + \
 				'' + \
 				(content_type if content_type else "") + \
 				nonce + \
@@ -143,7 +143,7 @@ def makeRequest(operation = None, buyOrSell = None, amount = None, price = None,
 		message = 'BITSTAMP ' + API_KEY + \
 				'POST' + \
 				'www.bitstamp.net' + \
-				f'/api/{operation_string}{bos}/' + \
+				f'/api/{operation_string}/' + \
 				'' + \
 				nonce + \
 				timestamp + \
@@ -165,20 +165,22 @@ def makeRequest(operation = None, buyOrSell = None, amount = None, price = None,
 
 	if api_version == 2:
 		r = requests.post(
-			f'https://www.bitstamp.net/api/v2/{operation_string}{bos}/{COPPIA_DA_USARE_NOME}/',
+			f'https://www.bitstamp.net/api/v2/{operation_string}'+(f'{bos}/{COPPIA_DA_USARE_NOME}/' if bos else ''),
 			headers=headers,
 			data=payload_URLencoded
 		)
+
 	else:
 		r = requests.post(
-			f'https://www.bitstamp.net/api/{operation_string}{bos}/',
+			f'https://www.bitstamp.net/api/{operation_string}/',
 			headers=headers,
 			data=payload_URLencoded
 		)		
 
 
 	if not r.status_code == 200:
-		logging.info(r.content['reason'])
+		if 'reason' in r.content:
+			logging.info(r.content['reason'])
 		raise Exception('Status code not 200')
 
 	if content_type:
