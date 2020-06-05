@@ -19,6 +19,5 @@
   },
   "todo-tree.filtering.useBuiltInExcludes": "file and search excludes",
   "todo-tree.filtering.excludeGlobs": ["**/env"],
-"python.formatting.provider": "yapf",
-"python.pythonPath": "C:\\Users\\Redragon948\\AppData\\Local\\Programs\\Python\\Python38\\python.exe"
+  "python.formatting.provider": "yapf"
 }
