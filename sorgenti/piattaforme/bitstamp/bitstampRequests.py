@@ -49,7 +49,7 @@ def buyORsell(operation:str,price:str,cripto:str):
 		'amount':cripto,
 		# vogliamo che si esegua istaneamente
 		'ioc_order ': True,
-		'fok_order ': True, # [e totalmente]
+		#'fok_order ': True, # [e totalmente]
 	}
 
 	payload_string = urlencode(payload)
