@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import os
@@ -28,7 +29,10 @@ def gestoreValoriJson( chiave=None, valore=None ):
 								tmp_config = tmp_config[ key ]
 						if isinstance( chiave,
 							list ) or isinstance( chiave, dict ):
-							tmp_config[ chiave[ -1 ] ] = valore
+							if isinstance( tmp_config[ chiave[ -1 ] ], list ):
+								tmp_config[ chiave[ -1 ] ].append( valore )
+							else:
+								tmp_config[ chiave[ -1 ] ] = valore
 						else:
 							valore = str( valore )
 							if valore.lower() == "True".lower() or valore.lower(
@@ -51,7 +55,10 @@ def gestoreValoriJson( chiave=None, valore=None ):
 							del tmp_config[ chiave[ -1 ] ]
 
 					else:
-						valori_json[ chiave ] = valore
+						if isinstance( valori_json[ chiave ], list ):
+							valori_json[ chiave ].append( valore )
+						else:
+							valori_json[ chiave ] = valore
 
 					jsonFile.write(
 						json.dumps( valori_json, sort_keys=True, indent=4 )
@@ -81,8 +88,52 @@ def commercialista( chiave=None, valore=None ):
 	return [ None, None ]
 
 
-# def ultimo_id_ordine(valore=None):
-# valori_json = gestoreValoriJson("ultimo_id", valore)
-# if valori_json and "ultimo_id" in valori_json:
-# return valori_json["ultimo_id"]
-# return None
+def getOrders( chiave='order_id', valore=None ):
+	orders = []
+	valori_json = gestoreValoriJson()
+	if valore:
+		for order in valori_json[ 'orders' ]:
+			if str( order[ chiave ] ) == str( valore ):
+				orders.append( order )
+		return orders if orders else None
+	else:
+		if valori_json and "orders" in valori_json:
+			return valori_json[ "orders" ]
+	return None
+
+
+def addOrder(
+	amount, price, order_id, bos, timestamp=datetime.now(), datetime=None
+):
+	order_status = "processing"
+	if not datetime:
+		datetime = timestamp.strftime( "%Y/%m/%d %H:%M:%S" )
+	order = {
+		'amount': amount,
+		'price': price,
+		'order_id': order_id,
+		'order_status': order_status,
+		'bos': bos,
+		'timestamp': timestamp,
+		'datetime': datetime
+	}
+	valori_json = gestoreValoriJson( "orders", order )
+	if valori_json and "orders" in valori_json:
+		return valori_json[ "orders" ]
+	return None
+
+
+def searchOrder( chiave='order_id', valore=None ):
+	orders = gestoreValoriJson()[ 'orders' ]
+	for index, order in enumerate( orders ):
+		if str( order[ chiave ] ) == str( valore ):
+			return index
+	return None
+
+
+def removeOrder( chiave='order_id', valore=None ):
+	index = searchOrder( chiave=chiave, valore=valore )
+	valori_json = gestoreValoriJson( [ "orders", index ], "" )
+	if valori_json and "orders" in valori_json:
+		return valori_json[ "orders" ]
+	return None
