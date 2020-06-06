@@ -6,9 +6,9 @@ from datetime import datetime
 
 import utilita.gestoreRapporti as gestoreRapporti
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import (COPPIA_DA_USARE_NOME, FEE,
-                                     TRADING_REPORT_FILENAME, VALUTA_CRIPTO,
-                                     VALUTA_SOLDI)
+from costanti.costanti_unico import (
+	COPPIA_DA_USARE_NOME, FEE, TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI
+)
 from piattaforme.bitstamp import bitstampRequestsRefactored as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita import apriFileRefactored as managerJson
@@ -23,38 +23,6 @@ def gestore(orderbook: dict):
 	#todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
 	try:
 		# todo -SE NON USI IOC/FOK calcola con un criterio se necessario riassestare il prezzo del 'attuale ordine e quindi magari cancellarlo
-
-		# todo- Check se ultimo ultimo_id_ordine() e' stato completato
-		# if YES LOGGA: Ordine [buy|sell] completo al prezzo di N VALUTA_SOLDI per N VALUTA_CRIPTO di N VALUTA_CRIPTO
-		cripto, soldi = managerJson.portafoglio()
-
-		#primo index:identifica il ORDER
-		#secondo index: identifica se Prezzo o Amount
-		bids_price = orderbook['bids'][0][0]
-		bids_amount = orderbook['bids'][0][1]
-
-		asks_price = orderbook['asks'][0][0]
-		asks_amount = orderbook['asks'][0][1]
-
-		#todo- set minimum soldi of 25
-		#todo- necessario? set minimum cripto of ? (c'e un minimo ma non ricordo quale sia)
-
-		#controllo se mi permetto quell'order
-		if asks_amount * asks_price >= soldi:
-			# Compro
-			my_amount = soldi / asks_price
-			order_result = bitstamp.buyLimit(my_amount, asks_price, fok=True)
-			managerJson.addOrder(
-				amount=order_result['amount'],
-				price=order_result['price'],
-				order_id=order_result['id'],
-				bos="sell" if int(order_result['bos']) else "buy"
-			)
-			managerJson.portafoglio(
-				"soldi", soldi - (order_result['amount'] * order_result['price'])
-			)
-
-			del order_result
 
 		orders = managerJson.getOrders()
 		orders_buy = []
@@ -103,6 +71,38 @@ def gestore(orderbook: dict):
 							logging.error(order_status['error'])
 						else:
 							logging.error(json.dumps(order_status))
+
+		# todo- Check se ultimo ultimo_id_ordine() e' stato completato
+		# if YES LOGGA: Ordine [buy|sell] completo al prezzo di N VALUTA_SOLDI per N VALUTA_CRIPTO di N VALUTA_CRIPTO
+		cripto, soldi = managerJson.portafoglio()
+
+		#primo index:identifica il ORDER
+		#secondo index: identifica se Prezzo o Amount
+		bids_price = orderbook['bids'][0][0]
+		bids_amount = orderbook['bids'][0][1]
+
+		asks_price = orderbook['asks'][0][0]
+		asks_amount = orderbook['asks'][0][1]
+
+		#todo- set minimum soldi of 25
+		#todo- necessario? set minimum cripto of ? (c'e un minimo ma non ricordo quale sia)
+
+		#controllo se mi permetto quell'order
+		if asks_amount * asks_price >= soldi:
+			# Compro
+			my_amount = soldi / asks_price
+			order_result = bitstamp.buyLimit(my_amount, asks_price, fok=True)
+			managerJson.addOrder(
+				amount=order_result['amount'],
+				price=order_result['price'],
+				order_id=order_result['id'],
+				bos="sell" if int(order_result['bos']) else "buy"
+			)
+			managerJson.portafoglio(
+				"soldi", soldi - (order_result['amount'] * order_result['price'])
+			)
+
+			del order_result
 
 		if orders_buy:
 			for order in orders_buy:
