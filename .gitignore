@@ -350,7 +350,10 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
+# file to create manually
 **/key.py
 valori.json
+
+# completely ignore
 **/*copia*.csv
 **/nohup.out

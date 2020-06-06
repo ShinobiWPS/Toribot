@@ -67,6 +67,7 @@ def avvio():
 	try:
 		# argv:  gli argomenti tranne il primo perche e' il nome del file
 		argv = sys.argv[1:]
+		#todo- crea cartella log se non esiste
 		passa_output_al_log_file()
 
 		now = datetime.now()

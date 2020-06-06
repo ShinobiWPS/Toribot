@@ -68,3 +68,9 @@ def forOrderCheck(data):
 	# aggiorna valori.json togliendo l ID
 	# synca l amount per creare la frazione di order
 	pass
+
+
+#if tg_bot:
+#todo- printa tutti i reason
+
+#	tg_bot.sendMessage(TELEGRAM_ID, result['reason']['__all__'][0])
