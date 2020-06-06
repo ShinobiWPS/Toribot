@@ -6,9 +6,9 @@ from datetime import datetime
 
 import utilita.gestoreRapporti as gestoreRapporti
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import (
-	COPPIA_DA_USARE_NOME, FEE, TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI
-)
+from costanti.costanti_unico import (COPPIA_DA_USARE_NOME, FEE,
+                                     TRADING_REPORT_FILENAME, VALUTA_CRIPTO,
+                                     VALUTA_SOLDI)
 from piattaforme.bitstamp import bitstampRequestsRefactored as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita import apriFileRefactored as managerJson
