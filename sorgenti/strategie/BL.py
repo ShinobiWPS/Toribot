@@ -6,9 +6,9 @@ from datetime import datetime
 
 import utilita.gestoreRapporti as gestoreRapporti
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import (
-	COPPIA_DA_USARE_NOME, FEE, TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI
-)
+from costanti.costanti_unico import (COPPIA_DA_USARE_NOME, FEE,
+                                     TRADING_REPORT_FILENAME, VALUTA_CRIPTO,
+                                     VALUTA_SOLDI)
 from piattaforme.bitstamp import bitstampRequestsRefactored as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita import apriFileRefactored as managerJson
@@ -17,7 +17,7 @@ from utilita.telegramBot import TelegramBot
 Fattore_Perdita = 0
 
 
-def gestore(orderbook):
+def gestore(orderbook: dict):
 	global Fattore_Perdita
 
 	#todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
@@ -28,12 +28,18 @@ def gestore(orderbook):
 		# if YES LOGGA: Ordine [buy|sell] completo al prezzo di N VALUTA_SOLDI per N VALUTA_CRIPTO di N VALUTA_CRIPTO
 		cripto, soldi = managerJson.portafoglio()
 
+		#primo index:identifica il ORDER
+		#secondo index: identifica se Prezzo o Amount
 		bids_price = orderbook['bids'][0][0]
-		bids_amount = orderbook['bids'][0][0]
+		bids_amount = orderbook['bids'][0][1]
 
 		asks_price = orderbook['asks'][0][0]
-		asks_amount = orderbook['asks'][0][0]
+		asks_amount = orderbook['asks'][0][1]
 
+		#todo- set minimum soldi of 25
+		#todo- necessario? set minimum cripto of ? (c'e un minimo ma non ricordo quale sia)
+
+		#controllo se mi permetto quell'order
 		if asks_amount * asks_price >= soldi:
 			# Compro
 			my_amount = soldi / asks_price
