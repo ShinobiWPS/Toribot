@@ -4,11 +4,9 @@ import os
 import sys
 from datetime import datetime
 
-import utilita.gestoreRapporti as gestoreRapporti
+import utilita.gestoreRapporti as report
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import (
-	COPPIA_DA_USARE_NOME, FEE, TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI
-)
+from costanti.costanti_unico import *
 from piattaforme.bitstamp import bitstampRequestsRefactored as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita import apriFileRefactored as managerJson
@@ -42,7 +40,23 @@ def gestore(orderbook: dict):
 							order_status['status'])
 						if order_status['status'] == "finished":
 							managerJson.gestoreValoriJson([ 'orders', index, 'order_id'], 0)
-							# gestoreRapporti.JsonWrites("log/"+str(order['bos'])+"_"+str(order['order_id'])+"_.json","w+",balance)
+
+							now = datetime.now()
+							dt_string = now.strftime(FORMATO_DATA_ORA)
+							report.JsonWrites(
+								LOG_CARTELLA_PERCORSO + "/" + str(order['bos']) + "_" +
+								str(order['order_id']) + ".json", "w+",
+								dt_string + " order completed"
+							)
+							report.JsonWrites(
+								LOG_CARTELLA_PERCORSO + "/check" + str(order['bos']) + "_" +
+								str(order['order_id']) + ".json", "w+", dt_string + " CLOSE " +
+								str(order['bos']).upper() + " " + str(order['order_id']) + " [" +
+								str(order['price']) + "] " + str(order['amount']) + (
+								VALUTA_SOLDI.upper()
+								if order['bos'].lower() == "sell" else VALUTA_CRIPTO.upper()
+								)
+							)
 							if order['bos'] == "sell":
 								# _________________________ CALCULATED _________________________
 								# soldi = managerJson.portafoglio()[-1]
@@ -52,9 +66,9 @@ def gestore(orderbook: dict):
 								# _________________________ ASKED _________________________
 								balance = json.loads(bitstamp.getBalance())
 								if balance and f"{VALUTA_SOLDI}_balance" in balance:
-									gestoreRapporti.JsonWrites(
-										"log/" + str(order['bos']) + "_" + str(order['order_id']) +
-										"_balance.json", "w+", balance
+									report.JsonWrites(
+										LOG_CARTELLA_PERCORSO + "/check" + str(order['bos']) + "_" +
+										str(order['order_id']) + "_balance.json", "w+", balance
 									)
 									#cripto_balance = float(balance[f"{VALUTA_SOLDI}_balance"]) if f"{VALUTA_CRIPTO}_balance" in balance else None
 									# fee = float( balance[ f"{COPPIA_DA_USARE_NOME}_fee" ] ) if f"{COPPIA_DA_USARE_NOME}_fee" in balance else None
@@ -96,18 +110,39 @@ def gestore(orderbook: dict):
 				amount=order_result['amount'],
 				price=order_result['price'],
 				order_id=order_result['id'],
-				bos="sell" if int(order_result['bos']) else "buy"
+				bos="buy"
 			)
-			managerJson.portafoglio(
-				"soldi", soldi - (order_result['amount'] * order_result['price'])
-			)
+			# _________________________ CALCULATED _________________________
+			# managerJson.portafoglio(
+			# 	"soldi", soldi - (order_result['amount'] * order_result['price'])
+			# )
+			# _________________________ ASKED _________________________
+			balance = json.loads(bitstamp.getBalance())
+			if balance and f"{VALUTA_SOLDI}_balance" in balance:
+				report.JsonWrites(
+					LOG_CARTELLA_PERCORSO + "/buy_" + str(order_result['id']) + "_balance.json",
+					"w+", balance
+				)
+				#cripto_balance = float(balance[f"{VALUTA_SOLDI}_balance"]) if f"{VALUTA_CRIPTO}_balance" in balance else None
+				# fee = float( balance[ f"{COPPIA_DA_USARE_NOME}_fee" ] ) if f"{COPPIA_DA_USARE_NOME}_fee" in balance else None
+				soldi_balance = float(
+					balance[f"{VALUTA_SOLDI}_balance"]
+				) if f"{VALUTA_SOLDI}_balance" in balance else None
+				managerJson.portafoglio("soldi", soldi_balance)
+			else:
+				logging.error("Balance error: " + order_result['id'])
 
+			report.JsonWrites(
+				LOG_CARTELLA_PERCORSO + "/buy_" + str(order_result['id']) + ".json", "w+",
+				dt_string + " OPEN BUY " + str(order_result['id']) + " [" +
+				str(order_result['price']) + "] " + str(soldi) + " -> " + str(my_amount) + "==" +
+				str(order_result['amount'])
+			)
 			del order_result
 
 		if orders_buy:
 			for order in orders_buy:
-				#check if every order is complete
-				#if complete check if sell
+
 				if order['order_status'] == "finished" and order[
 					'price'] < bids_price and bids_amount >= order['amount']:
 					# Vendo
@@ -116,7 +151,13 @@ def gestore(orderbook: dict):
 						amount=order_result['amount'],
 						price=order_result['price'],
 						order_id=order_result['id'],
-						bos="sell" if int(order_result['bos']) else "buy"
+						bos="sell"
+					)
+					report.JsonWrites(
+						LOG_CARTELLA_PERCORSO + "/sell_" + str(order_result['id']) + ".json", "w+",
+						dt_string + " OPEN SELL " + str(order_result['id']) + " [" +
+						str(order_result['price']) + "] " + str(soldi) + " -> " + str(my_amount) +
+						"==" + str(order_result['amount'])
 					)
 					del order_result
 

@@ -11,171 +11,209 @@ import requests
 from costanti.coppia_da_usare import (
 	COPPIA_DA_USARE_NOME, VALUTA_CRIPTO, VALUTA_SOLDI
 )
-from piattaforme.bitstamp.key import API_SECRET, api_key, client_id
+from piattaforme.bitstamp.key import API_SECRET
+from piattaforme.bitstamp.key import api_key as API_KEY
+from piattaforme.bitstamp.key import client_id as CLIENT_ID
 
-content_type = 'application/x-www-form-urlencoded'
-
-
-def buy( price: float, cripto: float ):
-	return buyORsell( 'buy', str( price ), str( cripto ) )
+#Public
 
 
-def sell( price: float, cripto: float ):
-	return buyORsell( 'sell', str( price ), str( cripto ) )
+def sellInstant( amount ):
+	return makeInstantOrder( "sell", amount )
 
 
-def buyORsell( operation: str, price: str, cripto: str ):
-	"""Make a BUY or SELL request
+def sellLimit( amount, price, ioc=None, fok=None ):
+	return makeLimitOrder( "sell", amount, price, ioc=ioc, fok=fok )
 
-	Arguments:
 
-		operation {str} -- operazione
-		price {str} -- prezzo della criptovaluta
-		cripto {str} -- ammontare di criptovaluta
+def buyInstant( amount ):
+	return makeInstantOrder( "buy", amount )
 
-	Raises:
 
-		Exception: ('Status code not 200')
-		Exception: ('Signatures do not match')
+def buyLimit( amount, price, ioc=None, fok=None ):
+	return makeLimitOrder( "buy", amount, price, ioc=ioc, fok=fok )
 
-	Returns:
 
-		dict-- contenuto della risposta completo
-	"""
-	timestamp = str( int( round( time.time() * 1000 ) ) )
-	nonce = str( uuid.uuid4() )
-	payload = {
-		'price': price,
-		'amount': cripto,
-		# vogliamo che si esegua istaneamente
-		'ioc_order ': True,
-		#'fok_order ': True, # [e totalmente]
-	}
+def makeInstantOrder( buyOrSell, amount ):
+	return makeRequest( operation="limit", buyOrSell=buyOrSell, amount=amount )
 
-	payload_string = urlencode( payload )
 
-	# '' (empty string) in message represents any query parameters or an empty string in case there are none
-	message = 'BITSTAMP ' + api_key + \
-          'POST' + \
-          'www.bitstamp.net' + \
-          f'/api/v2/{operation}/{COPPIA_DA_USARE_NOME}/' + \
-          '' + \
-          content_type + \
-          nonce + \
-          timestamp + \
-          'v2' + \
-          payload_string
-	message = message.encode( 'utf-8' )
-	signature = hmac.new( API_SECRET, msg=message,
-		digestmod=hashlib.sha256 ).hexdigest()
-	headers = {
-		'X-Auth': 'BITSTAMP ' + api_key,
-		'X-Auth-Signature': signature,
-		'X-Auth-Nonce': nonce,
-		'X-Auth-Timestamp': timestamp,
-		'X-Auth-Version': 'v2',
-		'Content-Type': content_type
-	}
-	r = requests.post(
-		f'https://www.bitstamp.net/api/v2/{operation}/{COPPIA_DA_USARE_NOME}/',
-		headers=headers,
-		data=payload_string
+def makeLimitOrder( buyOrSell, amount, price, ioc=None, fok=None ):
+	return makeRequest(
+		operation="limit",
+		buyOrSell=buyOrSell,
+		amount=amount,
+		price=price,
+		ioc=ioc,
+		fok=fok
 	)
 
-	if not r.status_code == 200:
-		logging.info( r.content[ 'reason' ] )
-		raise Exception( 'Status code not 200' )
 
-	string_to_sign = ( nonce + timestamp +
-		r.headers.get( 'Content-Type' ) ).encode( 'utf-8' ) + r.content
-	signature_check = hmac.new(
-		API_SECRET, msg=string_to_sign, digestmod=hashlib.sha256
-	).hexdigest()
-	if not r.headers.get( 'X-Server-Auth-Signature' ) == signature_check:
-		raise Exception( 'Signatures do not match' )
-
-	# ON BUY ERROR: {"status": "error", "reason": {"__all__": ["You have only 0.00000 {SOLDI}} balance. Check your account balance for details."]}}
-	# todo- ON SELL ERROR:
-	return r.content
+def checkOrder( order_id ):
+	return makeRequest( operation="order_status", order_id=order_id )
 
 
 def getBalance():
-	"""Ottieni Cripto ed Soldi disponibili
+	return makeRequest( operation="balance" )
 
-	Returns:
-		list -- array di Cripto,Soldi disponibili
-	"""
+
+#Private
+
+
+def makeRequest(
+	operation=None,
+	buyOrSell=None,
+	amount=None,
+	price=None,
+	ioc=None,
+	fok=None,
+	order_id=None
+):
+
 	timestamp = str( int( round( time.time() * 1000 ) ) )
 	nonce = str( uuid.uuid4() )
+
 	payload = {}
+	operation_string = ""
+	bos = ""
+	api_version = 2
+	content_type = ""
 
-	payload_string = urlencode( payload )
+	if not operation:
+		raise Exception( "Parameter missing" )
 
-	# '' (empty string) in message represents any query parameters or an empty string in case there are none
-	message = 'BITSTAMP ' + api_key + \
-           'POST' + \
-           'www.bitstamp.net' + \
-           '/api/v2/balance/' + \
-           '' + \
-           nonce + \
-           timestamp + \
-           'v2' + \
-           payload_string
+	if operation.lower() == "instant":
+
+		operation_string = operation.lower() + "/"
+
+		if not amount:
+			raise Exception( "Parameter missing" )
+
+		payload[ 'amount' ] = float( amount )
+
+		if buyOrSell.lower() == "buy":
+			bos = buyOrSell.lower()
+		elif buyOrSell.lower() == "sell":
+			bos = buyOrSell.lower()
+		else:
+			if buyOrSell:
+				raise Exception( "Parameter error" )
+			else:
+				raise Exception( "Parameter missing" )
+
+		content_type = 'application/x-www-form-urlencoded'
+
+	elif operation.lower() == "limit":
+
+		operation_string = ""
+
+		if not amount:
+			raise Exception( "Parameter missing" )
+		if not price:
+			raise Exception( "Parameter missing" )
+
+		payload[ 'amount' ] = float( amount )
+		payload[ 'price' ] = float( price )
+		if ioc:
+			payload[ 'ioc_order' ] = bool( ioc )
+		if fok:
+			payload[ 'fok_order' ] = bool( fok )
+
+		if buyOrSell.lower() == "buy":
+			bos = buyOrSell.lower()
+		elif buyOrSell.lower() == "sell":
+			bos = buyOrSell.lower()
+		else:
+			if buyOrSell:
+				raise Exception( "Parameter error" )
+			else:
+				raise Exception( "Parameter missing" )
+
+		content_type = 'application/x-www-form-urlencoded'
+
+	elif operation.lower() == "status":
+
+		operation_string = "order_status/"
+
+		if not order_id:
+			raise Exception( "Parameter missing" )
+
+		payload[ 'id' ] = order_id
+		api_version = 1
+
+	elif operation.lower() == "balance":
+
+		operation_string = "balance/"
+
+	else:
+		raise Exception( "Unkown API" )
+
+	payload_URLencoded = urlencode( payload )
+
+	if api_version == 2:
+		message = 'BITSTAMP ' + API_KEY + \
+                'POST' + \
+                'www.bitstamp.net' + \
+                f'/api/v2/{operation_string}'+(f'{bos}/{COPPIA_DA_USARE_NOME}/' if bos else '') + \
+                '' + \
+                (content_type if content_type else "") + \
+                nonce + \
+                timestamp + \
+                'v2' + \
+                payload_URLencoded
+	else:
+		message = 'BITSTAMP ' + API_KEY + \
+                'POST' + \
+                'www.bitstamp.net' + \
+                f'/api/{operation_string}/' + \
+                '' + \
+                nonce + \
+                timestamp + \
+                'v2' + \
+                payload_URLencoded
+
 	message = message.encode( 'utf-8' )
 	signature = hmac.new( API_SECRET, msg=message,
 		digestmod=hashlib.sha256 ).hexdigest()
+
 	headers = {
-		'X-Auth': 'BITSTAMP ' + api_key,
+		'X-Auth': 'BITSTAMP ' + API_KEY,
 		'X-Auth-Signature': signature,
 		'X-Auth-Nonce': nonce,
 		'X-Auth-Timestamp': timestamp,
-		'X-Auth-Version': 'v2',
+		'X-Auth-Version': 'v2'
 	}
-	r = requests.post(
-		'https://www.bitstamp.net/api/v2/balance/',
-		headers=headers,
-		data=payload_string
-	)
-	# /balance puo' failare solo per colpa dell'autenticazione, non ha risposte negative
-	return r.content
+	if content_type:
+		headers[ 'Content-Type' ] = content_type
 
+	if api_version == 2:
+		r = requests.post(
+			f'https://www.bitstamp.net/api/v2/{operation_string}' +
+			( f'{bos}/{COPPIA_DA_USARE_NOME}/' if bos else '' ),
+			headers=headers,
+			data=payload_URLencoded
+		)
 
-def getOrderStatus( order_id ):
-	"""Ottieni Cripto e Soldi disponibili
+	else:
+		r = requests.post(
+			f'https://www.bitstamp.net/api/{operation_string}/',
+			headers=headers,
+			data=payload_URLencoded
+		)
 
-	Returns:
-		list -- array di Cripto e Soldi disponibili
-	"""
-	timestamp = str( int( round( time.time() * 1000 ) ) )
-	nonce = str( uuid.uuid4() )
-	payload = { 'id': order_id}
+	if not r.status_code == 200:
+		if 'reason' in r.content:
+			logging.info( r.content[ 'reason' ] )
+		raise Exception( 'Status code not 200' )
 
-	payload_string = urlencode( payload )
-
-	# '' (empty string) in message represents any query parameters or an empty string in case there are none
-	message = 'BITSTAMP ' + api_key + \
-           'POST' + \
-           'www.bitstamp.net' + \
-           '/api/order_status/' + \
-           '' + \
-           nonce + \
-           timestamp + \
-           'v2' + \
-           payload_string
-	message = message.encode( 'utf-8' )
-	signature = hmac.new( API_SECRET, msg=message,
-		digestmod=hashlib.sha256 ).hexdigest()
-	headers = {
-		'X-Auth': 'BITSTAMP ' + api_key,
-		'X-Auth-Signature': signature,
-		'X-Auth-Nonce': nonce,
-		'X-Auth-Timestamp': timestamp,
-		'X-Auth-Version': 'v2',
-	}
-	r = requests.post(
-		'https://www.bitstamp.net/api/order_status/',
-		headers=headers,
-		data=payload_string
-	)
+	if content_type:
+		string_to_sign = (
+			nonce + timestamp + r.headers.get( 'Content-Type' )
+		).encode( 'utf-8' ) + r.content
+		signature_check = hmac.new(
+			API_SECRET, msg=string_to_sign, digestmod=hashlib.sha256
+		).hexdigest()
+		if not r.headers.get( 'X-Server-Auth-Signature' ) == signature_check:
+			raise Exception( 'Signatures do not match' )
 
 	return r.content
