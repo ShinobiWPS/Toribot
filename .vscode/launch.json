@@ -5,55 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Play B dev ", //dev:statici
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["B", "", "dev"],
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-
-    {
-      "name": "Play BR-gbp dev", //dev:statici +
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["BR-gbp", "dev"],
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "name": "Play BR-gbp ",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["BR-gbp"],
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-
-    {
-      "name": "Play BR dev ", //dev:statici +
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["BR", "", "dev"],
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-
-    {
-      "name": "Play M dev ", //dev:statici +
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["M", "", "dev"],
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "name": "Play BO dev ", //dev:statici +
+      "name": "Play BL ",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
