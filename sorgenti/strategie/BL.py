@@ -19,7 +19,7 @@ force_sell = False
 
 
 def gestore(orderbook: dict):
-	global Fattore_Perdita
+	global Fattore_Perdita, force_sell,force_buy
 
 	#todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
 	try:

@@ -58,7 +58,7 @@ def avvio():
 		dt_string = now.strftime(FORMATO_DATA_ORA)
 
 		# Creo tutte le cartelle necessarie
-		Path(TRADING_REPORT_FILENAME).mkdir(parents=True, exist_ok=True)
+		Path(TRADING_REPORT_FILENAME).parent.mkdir(parents=True, exist_ok=True)
 		# Scrivo sul report
 		report.FileWrite(TRADING_REPORT_FILENAME, ('*' * 5) + "STARTED" + ('*' * 5) + "\n")
 
@@ -673,7 +673,7 @@ if __name__ == "__main__":
 		# Inizializzo il thread per la funzione avvio()
 		mybot = threading.Thread(target=avvio, daemon=True)
 
-		if False:
+		if True:
 			# Avvio come thread la funzione avvio()
 			mybot.start()
 
