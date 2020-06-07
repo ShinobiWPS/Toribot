@@ -19,7 +19,7 @@ force_sell = False
 
 
 def gestore(orderbook: dict):
-	global Fattore_Perdita, force_sell,force_buy
+	global Fattore_Perdita, force_sell, force_buy
 
 	#todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
 	try:
@@ -207,9 +207,8 @@ def gestore(orderbook: dict):
 				# Se (l'ordine in causa è stato esaudito o è senza ID perchè è stato finito)
 				# e (il prezzo d'acquisto è minore del prezzo con cui venderei o sto forzando la vendita)
 				# e le cripto che mi comprerebbero sono maggiori di quelle che ho [quindi me le comprano tutte])
-				if (order['order_status'] == "finished"
-					or not order['order_id']) and (order['price'] < bids_price
-					or force_sell) and bids_amount >= order['amount']:
+				if (order['order_status'] == "finished" or not order['order_id']
+					) and (order['price'] < bids_price) and bids_amount >= order['amount']:
 					# Resetto la vendita forzata
 					force_sell = False
 					## Vendo
@@ -233,8 +232,12 @@ def gestore(orderbook: dict):
 					# per ordine e evitare problemi
 					del order_result
 
-	except Exception as e:
-		raise e
+	except Exception as ex:
+		# In caso di eccezioni printo e loggo tutti i dati disponibili
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+		print(ex, exc_type, fname, exc_tb.tb_lineno)
+		logging.error(ex)
 	finally:
 		# Aggiorno l'ultimo valore
 		managerJson.commercialista("ultimo_valore", orderbook)
