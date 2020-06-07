@@ -15,10 +15,10 @@ from flask import Flask, request
 from flask_cors import CORS
 
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import (COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA,
-                                     LOG_CARTELLA_PERCORSO,
-                                     TRADING_REPORT_FILENAME, VALUTA_CRIPTO,
-                                     VALUTA_SOLDI)
+from costanti.costanti_unico import (
+	COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA, LOG_CARTELLA_PERCORSO, TRADING_REPORT_FILENAME,
+	VALUTA_CRIPTO, VALUTA_SOLDI
+)
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
 from utilita import gestoreRapporti as report
@@ -438,8 +438,8 @@ def forza_bilancio():
 						# Chiedo alla piattaforma l'orderbook
 						orderbook = json.loads(bitstamp.getOrderbook())
 						# Ridimensiono l'orderbook
-						orderbook['asks'] = orderbook['asks'][0]
-						orderbook['bids'] = orderbook['bids'][0]
+						orderbook['asks'] = [orderbook['asks'][0]]
+						orderbook['bids'] = [orderbook['bids'][0]]
 						# Aggiorno l'ultimo valore con il nuovo orderbook
 						managerJson.commercialista("ultimo_valore", orderbook)
 						# Recupero l'ultimo ASKS price
@@ -469,8 +469,8 @@ def forza_bilancio():
 					# Chiedo alla piattaforma l'orderbook
 					orderbook = json.loads(bitstamp.getOrderbook())
 					# Ridimensiono l'orderbook
-					orderbook['asks'] = orderbook['asks'][0]
-					orderbook['bids'] = orderbook['bids'][0]
+					orderbook['asks'] = [orderbook['asks'][0]]
+					orderbook['bids'] = [orderbook['bids'][0]]
 					# Aggiorno l'ultimo valore con il nuovo orderbook
 					managerJson.commercialista("ultimo_valore", orderbook)
 					# Recupero l'ultimo ASKS price
