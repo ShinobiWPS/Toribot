@@ -15,10 +15,10 @@ from flask import Flask, request
 from flask_cors import CORS
 
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import (
-	COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA, LOG_CARTELLA_PERCORSO, TRADING_REPORT_FILENAME,
-	VALUTA_CRIPTO, VALUTA_SOLDI
-)
+from costanti.costanti_unico import (COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA,
+                                     LOG_CARTELLA_PERCORSO,
+                                     TRADING_REPORT_FILENAME, VALUTA_CRIPTO,
+                                     VALUTA_SOLDI)
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
 from utilita import gestoreRapporti as report
@@ -429,8 +429,22 @@ def forza_bilancio():
 					# Genero quindi un ordine fittizio da aggiungere al mio json
 					# in modo da colmare la lacuna
 
-					# Recupero l'ultimo ASKS price
-					my_price = ultimo_valore['asks'][0][0]
+					# Se c'è un ultimo valore
+					if 'asks' in ultimo_valore:
+						# Recupero l'ultimo ASKS price
+						my_price = ultimo_valore['asks'][0][0]
+					# Se non c'è nessun ultimo valore
+					else:
+						# Chiedo alla piattaforma l'orderbook
+						orderbook = json.loads(bitstamp.getOrderbook())
+						# Ridimensiono l'orderbook
+						orderbook['asks'] = orderbook['asks'][0]
+						orderbook['bids'] = orderbook['bids'][0]
+						# Aggiorno l'ultimo valore con il nuovo orderbook
+						managerJson.commercialista("ultimo_valore", orderbook)
+						# Recupero l'ultimo ASKS price
+						my_price = orderbook['asks'][0][0]
+
 					# Scrivo l'ordine fittizio sul mio json
 					managerJson.addOrder(
 						amount=cripto_balance - cripto_stimated,
@@ -446,8 +460,22 @@ def forza_bilancio():
 				# Genero quindi un ordine fittizio da aggiungere al mio json
 				# in modo da colmare la lacuna
 
-				# Recupero l'ultimo ASKS price
-				my_price = ultimo_valore['asks'][0][0]
+				# Se c'è un ultimo valore
+				if 'asks' in ultimo_valore:
+					# Recupero l'ultimo ASKS price
+					my_price = ultimo_valore['asks'][0][0]
+				# Se non c'è nessun ultimo valore
+				else:
+					# Chiedo alla piattaforma l'orderbook
+					orderbook = json.loads(bitstamp.getOrderbook())
+					# Ridimensiono l'orderbook
+					orderbook['asks'] = orderbook['asks'][0]
+					orderbook['bids'] = orderbook['bids'][0]
+					# Aggiorno l'ultimo valore con il nuovo orderbook
+					managerJson.commercialista("ultimo_valore", orderbook)
+					# Recupero l'ultimo ASKS price
+					my_price = orderbook['asks'][0][0]
+
 				# Scrivo l'ordine fittizio sul mio json
 				managerJson.addOrder(
 					amount=cripto_balance - cripto_stimated,
@@ -644,8 +672,10 @@ if __name__ == "__main__":
 	try:
 		# Inizializzo il thread per la funzione avvio()
 		mybot = threading.Thread(target=avvio, daemon=True)
-		# Avvio come thread la funzione avvio()
-		mybot.start()
+
+		if False:
+			# Avvio come thread la funzione avvio()
+			mybot.start()
 
 		# Avvia il il bot di telegram
 		tg_bot = TelegramBot(False)

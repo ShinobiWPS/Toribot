@@ -1,8 +1,9 @@
-import datetime
 import json
 import logging
 import os
 import sys
+import time
+from datetime import datetime
 from pathlib import Path
 
 from costanti.valori_percorso import VALORI_PERCORSO
@@ -11,7 +12,7 @@ from costanti.valori_percorso import VALORI_PERCORSO
 def gestoreValoriJson(chiave=None, valore=None):
 	try:
 
-		Path(VALORI_PERCORSO).mkdir(parents=True, exist_ok=True)
+		Path(VALORI_PERCORSO).parent.mkdir(parents=True, exist_ok=True)
 
 		with open(VALORI_PERCORSO, 'r+') as jsonFile:
 			if chiave is not None and valore is not None:
@@ -113,7 +114,7 @@ def addOrder(
 		'order_id': order_id,
 		'order_status': order_status,
 		'bos': bos,
-		'timestamp': timestamp,
+		'timestamp': time.mktime(timestamp.timetuple()),
 		'datetime': datetime
 	}
 	valori_json = gestoreValoriJson("orders", order)

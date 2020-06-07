@@ -9,7 +9,7 @@
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["BO", "", "dev"],
+      "args": ["BL", "", "dev"],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },
