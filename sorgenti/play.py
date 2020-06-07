@@ -514,17 +514,27 @@ def bilancio():
 	return '', 404
 
 
-# @app.route('/bilancio_stimato', methods=['GET'])
-# def bilancio_stimato():
-# Verifico che il token passato via GET sia corretto
-# 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
-# 		cripto, soldi = portafoglio()
-# 		ultimo_valore = commercialista()[0]
-# 		return str(
-# 			str(soldi) + " " + VALUTA_SOLDI if soldi else str(cripto * ultimo_valore) + " " + VALUTA_CRIPTO
-# 		), 200
-# Ritorno 404
-# 	return '', 404
+@app.route('/bilancio_stimato', methods=['GET'])
+def bilancio_stimato():
+	# Verifico che il token passato via GET sia corretto
+	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
+		# Ottengo gli ordini dal mio json
+		cripto, soldi = managerJson.portafoglio()
+		ultimo_valore, orders = managerJson.commercialista()
+		# Inizializzo la variabile per la stima
+		soldi_stimati = 0
+		# Per tutti gli ordini
+		for order in orders:
+			# Sommo il valore attuale delle cripto in soldi
+			soldi_stimati += order['amount'] * float(ultimo_valore['bids'][0][0])
+		# Sommo i soldi stimati con i soldi rimasti inutilizzati
+		soldi_stimati += soldi
+		# Ritorno il valore dei soldi stimati
+		return str(soldi_stimati) + " " + VALUTA_SOLDI, 200
+
+	# Ritorno 404
+	return '', 404
+
 
 # @app.route('/imposta_bilancio', methods=['GET'])
 # def imposta_bilancio():
@@ -679,7 +689,7 @@ if __name__ == "__main__":
 			mybot.start()
 
 		# Avvia il il bot di telegram
-		tg_bot = TelegramBot(False)
+		tg_bot = TelegramBot(True)
 
 		# Avvia le API
 		app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False, threaded=True)

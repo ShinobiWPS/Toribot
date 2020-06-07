@@ -113,13 +113,14 @@ def getOrders(chiave='order_id', valore=None):
 	return None
 
 
-def addOrder(
-	amount, price, order_id, bos, timestamp=datetime.now(), datetime=None, order_status=None
-):
+def addOrder(amount, price, order_id, bos, timestamp=None, my_datetime=None, order_status=None):
+
+	if timestamp == None:
+		timestamp = datetime.now()
 	if not order_status:
 		order_status = "processing"
-	if not datetime:
-		datetime = timestamp.strftime("%Y/%m/%d %H:%M:%S")
+	if not my_datetime:
+		my_datetime = timestamp.strftime("%Y/%m/%d %H:%M:%S")
 	order = {
 		'amount': amount,
 		'price': price,
@@ -127,7 +128,7 @@ def addOrder(
 		'order_status': order_status,
 		'bos': bos,
 		'timestamp': time.mktime(timestamp.timetuple()),
-		'datetime': datetime
+		'datetime': my_datetime
 	}
 	valori_json = gestoreValoriJson("orders", order)
 	if valori_json and "orders" in valori_json:

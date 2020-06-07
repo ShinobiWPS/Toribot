@@ -19,6 +19,7 @@ force_buy = False
 force_sell = False
 closing = False
 
+
 def gestore(orderbook: dict):
 	global Fattore_Perdita, force_sell, force_buy, closing
 
@@ -52,6 +53,11 @@ def gestore(orderbook: dict):
 						# Aggiorno lo stato dell'ordine nel mio json
 						managerJson.gestoreValoriJson([ 'orders', index, 'order_status'],
 							order_status['status'])
+						# Salvo la risposta del checkOrder in un json per Debug
+						report.JsonWrites(
+							LOG_CARTELLA_PERCORSO + "/check" + str(order['bos']) + "_" +
+							str(order['order_id']) + ".json", "w+", order_status
+						)
 						# Se lo stato è finished
 						if order_status['status'].lower() == "finished":
 							# Cancello l'ID dell'ordine in quanto già easudito
@@ -62,12 +68,11 @@ def gestore(orderbook: dict):
 							# Converto il timestamp attuale in un datetime in formato umano
 							dt_string = now.strftime(FORMATO_DATA_ORA)
 
-							# Salvo la risposta del checkOrder in un json per Debug
-							report.JsonWrites(
-								LOG_CARTELLA_PERCORSO + "/check" + str(order['bos']) + "_" +
-								str(order['order_id']) + ".json", "w+", dt_string + " CLOSE " +
+							# Aggiungo al report la chiusura dell'ordine
+							report.FileAppend(
+								TRADING_REPORT_FILENAME, dt_string + " CLOSE " +
 								str(order['bos']).upper() + " " + str(order['order_id']) + " [" +
-								str(order['price']) + "] " + str(order['amount']) + (
+								str(order['price']) + "] " + str(order['amount']) + " " + (
 								VALUTA_SOLDI.upper()
 								if order['bos'].lower() == "sell" else VALUTA_CRIPTO.upper()
 								)
@@ -107,6 +112,14 @@ def gestore(orderbook: dict):
 								managerJson.gestoreValoriJson([ 'orders', index ], '')
 
 					else:
+						# Se è un ordine non finished e failato
+						if order['order_status'].lower(
+						) != "finished" and 'error' in order_status and order_status[
+							'error'] == "Order not found":
+							# Aggiorno il valore dei soldi nel mio json
+							managerJson.portafoglio("soldi", order['amount'] * order['price'])
+							# Cancello l'ordine
+							managerJson.gestoreValoriJson([ 'orders', index ], '')
 						# Se nella risposta del checkOrder non c'è lo status dell'ordine,
 						# ma c'è il motivo dell'errore
 						if 'error' in order_status:
@@ -140,7 +153,7 @@ def gestore(orderbook: dict):
 		#todo- necessario? set minimum cripto of ? (c'e un minimo ma non ricordo quale sia)
 
 		# Se ho abbastanza soldi per fare un'ordine minimo (minimo per la piattaforma)
-		if soldi > MINIMUM_ORDER:
+		if soldi > MINIMUM_ORDER or force_buy:
 			# Resetto l'acquisto forzato (al momento non utilizzato)
 			force_buy = False
 			## Compro
@@ -162,9 +175,12 @@ def gestore(orderbook: dict):
 				dt_string = now.strftime(FORMATO_DATA_ORA)
 				report.JsonWrites(
 					LOG_CARTELLA_PERCORSO + "/buy_" + str(order_result['id']) + ".json", "w+",
-					dt_string + " OPEN BUY " + str(order_result['id']) + " [" +
-					str(order_result['price']) + "] " + str(soldi) + " -> " + str(my_amount) +
-					"==" + str(order_result['amount'])
+					order_result
+				)
+				report.FileAppend(
+					TRADING_REPORT_FILENAME, dt_string + " OPEN BUY " + str(order_result['id']) +
+					" [" + str(order_result['price']) + "] " + str(soldi) + " -> " +
+					str(my_amount) + "==" + str(order_result['amount'])
 				)
 				# Aggiungo l'apertura dell'ordine al mio json
 				managerJson.addOrder(
@@ -224,8 +240,8 @@ def gestore(orderbook: dict):
 				# e (il prezzo d'acquisto è minore del prezzo con cui venderei o sto forzando la vendita)
 				# e le cripto che mi comprerebbero sono maggiori di quelle che ho [quindi me le comprano tutte])
 				if (order['order_status'].lower() == "finished" or not order['order_id']
-					) and (float(order['price']) < float(bids_price)
-					or force_sell or closing) and float(bids_amount) >= float(order['amount']):
+					) and (float(order['price']) < float(bids_price) or force_sell
+					or closing) and float(bids_amount) >= float(order['amount']):
 					# Resetto la vendita forzata
 					force_sell = False
 					## Vendo
@@ -252,9 +268,12 @@ def gestore(orderbook: dict):
 						dt_string = now.strftime(FORMATO_DATA_ORA)
 						report.JsonWrites(
 							LOG_CARTELLA_PERCORSO + "/sell_" + str(order_result['id']) + ".json",
-							"w+", dt_string + " OPEN SELL " + str(order_result['id']) + " [" +
-							str(order_result['price']) + "] " + str(soldi) + " -> " +
-							str(order_result['amount'])
+							"w+", order_result
+						)
+						report.FileAppend(
+							TRADING_REPORT_FILENAME, dt_string + " OPEN SELL " +
+							str(order_result['id']) + " [" + str(order_result['price']) + "] " +
+							str(soldi) + " -> " + str(order_result['amount'])
 						)
 						# Cancello la variabile con la risposta dell'ordine di acquisto
 						# per ordine e evitare problemi
