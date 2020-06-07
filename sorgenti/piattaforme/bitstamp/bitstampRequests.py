@@ -10,7 +10,7 @@ from urllib.parse import urlencode
 import requests
 
 from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME, VALUTA_CRIPTO, VALUTA_SOLDI)
-from piattaforme.bitstamp.key import API_SECRET
+from piattaforme.bitstamp.key import API_SECRET, CUSTOMER_ID
 from piattaforme.bitstamp.key import api_key as API_KEY
 from piattaforme.bitstamp.key import client_id as CLIENT_ID
 
@@ -44,7 +44,7 @@ def makeLimitOrder(buyOrSell, amount, price, ioc=None, fok=None):
 
 
 def checkOrder(order_id):
-	return makeRequest(operation="order_status", order_id=order_id)
+	return makeRequest(operation="status", order_id=order_id)
 
 
 def getBalance():
@@ -150,28 +150,26 @@ def makeRequest(
 
 	if api_version == 2:
 		message = 'BITSTAMP ' + API_KEY + \
-                                                    'POST' + \
-                                                    'www.bitstamp.net' + \
-                                                    f'/api/v2/{operation_string}'+(f'{bos}/{COPPIA_DA_USARE_NOME}/' if bos else '') + \
-                                                    '' + \
-                                                    (content_type if content_type else "") + \
-                                                    nonce + \
-                                                    timestamp + \
-                                                    'v2' + \
-                                                    payload_URLencoded
+                                                                                                                                                                            'POST' + \
+                                                                                                                                                                            'www.bitstamp.net' + \
+                                                                                                                                                                            f'/api/v2/{operation_string}'+(f'{bos}/{COPPIA_DA_USARE_NOME}/' if bos else '') + \
+                                                                                                                                                                            '' + \
+                                                                                                                                                                            (content_type if content_type else "") + \
+                                                                                                                                                                            nonce + \
+                                                                                                                                                                            timestamp + \
+                                                                                                                                                                            'v2' + \
+                                                                                                                                                                            payload_URLencoded
+		message = message.encode('utf-8')
+		signature = hmac.new(API_SECRET, msg=message, digestmod=hashlib.sha256).hexdigest().upper()
 	else:
-		message = 'BITSTAMP ' + API_KEY + \
-                                                    'POST' + \
-                                                    'www.bitstamp.net' + \
-                                                    f'/api/{operation_string}/' + \
-                                                    '' + \
-                                                    nonce + \
-                                                    timestamp + \
-                                                    'v2' + \
-                                                    payload_URLencoded
-
-	message = message.encode('utf-8')
-	signature = hmac.new(API_SECRET, msg=message, digestmod=hashlib.sha256).hexdigest()
+		nonce = str(int(time.time() * 10))
+		message = nonce + str(CUSTOMER_ID) + str(API_KEY)
+		message = message.encode('utf-8')
+		signature = hmac.new(API_SECRET, msg=message, digestmod=hashlib.sha256).hexdigest().upper()
+		payload['signature'] = signature
+		payload['nonce'] = nonce
+		payload['key'] = API_KEY
+		payload_URLencoded = urlencode(payload)
 
 	headers = {
 		'X-Auth': 'BITSTAMP ' + API_KEY,
@@ -180,6 +178,7 @@ def makeRequest(
 		'X-Auth-Timestamp': timestamp,
 		'X-Auth-Version': 'v2'
 	}
+
 	if content_type:
 		headers['Content-Type'] = content_type
 
@@ -195,8 +194,8 @@ def makeRequest(
 	else:
 		r = requests.post(
 			f'https://www.bitstamp.net/api/{operation_string}/',
-			headers=headers,
-			data=payload_URLencoded
+			# headers=headers,
+			data=payload
 		)
 
 	if not r.status_code == 200:

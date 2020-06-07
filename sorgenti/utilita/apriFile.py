@@ -10,72 +10,79 @@ from costanti.costanti_unico import VALORI_PERCORSO, VALORI_TEMPLATE_PERCORSO
 
 
 def gestoreValoriJson(chiave=None, valore=None):
-	try:
+	# try:
 
-		Path(VALORI_PERCORSO).parent.mkdir(parents=True, exist_ok=True)
-		if not os.path.exists(VALORI_PERCORSO) and os.path.exists(VALORI_TEMPLATE_PERCORSO):
-			with open(str(VALORI_TEMPLATE_PERCORSO).strip(), "r") as file:
-				template = file.read().strip()
-			with open(str(VALORI_PERCORSO).strip(), "w") as file:
-				file.write(template.strip())
+	Path(VALORI_PERCORSO).parent.mkdir(parents=True, exist_ok=True)
+	if not os.path.exists(VALORI_PERCORSO) and os.path.exists(VALORI_TEMPLATE_PERCORSO):
+		with open(str(VALORI_TEMPLATE_PERCORSO).strip(), "r") as file:
+			template = file.read().strip()
+		with open(str(VALORI_PERCORSO).strip(), "w") as file:
+			file.write(template.strip())
 
-		with open(VALORI_PERCORSO, 'r+') as jsonFile:
-			if chiave is not None and valore is not None:
-				try:
-					valori_json = json.loads(jsonFile.read())
+	with open(VALORI_PERCORSO, 'r+') as jsonFile:
+		if chiave is not None and valore is not None:
+			# try:
+			valori_json = json.loads(jsonFile.read())
 
-					jsonFile.seek(0)
+			jsonFile.seek(0)
 
-					if isinstance(chiave, list):
-						tmp_config = valori_json
-						for key in chiave[:-1]:
-							if key in tmp_config:
-								if not isinstance(tmp_config[key], dict):
-									del tmp_config[key]
-									tmp_config[key] = {}
-								tmp_config = tmp_config[key]
-							else:
-								tmp_config[key] = {}
-								tmp_config = tmp_config[key]
-						if isinstance(chiave, list) or isinstance(chiave, dict):
-							if isinstance(tmp_config[chiave[-1]], list):
-								tmp_config[chiave[-1]].append(valore)
-							else:
-								tmp_config[chiave[-1]] = valore
-						else:
-							valore = str(valore)
-							if valore.lower() == "True".lower() or valore.lower() == "False".lower(
-							):
-								tmp_config[chiave[-1]
-											] = True if valore.lower() == "True".lower() else False
-							elif valore.replace('-', '',
-								1).isdigit() and valore[1:].find('-') == -1:
-								tmp_config[chiave[-1]] = int(valore)
-							elif valore.replace('-', '', 1).replace('.', '', 1).replace(',', '',
-								1).isdigit() and valore[1:].find('-') == -1:
-								tmp_config[chiave[-1]] = float(valore)
-							else:
-								tmp_config[chiave[-1]] = valore
-
-						if valore == "":
-							del tmp_config[chiave[-1]]
-
+			if isinstance(chiave, list):
+				tmp_config = valori_json
+				for key in chiave[:-1]:
+					if (isinstance(tmp_config, dict) and key
+						in tmp_config) or (isinstance(tmp_config, list) and key < len(tmp_config)):
+						if not isinstance(tmp_config[key],
+							dict) and not isinstance(tmp_config[key], list):
+							del tmp_config[key]
+							tmp_config[key] = {}
+						tmp_config = tmp_config[key]
 					else:
-						if isinstance(valori_json[chiave], list):
-							valori_json[chiave].append(valore)
-						else:
-							valori_json[chiave] = valore
+						tmp_config[key] = {}
+						tmp_config = tmp_config[key]
+				if isinstance(chiave, list) or isinstance(chiave, dict):
+					if isinstance(tmp_config[chiave[-1]], list):
+						tmp_config[chiave[-1]].append(valore)
+					else:
+						tmp_config[chiave[-1]] = valore
+				else:
+					valore = str(valore)
+					if valore.lower() == "True".lower() or valore.lower() == "False".lower():
+						tmp_config[chiave[-1]] = True if valore.lower() == "True".lower() else False
+					elif valore.replace('-', '', 1).isdigit() and valore[1:].find('-') == -1:
+						tmp_config[chiave[-1]] = int(valore)
+					elif valore.replace('-', '', 1).replace('.', '', 1).replace(',', '',
+						1).isdigit() and valore[1:].find('-') == -1:
+						tmp_config[chiave[-1]] = float(valore)
+					else:
+						tmp_config[chiave[-1]] = valore
 
-					jsonFile.write(json.dumps(valori_json, sort_keys=True, indent=4))
-					jsonFile.truncate()
+				if valore == "":
+					del tmp_config[chiave[-1]]
 
-					return valori_json
-				except Exception as e:
-					logging.error(e)
 			else:
-				return json.loads(jsonFile.read())
-	except Exception as e:
-		logging.error(e)
+				if isinstance(valori_json[chiave], list):
+					valori_json[chiave].append(valore)
+				else:
+					valori_json[chiave] = valore
+
+			jsonFile.write(json.dumps(valori_json, sort_keys=True, indent=4))
+			jsonFile.truncate()
+
+			return valori_json
+			#except Exception as ex:
+			#	# In caso di eccezioni printo e loggo tutti i dati disponibili
+			#	exc_type, exc_obj, exc_tb = sys.exc_info()
+			#	fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+			#	print(ex, exc_type, fname, exc_tb.tb_lineno)
+			#	logging.error(ex)
+		else:
+			return json.loads(jsonFile.read())
+	# except Exception as ex:
+	# 	# In caso di eccezioni printo e loggo tutti i dati disponibili
+	# 	exc_type, exc_obj, exc_tb = sys.exc_info()
+	# 	fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+	# 	print(ex, exc_type, fname, exc_tb.tb_lineno)
+	# 	logging.error(ex)
 
 
 def portafoglio(chiave=None, valore=None):

@@ -15,10 +15,10 @@ from flask import Flask, request
 from flask_cors import CORS
 
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import (COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA,
-                                     LOG_CARTELLA_PERCORSO,
-                                     TRADING_REPORT_FILENAME, VALUTA_CRIPTO,
-                                     VALUTA_SOLDI)
+from costanti.costanti_unico import (
+	COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA, LOG_CARTELLA_PERCORSO, TRADING_REPORT_FILENAME,
+	VALUTA_CRIPTO, VALUTA_SOLDI
+)
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
 from utilita import gestoreRapporti as report
@@ -61,6 +61,7 @@ def avvio():
 		Path(TRADING_REPORT_FILENAME).parent.mkdir(parents=True, exist_ok=True)
 		# Scrivo sul report
 		report.FileWrite(TRADING_REPORT_FILENAME, ('*' * 5) + "STARTED" + ('*' * 5) + "\n")
+		logging.info(('*' * 5) + "STARTED" + ('*' * 5) + "\n")
 
 		# Chiedo alla piattaforma il bilancio
 		balance = json.loads(bitstamp.getBalance())
@@ -485,7 +486,7 @@ def forza_bilancio():
 					bos="buy"
 				)
 		# Ritorno i soldi
-		return str(soldi), 200
+		return str(soldi_balance), 200
 
 	# Ritorno 404
 	return '', 404
