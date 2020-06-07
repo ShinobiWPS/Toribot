@@ -125,15 +125,15 @@ def gestore(orderbook: dict):
 		# Estraggo i valori dall'orderbook
 		# dal primo bids (proposta d'acquisto)
 		# il primo valore è il price (prezzo)
-		bids_price = orderbook['bids'][0][0]
+		bids_price = float(orderbook['bids'][0][0])
 		# il secondo valore è l'amount (quantità)
-		bids_amount = orderbook['bids'][0][1]
+		bids_amount = float(orderbook['bids'][0][1])
 
 		# dal primo asks (proposta di vendita)
 		# il primo valore è il price (prezzo)
-		asks_price = orderbook['asks'][0][0]
+		asks_price = float(orderbook['asks'][0][0])
 		# il secondo valore è l'amount (quantità)
-		asks_amount = orderbook['asks'][0][1]
+		asks_amount = float(orderbook['asks'][0][1])
 
 		#todo- set minimum soldi of 25
 		#todo- necessario? set minimum cripto of ? (c'e un minimo ma non ricordo quale sia)

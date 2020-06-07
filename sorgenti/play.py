@@ -443,7 +443,7 @@ def forza_bilancio():
 						# Aggiorno l'ultimo valore con il nuovo orderbook
 						managerJson.commercialista("ultimo_valore", orderbook)
 						# Recupero l'ultimo ASKS price
-						my_price = orderbook['asks'][0][0]
+						my_price = float(orderbook['asks'][0][0])
 
 					# Scrivo l'ordine fittizio sul mio json
 					managerJson.addOrder(
