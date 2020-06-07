@@ -285,6 +285,76 @@ def forza_bilancio():
 				dt_string + " Sync balance: " + str(round(soldi_balance - soldi, 5)) + " " +
 				str(VALUTA_SOLDI.upper())
 			)
+		cripto_balance = float(
+			balance[f"{VALUTA_CRIPTO}_balance"]
+		) if f"{VALUTA_CRIPTO}_balance" in balance else None
+		if cripto_balance:
+			# Ottengo gli ordini dal mio json
+			ultimo_valore, orders = managerJson.commercialista()
+			cripto_stimated = 0
+			# Per tutti gli ordini
+			for order in orders:
+				# Se è un ordine d'acquisto
+				if order['bos'] == "buy":
+					cripto_stimated += order['amount']
+			# Se la cripto che ho stimato di avere in base agli ordini nel json
+			# è maggiore delle cripto che ho sul conto vuol dire che degli ordini non sono stati esauditi
+			if cripto_stimated > cripto_balance:
+				# Riprovo quindi tenendo conto solo degli ordini certamente easuditi.
+				# Riazzero la cripto stimate, per rifare il conteggio
+				cripto_stimated = 0
+
+				# Per tutti gli ordini
+				for order in orders:
+					# Se è un ordine di acquisto
+					# ed è stato completato (perchè non ha id o ha stato == finished [come da documentazione della piattaforma])
+					if order['bos'] == "buy" and (
+						not order['order_id'] or order['order_status'] == "finished"
+					):
+						cripto_stimated += order['amount']
+
+				# Se la cripto che ho stimato di avere in base agli ordini nel json
+				# è ancora maggiore delle cripto che ho sul conto vuol dire che ci sono degli ordini falsati
+				# non posso continuare perchè potrei cercare di vendere cripto che non ho
+				if cripto_stimated > cripto_balance:
+					logging.error("Errore valori.json falsi ordini, riverificare manualmente")
+					report.FileAppend(
+						TRADING_REPORT_FILENAME,
+						dt_string + " Errore valori.json falsi ordini, riverificare manualmente"
+					)
+					raise Exception(
+						"Incoerenze non sistemabili automaticamente, provvedere manualmente prima di riavviare"
+					)
+
+				# Se la cripto che ho stimato di avere in base agli ordini nel json
+				# è minore delle cripto che ho sul conto vuol dire che ho delle cripto non considerate nel json
+				elif cripto_stimated < cripto_balance:
+					# Genero quindi un ordine fittizio da aggiungere al mio json
+					# in modo da colmare la lacuna
+
+					my_price = ultimo_valore['asks'][0][0]
+					managerJson.addOrder(
+						amount=cripto_balance - cripto_stimated,
+						price=my_price,
+						order_id=0,
+						order_status="forced",
+						bos="buy"
+					)
+
+			# Se la cripto che ho stimato di avere in base agli ordini nel json
+			# è minore delle cripto che ho sul conto vuol dire che ho delle cripto non considerate nel json
+			elif cripto_stimated < cripto_balance:
+				# Genero quindi un ordine fittizio da aggiungere al mio json
+				# in modo da colmare la lacuna
+
+				my_price = ultimo_valore['asks'][0][0]
+				managerJson.addOrder(
+					amount=cripto_balance - cripto_stimated,
+					price=my_price,
+					order_id=0,
+					order_status="forced",
+					bos="buy"
+				)
 
 		return str(soldi), 200
 

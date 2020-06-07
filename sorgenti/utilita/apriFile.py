@@ -100,8 +100,11 @@ def getOrders(chiave='order_id', valore=None):
 	return None
 
 
-def addOrder(amount, price, order_id, bos, timestamp=datetime.now(), datetime=None):
-	order_status = "processing"
+def addOrder(
+	amount, price, order_id, bos, timestamp=datetime.now(), datetime=None, order_status=None
+):
+	if not order_status:
+		order_status = "processing"
 	if not datetime:
 		datetime = timestamp.strftime("%Y/%m/%d %H:%M:%S")
 	order = {
