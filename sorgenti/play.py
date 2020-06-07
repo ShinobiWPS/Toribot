@@ -15,10 +15,10 @@ from flask import Flask, request
 from flask_cors import CORS
 
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import (
-	COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA, LOG_CARTELLA_PERCORSO, TRADING_REPORT_FILENAME,
-	VALUTA_CRIPTO, VALUTA_SOLDI
-)
+from costanti.costanti_unico import (COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA,
+                                     LOG_CARTELLA_PERCORSO,
+                                     TRADING_REPORT_FILENAME, VALUTA_CRIPTO,
+                                     VALUTA_SOLDI)
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
 from utilita import gestoreRapporti as report
@@ -448,7 +448,7 @@ def forza_bilancio():
 					# Scrivo l'ordine fittizio sul mio json
 					managerJson.addOrder(
 						amount=cripto_balance - cripto_stimated,
-						price=my_price,
+						price=float(my_price),
 						order_id=0,
 						order_status="forced",
 						bos="buy"
@@ -479,7 +479,7 @@ def forza_bilancio():
 				# Scrivo l'ordine fittizio sul mio json
 				managerJson.addOrder(
 					amount=cripto_balance - cripto_stimated,
-					price=my_price,
+					price=float(my_price),
 					order_id=0,
 					order_status="forced",
 					bos="buy"
