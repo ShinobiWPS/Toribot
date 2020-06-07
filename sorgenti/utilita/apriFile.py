@@ -6,13 +6,18 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from costanti.valori_percorso import VALORI_PERCORSO
+from costanti.costanti_unico import VALORI_PERCORSO, VALORI_TEMPLATE_PERCORSO
 
 
 def gestoreValoriJson(chiave=None, valore=None):
 	try:
 
 		Path(VALORI_PERCORSO).parent.mkdir(parents=True, exist_ok=True)
+		if not os.path.exists(VALORI_PERCORSO) and os.path.exists(VALORI_TEMPLATE_PERCORSO):
+			with open(str(VALORI_TEMPLATE_PERCORSO).strip(), "r") as file:
+				template = file.read().strip()
+			with open(str(VALORI_PERCORSO).strip(), "w") as file:
+				file.write(template.strip())
 
 		with open(VALORI_PERCORSO, 'r+') as jsonFile:
 			if chiave is not None and valore is not None:

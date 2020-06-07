@@ -1,0 +1,49 @@
+{
+    "cripto": 0.0061591,
+    "orders": [
+        {
+            "amount": 0.006,
+            "bos": "buy",
+            "datetime": "2020/06/07 13:59:22",
+            "order_id": 0,
+            "order_status": "forced",
+            "price": "7595.53",
+            "timestamp": 1591531162.0
+        },
+        {
+            "amount": 9.999999999940612e-08,
+            "bos": "buy",
+            "datetime": "2020/06/07 14:02:06",
+            "order_id": 0,
+            "order_status": "forced",
+            "price": "7",
+            "timestamp": 1591531326.0
+        },
+        {
+            "amount": 0.0001590000000000003,
+            "bos": "buy",
+            "datetime": "2020/06/07 14:10:18",
+            "order_id": 0,
+            "order_status": "forced",
+            "price": "7587.53",
+            "timestamp": 1591531818.0
+        }
+    ],
+    "soldi": 0.0,
+    "ultimo_valore": {
+        "asks": [
+            [
+                "7587.53",
+                "0.05200000"
+            ]
+        ],
+        "bids": [
+            [
+                "7564.74",
+                "0.51219146"
+            ]
+        ],
+        "microtimestamp": "1591531829864405",
+        "timestamp": "1591531829"
+    }
+}

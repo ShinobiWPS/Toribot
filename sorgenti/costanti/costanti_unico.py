@@ -4,16 +4,17 @@ VALUTA_SOLDI='gbp'
 VALUTA_CRIPTO='btc'
 COPPIA_DA_USARE_NOME=f'{VALUTA_CRIPTO}{VALUTA_SOLDI}'
 
-DATASET_CARTELLA_PERCORSO = 'dataset'
+DATASET_CARTELLA_PERCORSO = "dataset"
 
 FEE=0.0
 MINIMUM_ORDER = 25
 
-FORMATO_DATA_ORA='%d-%m-%Y %H:%M:%S'
+FORMATO_DATA_ORA="%d-%m-%Y %H:%M:%S"
 
-LOG_CARTELLA_PERCORSO = 'log'
+LOG_CARTELLA_PERCORSO = "log"
 TRADING_REPORT_FILENAME = "log/report.txt"
 
-PORTAFOGLIO_PERCORSO = 'sorgenti/portafoglio.json'
+PORTAFOGLIO_PERCORSO = "sorgenti/portafoglio.json"
 
-VALORI_PERCORSO = 'sorgenti/valori.json'
+VALORI_PERCORSO = "sorgenti/valori.json"
+VALORI_TEMPLATE_PERCORSO = "sorgenti/valori_template.json"
