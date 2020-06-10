@@ -54,6 +54,7 @@ def WSOB_on_open(ws):
 	})
 	# Invio la richiesta d'iscrizione alla piattaforma
 	ws.send(jsonString)
+	print('luce verde')
 
 
 # Funzione alla ricezione di dati dal websocket per l'orderbook
