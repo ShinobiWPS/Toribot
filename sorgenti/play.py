@@ -16,13 +16,15 @@ from flask_cors import CORS
 
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
 from costanti.costanti_unico import (
-	COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA, LOG_CARTELLA_PERCORSO, TRADING_REPORT_FILENAME,
-	VALUTA_CRIPTO, VALUTA_SOLDI
+	BITSTAMP_WEBSOCKET_CHANNEL_ORDERBOOK, BITSTAMP_WEBSOCKET_CHANNEL_TRADE,
+	BITSTAMP_WEBSOCKET_EVENT, BITSTAMP_WEBSOCKET_URL, COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA,
+	LOG_CARTELLA_PERCORSO, TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI
 )
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
 from utilita import gestoreRapporti as report
 from utilita import log
+from utilita.MyWebSocket import MyWebSocket
 from utilita.telegramBot import TelegramBot
 
 # Inizializzo API
@@ -37,13 +39,76 @@ strategiaSigla = sys.argv[1]
 path = f'strategie.{strategiaSigla}'
 strategiaModulo = importlib.import_module(path)
 
+# ______________________________________ WEBSOCKET ______________________________________
+
+# Ora nelle classi (MyWebSocket)
+
+
+def onWSTradeClose():
+	global tg_bot
+	# Se il bot telegram è presente
+	if tg_bot:
+		# Invio un messaggio di avvertimento
+		tg_bot.sendMessage(TELEGRAM_ID, "WebSocket Trade closed")
+
+
+def onWSTradeMessage(messageDict):
+	try:
+		# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
+		if messageDict and 'data' in messageDict and messageDict['data']:
+			# Invio i dati alla funzione che li gestirà (al momento non implementata)
+			nuovoTrade(messageDict['data'])
+	except Exception as ex:
+		# In caso di eccezioni printo e loggo tutti i dati disponibili
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+		print(ex, exc_type, fname, exc_tb.tb_lineno)
+		logging.error(ex)
+
+
+def onWSOBMessage(messageDict):
+	try:
+		# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
+		if messageDict and 'data' in messageDict and messageDict['data']:
+			# Invio i dati alla funzione che li gestirà (al momento non implementata)
+			strategiaModulo.gestore(messageDict['data'])
+	except Exception as ex:
+		# In caso di eccezioni printo e loggo tutti i dati disponibili
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+		print(ex, exc_type, fname, exc_tb.tb_lineno)
+		logging.error(ex)
+
+
+def onWSOBClose():
+	global tg_bot
+	# Se il bot telegram è presente
+	if tg_bot:
+		# Invio un messaggio di avvertimento
+		tg_bot.sendMessage(TELEGRAM_ID, "WebSocket OrderBook closed")
+
+
+# Inizializzo i websocket
+ws_trade = MyWebSocket(
+	run=False,
+	WS_URL=BITSTAMP_WEBSOCKET_URL,
+	WS_EVENT=BITSTAMP_WEBSOCKET_EVENT,
+	WS_CHANNEL=BITSTAMP_WEBSOCKET_CHANNEL_TRADE,
+	callbackOnMessage=onWSTradeMessage,
+	callbackOnClose=onWSTradeClose
+)
+ws_ob = MyWebSocket(
+	run=True,
+	WS_URL=BITSTAMP_WEBSOCKET_URL,
+	WS_EVENT=BITSTAMP_WEBSOCKET_EVENT,
+	WS_CHANNEL=BITSTAMP_WEBSOCKET_CHANNEL_ORDERBOOK,
+	callbackOnMessage=onWSOBMessage,
+	callbackOnClose=onWSOBClose
+)
+
 # Inizializzo variabili per il funzionamento dello script
 mybot = None
 tg_bot = None
-ws_trade = None
-ws_ob = None
-ws_trade_open = False
-ws_ob_open = False
 
 
 def avvio():
@@ -60,7 +125,7 @@ def avvio():
 		# Creo tutte le cartelle necessarie
 		Path(TRADING_REPORT_FILENAME).parent.mkdir(parents=True, exist_ok=True)
 		# Scrivo sul report
-		report.FileWrite(TRADING_REPORT_FILENAME, ('*' * 5) + "STARTED" + ('*' * 5) + "\n")
+		report.FileAppend(TRADING_REPORT_FILENAME, ('*' * 5) + "STARTED" + ('*' * 5) + "\n")
 		logging.info(('*' * 5) + "STARTED" + ('*' * 5) + "\n")
 
 		# Chiedo alla piattaforma il bilancio
@@ -89,7 +154,7 @@ def avvio():
 		sys.stdout.flush()
 
 		# Starto il websocket dell'orderbook
-		startWebSocketOrderBook()
+		# startWebSocketOrderBook()
 
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
@@ -108,168 +173,6 @@ def nuovoTrade(valore):
 	# Funzione non implementata
 	# Prevista per la verifica dell'esecuzione degli ordini senza l'uso di checkOrder
 	pass
-
-
-# ______________________________________ WEBSOCKET ______________________________________
-
-
-# ___________________ TRADE __________________________
-# Funzione d'inizializzazione del websocket per i valori del trading
-def startWebSocketTrade():
-	global ws_trade
-	try:
-		# Debug: questo mostra piu informazioni se True
-		websocket.enableTrace(False)
-		# Inizializzo il websocket
-		ws_trade = websocket.WebSocketApp(
-			"wss://ws.bitstamp.net",
-			on_message=WST_on_message,
-			on_error=WST_on_error,
-			on_close=WST_on_close
-		)
-		# Imposto la funzione on_open, eseguita all'aggancio del websocket
-		ws_trade.on_open = WST_on_open
-		# Eseguo il websocket come demone (~ in background)
-		ws_trade.run_forever()
-	except KeyboardInterrupt:
-		# in caso di eccezioni chiudo il websocket
-		ws_trade.close()
-	except Exception as ex:
-		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, exc_obj, exc_tb = sys.exc_info()
-		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		print(ex, exc_type, fname, exc_tb.tb_lineno)
-		logging.error(ex)
-
-
-# Funzione all'aggancio del WebSocket per i trade
-def WST_on_open(ws):
-	global ws_trade_open
-	# Imposto la variabile per sapere che il websocket è aperto
-	ws_trade_open = True
-	# Imposto il json della richiesta d'iscrizione al canale di eventi
-	jsonString = json.dumps({
-		"event": "bts:subscribe",
-		"data": {
-		"channel": f"live_trades_{COPPIA_DA_USARE_NOME}"
-		}
-	})
-	# Invio la richiesta d'iscrizione alla piattaforma
-	ws.send(jsonString)
-
-
-# Funzione alla ricezione di dati dal websocket per il trade
-def WST_on_message(ws, message: str):
-	# Decodifico i dati ricevuti come json, convertendoli in un oggetto
-	messageDict = json.loads(message)
-	# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
-	if 'data' in messageDict and messageDict['data']:
-		# Invio i dati alla funzione che li gestirà (al momento non implementata)
-		nuovoTrade(messageDict['data'])
-
-
-# Funzione in caso di errori col websocket per il trade
-def WST_on_error(ws, error: str):
-	global ws_trade_open
-	# Imposto la variabile per sapere che il websocket è chiuso
-	ws_trade_open = False
-	# Printo l'errore che ha chiuso il websocket
-	print(error)
-	# Loggo come errore l'errore che ha chiuso il websocket
-	logging.error(error)
-
-
-# Funzione alla chiusura del websocket per il trade
-def WST_on_close(ws):
-	global ws_trade_open
-	# Imposto la variabile per sapere che il websocket è chiuso
-	ws_trade_open = False
-	# Se il bot telegram è presente
-	if tg_bot:
-		# Invio un messaggio di avvertimento
-		tg_bot.sendMessage(TELEGRAM_ID, "WebSocket Trade closed")
-	# Printo un messaggio per avvertire della chiusura del websocket per il trade
-	print("### WebSocket Trade closed ###")
-
-
-# ___________________ ORDERBOOK __________________________
-# Funzione d'inizializzazione del websocket per i valori dell'orderbook
-def startWebSocketOrderBook():
-	global ws_ob
-	try:
-		# Debug: questo mostra piu informazioni se True
-		websocket.enableTrace(False)
-		# Inizializzo il websocket
-		ws_ob = websocket.WebSocketApp(
-			"wss://ws.bitstamp.net",
-			on_message=WSOB_on_message,
-			on_error=WSOB_on_error,
-			on_close=WSOB_on_close
-		)
-		# Imposto la funzione on_open, eseguita all'aggancio del websocket
-		ws_ob.on_open = WSOB_on_open
-		# Eseguo il websocket come demone (~ in background)
-		ws_ob.run_forever()
-	except KeyboardInterrupt:
-		# in caso di eccezioni chiudo il websocket
-		ws_ob.close()
-	except Exception as ex:
-		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, exc_obj, exc_tb = sys.exc_info()
-		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		print(ex, exc_type, fname, exc_tb.tb_lineno)
-		logging.error(ex)
-
-
-# Funzione all'aggancio del WebSocket per i orderbook
-def WSOB_on_open(ws):
-	"""Funzione all'aggancio del WebSocket"""
-	global ws_ob_open
-	# Imposto la variabile per sapere che il websocket è aperto
-	ws_ob_open = True
-	# Imposto il json della richiesta d'iscrizione al canale di eventi
-	jsonString = json.dumps({
-		"event": "bts:subscribe",
-		"data": {
-		"channel": f"order_book_{COPPIA_DA_USARE_NOME}"
-		}
-	})
-	# Invio la richiesta d'iscrizione alla piattaforma
-	ws.send(jsonString)
-
-
-# Funzione alla ricezione di dati dal websocket per l'orderbook
-def WSOB_on_message(ws, message: str):
-	# Decodifico i dati ricevuti come json, convertendoli in un oggetto
-	messageDict = json.loads(message)
-	# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
-	if 'data' in messageDict and messageDict['data']:
-		# Invio i dati alla funzione che li gestirà (al momento non implementata)
-		strategiaModulo.gestore(messageDict['data'])
-
-
-# Funzione in caso di errori col websocket per il orderbook
-def WSOB_on_error(ws, error: str):
-	global ws_ob_open
-	# Imposto la variabile per sapere che il websocket è chiuso
-	ws_ob_open = False
-	# Printo l'errore che ha chiuso il websocket
-	print(error)
-	# Loggo come errore l'errore che ha chiuso il websocket
-	logging.error(error)
-
-
-# Funzione alla chiusura del websocket per il orderbook
-def WSOB_on_close(ws):
-	global ws_ob_open
-	# Imposto la variabile per sapere che il websocket è chiuso
-	ws_ob_open = False
-	# Se il bot telegram è presente
-	if tg_bot:
-		# Invio un messaggio di avvertimento
-		tg_bot.sendMessage(TELEGRAM_ID, "WebSocket Orderbook closed")
-	# Printo un messaggio per avvertire della chiusura del websocket per il orderbook
-	print("### WebSocket Orderbook closed ###")
 
 
 # ______________________________________ API ______________________________________
@@ -501,14 +404,15 @@ def bilancio():
 		# Se è presente come argomento GET
 		if 'soldi' in request.args:
 			# Ritorno il valore dei soldi
-			return str(soldi) + " " + VALUTA_SOLDI, 200
+			return str(soldi) + " " + VALUTA_SOLDI.upper(), 200
 		# Se è presente come argomento GET
 		if 'cripto' in request.args:
 			# Ritorno il valore delle cripto
-			return str(cripto) + " " + VALUTA_CRIPTO, 200
+			return str(cripto) + " " + VALUTA_CRIPTO.upper(), 200
 		# Ritorno il valore di soldi e cripto
 		return str(
-			str(soldi) + " " + VALUTA_SOLDI if soldi else str(cripto) + " " + VALUTA_CRIPTO
+			str(soldi) + " " + VALUTA_SOLDI.upper() if soldi else str(cripto) + " " +
+			VALUTA_CRIPTO.upper()
 		), 200
 	# Ritorno 404
 	return '', 404
@@ -530,7 +434,7 @@ def bilancio_stimato():
 		# Sommo i soldi stimati con i soldi rimasti inutilizzati
 		soldi_stimati += soldi
 		# Ritorno il valore dei soldi stimati
-		return str(soldi_stimati) + " " + VALUTA_SOLDI, 200
+		return str(soldi_stimati) + " " + VALUTA_SOLDI.upper(), 200
 
 	# Ritorno 404
 	return '', 404
@@ -552,17 +456,19 @@ def bilancio_stimato():
 
 @app.route('/status', methods=['GET'])
 def status():
-	global ws_trade_open, ws_ob_open
+	global ws_trade, ws_ob
 	# Verifico che il token passato via GET sia corretto
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		# Creo l'oggetto con cui rispondere con i valori degli stati
 		res = {
-			'ws_trade': ws_trade_open,
-			'ws_ob': ws_ob_open,
-			'tg_bot': tg_bot
+			'ws_trade': ws_trade.trace,
+			'ws_ob': ws_ob.isOpen,
+			'tg_bot': (True if tg_bot else False)
 		}
 		# Ritorno in formato json l'oggetto con gli stati
-		return str(json.dumps(res)), 200
+		# return str(json.dumps(res)), 200
+		# Temporaneamente invio solo lo stato del websocket dell' orderbook
+		return str(ws_ob.isOpen), 200
 	# Ritorno 404
 	return '', 404
 

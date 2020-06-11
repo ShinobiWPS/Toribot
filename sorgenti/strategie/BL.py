@@ -23,6 +23,9 @@ closing = False
 def gestore(orderbook: dict):
 	global Fattore_Perdita, force_sell, force_buy, closing
 
+	# Avvia il il bot di telegram
+	tg_bot = TelegramBot(False)
+
 	#todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
 	try:
 		# todo -SE NON USI IOC/FOK calcola con un criterio se necessario riassestare il prezzo del 'attuale ordine e quindi magari cancellarlo
@@ -62,6 +65,11 @@ def gestore(orderbook: dict):
 						if order_status['status'].lower() == "finished":
 							# Cancello l'ID dell'ordine in quanto già easudito
 							managerJson.gestoreValoriJson([ 'orders', index, 'order_id'], 0)
+
+							if tg_bot:
+								tg_bot.sendMessage(
+									tg_bot.Admins_ID, "" + order['bos'].lower() + " success"
+								)
 
 							# Ottengo il timestamp attuale
 							now = datetime.now()
