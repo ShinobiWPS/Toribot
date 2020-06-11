@@ -345,7 +345,7 @@ def forza_bilancio():
 						orderbook['asks'] = [orderbook['asks'][0]]
 						orderbook['bids'] = [orderbook['bids'][0]]
 						# Aggiorno l'ultimo valore con il nuovo orderbook
-						managerJson.commercialista("ultimo_valore", orderbook)
+						managerJson.commercialista("ultimo_valore", [orderbook])
 						# Recupero l'ultimo ASKS price
 						my_price = float(orderbook['asks'][0][0])
 
@@ -376,7 +376,7 @@ def forza_bilancio():
 					orderbook['asks'] = [orderbook['asks'][0]]
 					orderbook['bids'] = [orderbook['bids'][0]]
 					# Aggiorno l'ultimo valore con il nuovo orderbook
-					managerJson.commercialista("ultimo_valore", orderbook)
+					managerJson.commercialista("ultimo_valore", [orderbook])
 					# Recupero l'ultimo ASKS price
 					my_price = float(orderbook['asks'][0][0])
 

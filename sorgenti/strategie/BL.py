@@ -313,22 +313,34 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 		print(ex, exc_type, fname, exc_tb.tb_lineno)
 		logging.error(ex)
 	finally:
-		# Aggiorno l'ultimo valore
+		# Recupero la lista degli ultimi valori
 		ultimo_valore, _ = managerJson.commercialista()
+		# Se è una lista
 		if isinstance(ultimo_valore, list):
+			# E se la lista è maggiore o uguale al numero di elementi che voglio
 			if len(ultimo_valore) >= LUNGHEZZA_MEMORIA:
+				# Partendo dall'inizio cancello gli elementi in più
 				for index in range(len(ultimo_valore) - LUNGHEZZA_MEMORIA + 1):
+					# Cancello dalla lista
 					ultimo_valore.pop(0)
+					# Cancello dal mio json
 					managerJson.gestoreValoriJson([ 'ultimo_valore', 0 ], '')
+		# Se non è una lista qualcosa non va
 		else:
+			# Quindi la reinizializzo
 			ultimo_valore = []
 
+		# Clono l'orderbook per ridimensionarlo
 		orderbook_resized = orderbook
+		# Estraggo solo il numero di asks desiderati
 		orderbook_resized['asks'] = orderbook_resized['asks'][:NUMERO_ORDINI_ORDERBOOK]
+		# Estraggo solo il numero di bids desiderati
 		orderbook_resized['bids'] = orderbook_resized['bids'][:NUMERO_ORDINI_ORDERBOOK]
 
+		# Addo il nuovo orderbook ridimensionato al mio json
 		managerJson.commercialista("ultimo_valore", orderbook_resized)
 
+		# Aggiorno le statistiche
 		MyStat.strategy_cycle_duration_update(end=time.time())
 
 
