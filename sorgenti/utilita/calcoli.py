@@ -43,6 +43,10 @@ def firstOrderPrice(bids_or_asks: list):
 	return float(bids_or_asks[0][0])
 
 
+def firstOrderAmount(bids_or_asks: list):
+	return float(bids_or_asks[0][1])
+
+
 def priceChange(prezzo_float: float, bid_or_ask: str):
 	prezzo = str(prezzo_float)
 

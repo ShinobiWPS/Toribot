@@ -1,6 +1,6 @@
 # LIMIT ORDER, no flag
 
-# comprando all'evento
+# comprando ad un evento
 # precalcola:  delta minimo di guadagno + fee = prezzo ottimale di vendita
 # ogni 10sec deve valutare SE ce ne sarebbe uno migliore ,
 
@@ -12,7 +12,7 @@ from utilita.calcoli import depthChartAnalyzer, ilPrezzoGiusto
 #DELTA = 0  # %
 
 
-def processaOrderbook(orderbook: dict):
+def rivalutaPrezzo(orderbook: dict):
 
 	good_price_bid, good_price_ask = ilPrezzoGiusto(orderbook['bids'], orderbook['asks'])
 	return [ good_price_bid, good_price_ask ]
@@ -22,4 +22,4 @@ def processaOrderbook(orderbook: dict):
 
 
 if __name__ == "__main__":
-	startWebSocketOrderBook(processaOrderbook)
+	startWebSocketOrderBook(rivalutaPrezzo)
