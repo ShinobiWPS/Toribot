@@ -40,7 +40,7 @@ class MyWebSocket(object):
 		self.callbackOnClose = callbackOnClose
 		self.callbackOnError = callbackOnError
 		self.ws = None
-		self.trace = False
+		self.trace = trace
 		self.isOpen = False
 
 		self.start(run)
@@ -57,10 +57,10 @@ class MyWebSocket(object):
 			# Inizializzo il websocket
 			self.ws = websocket.WebSocketApp(
 				self.WS_URL,
-				on_message = lambda ws,msg: self.on_message(ws, msg),
-				on_error   = lambda ws,msg: self.on_error(ws, msg),
-				on_close   = lambda ws:     self.on_close(ws),
-				on_open    = lambda ws:     self.on_open(ws)
+				on_message=lambda ws, msg: self.on_message(ws, msg),
+				on_error=lambda ws, msg: self.on_error(ws, msg),
+				on_close=lambda ws: self.on_close(ws),
+				on_open=lambda ws: self.on_open(ws)
 			)
 			if run:
 				self.run_forever()
@@ -70,7 +70,7 @@ class MyWebSocket(object):
 			self.ws.close()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, exc_obj, exc_tb = sys.exc_info()
+			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
 			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 			print(ex, exc_type, fname, exc_tb.tb_lineno)
 			logging.error(ex)
@@ -79,9 +79,11 @@ class MyWebSocket(object):
 		# Eseguo il websocket come demone (~ in background)
 		try:
 			self.ws.run_forever()
-			pass
-		except Exception as e:
-			print(e)
+		except Exception as ex:
+			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
+			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+			print(ex, exc_type, fname, exc_tb.tb_lineno)
+			logging.error(ex)
 
 	def close(self):
 		self.ws.close()
@@ -102,11 +104,10 @@ class MyWebSocket(object):
 			ws.send(jsonString)
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, exc_obj, exc_tb = sys.exc_info()
+			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
 			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 			print(ex, exc_type, fname, exc_tb.tb_lineno)
 			logging.error(ex)
-
 
 	# Funzione alla ricezione di dati dal websocket per il trade
 	def on_message(self, ws, message: str):
@@ -116,11 +117,10 @@ class MyWebSocket(object):
 			self.callbackOnMessage(messageDict)
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, exc_obj, exc_tb = sys.exc_info()
+			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
 			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 			print(ex, exc_type, fname, exc_tb.tb_lineno)
 			logging.error(ex)
-
 
 	# Funzione in caso di errori col websocket per il trade
 	def on_error(self, ws, error: str):
@@ -134,7 +134,7 @@ class MyWebSocket(object):
 			self.callbackOnError(error)
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, exc_obj, exc_tb = sys.exc_info()
+			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
 			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 			print(ex, exc_type, fname, exc_tb.tb_lineno)
 			logging.error(ex)
@@ -149,7 +149,7 @@ class MyWebSocket(object):
 			self.callbackOnClose()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, exc_obj, exc_tb = sys.exc_info()
+			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
 			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 			print(ex, exc_type, fname, exc_tb.tb_lineno)
 			logging.error(ex)

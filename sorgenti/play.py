@@ -53,6 +53,7 @@ def onWSTradeClose():
 
 
 def onWSTradeMessage(messageDict):
+	global MyStat
 	try:
 		# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
 		if messageDict and 'data' in messageDict and messageDict['data']:
@@ -60,13 +61,14 @@ def onWSTradeMessage(messageDict):
 			nuovoTrade(messageDict['data'])
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, exc_obj, exc_tb = sys.exc_info()
+		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 		print(ex, exc_type, fname, exc_tb.tb_lineno)
 		logging.error(ex)
 
 
 def onWSOBMessage(messageDict):
+	global MyStat
 	try:
 		# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
 		if messageDict and 'data' in messageDict and messageDict['data']:
@@ -74,7 +76,7 @@ def onWSOBMessage(messageDict):
 			strategiaModulo.gestore(messageDict['data'])
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, exc_obj, exc_tb = sys.exc_info()
+		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 		print(ex, exc_type, fname, exc_tb.tb_lineno)
 		logging.error(ex)
@@ -88,6 +90,12 @@ def onWSOBClose():
 		tg_bot.sendMessage(TELEGRAM_ID, "WebSocket OrderBook closed")
 
 
+# Inizializzo variabili per il funzionamento dello script
+ws_trade = None
+ws_ob = None
+mybot = None
+tg_bot = None
+
 # Inizializzo i websocket
 ws_trade = MyWebSocket(
 	run=False,
@@ -98,7 +106,7 @@ ws_trade = MyWebSocket(
 	callbackOnClose=onWSTradeClose
 )
 ws_ob = MyWebSocket(
-	run=True,
+	run=False,
 	WS_URL=BITSTAMP_WEBSOCKET_URL,
 	WS_EVENT=BITSTAMP_WEBSOCKET_EVENT,
 	WS_CHANNEL=BITSTAMP_WEBSOCKET_CHANNEL_ORDERBOOK,
@@ -106,12 +114,9 @@ ws_ob = MyWebSocket(
 	callbackOnClose=onWSOBClose
 )
 
-# Inizializzo variabili per il funzionamento dello script
-mybot = None
-tg_bot = None
-
 
 def avvio():
+	global ws_trade, ws_ob
 	try:
 		# argv:  gli argomenti tranne il primo perche e' il nome del file
 		# argv = sys.argv[1:]
@@ -137,7 +142,7 @@ def avvio():
 			balance[f"{VALUTA_SOLDI}_balance"]
 		) if f"{VALUTA_SOLDI}_balance" in balance else None
 		# Aggiorno il valore dei soldi sul mio json
-		cripto, soldi = managerJson.portafoglio("soldi", soldi_balance)
+		unused_cripto, soldi = managerJson.portafoglio("soldi", soldi_balance)
 
 		# Se ci sono soldi
 		if soldi:
@@ -154,11 +159,11 @@ def avvio():
 		sys.stdout.flush()
 
 		# Starto il websocket dell'orderbook
-		# startWebSocketOrderBook()
+		ws_ob.run_forever()
 
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, exc_obj, exc_tb = sys.exc_info()
+		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 		print(ex, exc_type, fname, exc_tb.tb_lineno)
 		logging.error(ex)
@@ -255,7 +260,7 @@ def forza_bilancio():
 		# Converto il timestamp in un datetime in formato umano
 		dt_string = now.strftime(FORMATO_DATA_ORA)
 		# Leggo dal mio json il valore di soldi e cripto
-		cripto, soldi = managerJson.portafoglio()
+		unused_cripto, soldi = managerJson.portafoglio()
 		# Scrivo sul report
 		report.FileAppend(TRADING_REPORT_FILENAME, dt_string + " Sincronizzo bilancio")
 		# Chiedo il bilancio alla piattaforma
@@ -423,7 +428,7 @@ def bilancio_stimato():
 	# Verifico che il token passato via GET sia corretto
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		# Ottengo gli ordini dal mio json
-		cripto, soldi = managerJson.portafoglio()
+		unused_cripto, soldi = managerJson.portafoglio()
 		ultimo_valore, orders = managerJson.commercialista()
 		# Inizializzo la variabile per la stima
 		soldi_stimati = 0
@@ -460,7 +465,7 @@ def status():
 	# Verifico che il token passato via GET sia corretto
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		# Creo l'oggetto con cui rispondere con i valori degli stati
-		res = {
+		unused_res = {
 			'ws_trade': ws_trade.trace,
 			'ws_ob': ws_ob.isOpen,
 			'tg_bot': (True if tg_bot else False)
@@ -584,6 +589,8 @@ def shutdown():
 	# Ritorno 404
 	return '', 404
 
+
+print(__name__)
 
 if __name__ == "__main__":
 	try:
