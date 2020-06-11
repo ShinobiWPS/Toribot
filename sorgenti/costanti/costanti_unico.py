@@ -19,6 +19,8 @@ PORTAFOGLIO_PERCORSO = "sorgenti/portafoglio.json"
 VALORI_PERCORSO = "sorgenti/valori.json"
 VALORI_TEMPLATE_PERCORSO = "sorgenti/valori_template.json"
 
+STATISTICA_PERCORSO = "log/stats.json"
+
 BITSTAMP_WEBSOCKET_URL = "wss://ws.bitstamp.net"
 BITSTAMP_WEBSOCKET_EVENT = "bts:subscribe"
 BITSTAMP_WEBSOCKET_CHANNEL_TRADE = f"live_trades_{COPPIA_DA_USARE_NOME}"

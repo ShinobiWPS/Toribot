@@ -25,6 +25,7 @@ from utilita import apriFile as managerJson
 from utilita import gestoreRapporti as report
 from utilita import log
 from utilita.MyWebSocket import MyWebSocket
+from utilita.Statistics import Statistics
 from utilita.telegramBot import TelegramBot
 
 # Inizializzo API
@@ -38,6 +39,8 @@ log.inizializza_log()
 strategiaSigla = sys.argv[1]
 path = f'strategie.{strategiaSigla}'
 strategiaModulo = importlib.import_module(path)
+
+MyStat = Statistics()
 
 # ______________________________________ WEBSOCKET ______________________________________
 
@@ -57,6 +60,9 @@ def onWSTradeMessage(messageDict):
 	try:
 		# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
 		if messageDict and 'data' in messageDict and messageDict['data']:
+
+			# Aggiorno le statistiche
+			MyStat.WST_update()
 			# Invio i dati alla funzione che li gestirà (al momento non implementata)
 			nuovoTrade(messageDict['data'])
 	except Exception as ex:
@@ -72,8 +78,11 @@ def onWSOBMessage(messageDict):
 	try:
 		# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
 		if messageDict and 'data' in messageDict and messageDict['data']:
+
+			# Aggiorno le statistiche
+			MyStat.WSOB_update()
 			# Invio i dati alla funzione che li gestirà (al momento non implementata)
-			strategiaModulo.gestore(messageDict['data'])
+			strategiaModulo.gestore(messageDict['data'], MyStat)
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
 		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
