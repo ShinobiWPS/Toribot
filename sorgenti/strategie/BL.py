@@ -25,10 +25,10 @@ closing = False
 def gestore(orderbook: dict, MyStat=Statistics()):
 	global Fattore_Perdita, force_sell, force_buy, closing
 
+	MyStat.strategy_cycle_duration_update(start=time.time())
+
 	# Avvia il il bot di telegram
 	tg_bot = TelegramBot(False)
-
-	MyStat.strategy_cycle_duration_update(start=time.time())
 
 	#todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
 	try:
@@ -168,7 +168,7 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 		#todo- necessario? set minimum cripto of ? (c'e un minimo ma non ricordo quale sia)
 
 		# Se ho abbastanza soldi per fare un'ordine minimo (minimo per la piattaforma)
-		if soldi > MINIMUM_ORDER or force_buy:
+		if soldi > MINIMUM_ORDER_VALUE or force_buy:
 			# Resetto l'acquisto forzato (al momento non utilizzato)
 			force_buy = False
 			## Compro
@@ -314,7 +314,21 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 		logging.error(ex)
 	finally:
 		# Aggiorno l'ultimo valore
-		managerJson.commercialista("ultimo_valore", orderbook)
+		ultimo_valore, _ = managerJson.commercialista()
+		if isinstance(ultimo_valore, list):
+			if len(ultimo_valore) >= LUNGHEZZA_MEMORIA:
+				for index in range(len(ultimo_valore) - LUNGHEZZA_MEMORIA + 1):
+					ultimo_valore.pop(0)
+					managerJson.gestoreValoriJson([ 'ultimo_valore', 0 ], '')
+		else:
+			ultimo_valore = []
+
+		orderbook_resized = orderbook
+		orderbook_resized['asks'] = orderbook_resized['asks'][:NUMERO_ORDINI_ORDERBOOK]
+		orderbook_resized['bids'] = orderbook_resized['bids'][:NUMERO_ORDINI_ORDERBOOK]
+
+		managerJson.commercialista("ultimo_valore", orderbook_resized)
+
 		MyStat.strategy_cycle_duration_update(end=time.time())
 
 

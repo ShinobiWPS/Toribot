@@ -218,23 +218,7 @@ def ultimo_valore():
 		# Leggo dal mio json l'ultimo valore
 		ultimo_valore = managerJson.commercialista()[0]
 		# Ritorno l'ultimo valore
-		return str(ultimo_valore), 200
-	# Ritorno 404
-	return '', 404
-
-
-@app.route('/imposta_ultimo_valore', methods=['GET'])
-def imposta_ultimo_valore():
-	# Verifico che il token passato via GET sia corretto
-	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
-		# Se presente l'argomento GET
-		if 'valore' in request.args:
-			# Imposto nel mio json l'ultimo valore
-			ultimo_valore = managerJson.commercialista(
-				"ultimo_valore", float(request.args['valore'])
-			)[0]
-			# Ritorno l'ultimo valore appena impostato
-			return str(ultimo_valore), 200
+		return str(ultimo_valore[-1]['bids'][0]), 200
 	# Ritorno 404
 	return '', 404
 
@@ -302,6 +286,8 @@ def forza_bilancio():
 		if cripto_balance:
 			# Ottengo gli ordini dal mio json
 			ultimo_valore, orders = managerJson.commercialista()
+			# Estraggo l'ultimo ultimo valore
+			ultimo_valore = ultimo_valore[-1]
 			# Inizializzo la variabile per la stima delle cripto
 			cripto_stimated = 0
 			# Per tutti gli ordini
@@ -444,7 +430,7 @@ def bilancio_stimato():
 		# Per tutti gli ordini
 		for order in orders:
 			# Sommo il valore attuale delle cripto in soldi
-			soldi_stimati += order['amount'] * float(ultimo_valore['bids'][0][0])
+			soldi_stimati += order['amount'] * float(ultimo_valore[-1]['bids'][0][0])
 		# Sommo i soldi stimati con i soldi rimasti inutilizzati
 		soldi_stimati += soldi
 		# Ritorno il valore dei soldi stimati
@@ -559,7 +545,7 @@ def send_sell():
 # 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 # 		cripto, soldi = portafoglio()
 # 		ultimo_valore = commercialista()[0]
-# 		strategiaModulo.vendi(cripto, ultimo_valore)
+# 		strategiaModulo.vendi(cripto, ultimo_valore[-1])
 # 		return 'Selling', 200
 # Ritorno 404
 # 	return '', 404
