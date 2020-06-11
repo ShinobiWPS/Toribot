@@ -17,7 +17,7 @@ from telepot.loop import MessageLoop
 
 class TelegramBot(object):
 
-	# Admins_ID = []
+	Admins_ID = [ '42219043', '33223598']
 	Current_Admin_ID = 0
 
 	toribot_API_Domain = "127.0.0.1"
@@ -55,7 +55,7 @@ class TelegramBot(object):
 	def messageHandler(self, message):
 		content_type, chat_type, chat_id = telepot.glance(message)
 		if content_type == 'text':
-			if message['entities']:
+			if 'entities' in message and message['entities']:
 				command = (
 					message[content_type][int(message['entities'][0]['offset']) +
 					1:int(message['entities'][0]['offset']) + int(message['entities'][0]['length'])]
@@ -108,6 +108,7 @@ class TelegramBot(object):
 								chat_id,
 								str("Running" if r.text.lower() == "true" else "NOT running")
 							)
+							# self.sendMessage(chat_id, str(r.text))
 					except requests.exceptions.ConnectionError as ex:
 						print(ex)
 						self.sendMessage(chat_id, "Error, ToriBot API Error" + str(ex))
@@ -159,7 +160,11 @@ class TelegramBot(object):
 		# self.sendMessage(chat_id, str(message[content_type]))
 
 	def sendMessage(self, telegram_id, message):
-		self.tg_bot.sendMessage(telegram_id, message)
+		if isinstance(telegram_id, list):
+			for tid in telegram_id:
+				self.tg_bot.sendMessage(tid, message)
+		else:
+			self.tg_bot.sendMessage(telegram_id, message)
 
 	def getToribotAPI(self, endpoint):
 		return requests.get(
