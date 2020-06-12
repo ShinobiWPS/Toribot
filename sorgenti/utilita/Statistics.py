@@ -5,6 +5,7 @@ import sys
 import time
 
 from costanti.costanti_unico import STATISTICA_PERCORSO
+from utilita.infoAboutError import getErrorInfo
 
 
 class Statistics(object):
@@ -128,10 +129,7 @@ class Statistics(object):
 
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print(ex, exc_type, fname, exc_tb.tb_lineno)
-			logging.error(ex)
+			getErrorInfo(ex)
 
 	def WSOB_update(self, WSOB_timestamp=None):
 		try:
@@ -171,10 +169,7 @@ class Statistics(object):
 			self.update_json()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print(ex, exc_type, fname, exc_tb.tb_lineno)
-			logging.error(ex)
+			getErrorInfo(ex)
 
 	def strategy_cycle_duration_update(self, start=None, end=None):
 		try:
@@ -218,10 +213,7 @@ class Statistics(object):
 
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print(ex, exc_type, fname, exc_tb.tb_lineno)
-			logging.error(ex)
+			getErrorInfo(ex)
 
 	def strategy_trade_duration_update(self, trade_timestamp=None):
 
@@ -262,10 +254,7 @@ class Statistics(object):
 			self.update_json()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print(ex, exc_type, fname, exc_tb.tb_lineno)
-			logging.error(ex)
+			getErrorInfo(ex)
 
 	def strategy_buy_duration_update(self, buy_timestamp=None):
 
@@ -308,10 +297,7 @@ class Statistics(object):
 			self.update_json()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print(ex, exc_type, fname, exc_tb.tb_lineno)
-			logging.error(ex)
+			getErrorInfo(ex)
 
 	def strategy_sell_duration_update(self, sell_timestamp=None):
 
@@ -354,10 +340,7 @@ class Statistics(object):
 			self.update_json()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print(ex, exc_type, fname, exc_tb.tb_lineno)
-			logging.error(ex)
+			getErrorInfo(ex)
 
 	def strategy_spread_duration_update(self, spread):
 
@@ -386,10 +369,7 @@ class Statistics(object):
 			self.update_json()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print(ex, exc_type, fname, exc_tb.tb_lineno)
-			logging.error(ex)
+			getErrorInfo(ex)
 
 	def update_json(self):
 		try:
@@ -399,7 +379,4 @@ class Statistics(object):
 			# NON VA MOLTO BENE, DA RIPENSARE
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print(ex, exc_type, fname, exc_tb.tb_lineno)
-			logging.error(ex)
+			getErrorInfo(ex)

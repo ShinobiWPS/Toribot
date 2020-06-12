@@ -5,6 +5,8 @@ import sys
 
 import websocket
 
+from utilita.infoAboutError import getErrorInfo
+
 COPPIA_DA_USARE_NOME = 'btcgbp'
 ws_ob_open = None
 
@@ -33,10 +35,7 @@ def startWebSocketOrderBook(callback):
 		ws_ob.close()
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		print(ex, exc_type, fname, exc_tb.tb_lineno)
-		logging.error(ex)
+		getErrorInfo(ex)
 
 
 # Funzione all'aggancio del WebSocket per i orderbook

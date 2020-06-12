@@ -12,6 +12,7 @@ from costanti.costanti_unico import *
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita import apriFile as managerJson
+from utilita.infoAboutError import getErrorInfo
 from utilita.Statistics import Statistics
 from utilita.telegramBot import TelegramBot
 
@@ -308,10 +309,7 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		print(ex, exc_type, fname, exc_tb.tb_lineno)
-		logging.error(ex)
+		getErrorInfo(ex)
 	finally:
 		# Recupero la lista degli ultimi valori
 		ultimo_valore, _ = managerJson.commercialista()
