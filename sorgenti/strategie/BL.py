@@ -12,6 +12,8 @@ from costanti.costanti_unico import *
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita import apriFile as managerJson
+from utilita.calcoli import firstOrderAmount, firstOrderPrice
+from utilita.infoAboutError import getErrorInfo
 from utilita.Statistics import Statistics
 from utilita.telegramBot import TelegramBot
 
@@ -160,15 +162,15 @@ def gestore(orderbook: dict, MyStat=Statistics(), tg_bot=TelegramBot(False)):
 		# Estraggo i valori dall'orderbook
 		# dal primo bids (proposta d'acquisto)
 		# il primo valore è il price (prezzo)
-		bids_price = float(orderbook['bids'][0][0])
+		bids_price = firstOrderPrice(orderbook['bids'])
 		# il secondo valore è l'amount (quantità)
-		bids_amount = float(orderbook['bids'][0][1])
+		bids_amount = firstOrderAmount(orderbook['bids'])
 
 		# dal primo asks (proposta di vendita)
 		# il primo valore è il price (prezzo)
-		asks_price = float(orderbook['asks'][0][0])
+		asks_price = firstOrderAmount(orderbook['asks'])
 		# il secondo valore è l'amount (quantità)
-		asks_amount = float(orderbook['asks'][0][1])
+		asks_amount = firstOrderAmount(orderbook['asks'])
 
 		asks_percentage = getAsksPercentage(asks_price)
 		bids_percentage = getBidsPercentage(bids_price)
@@ -326,10 +328,7 @@ def gestore(orderbook: dict, MyStat=Statistics(), tg_bot=TelegramBot(False)):
 
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		print(ex, exc_type, fname, exc_tb.tb_lineno)
-		logging.error(ex)
+		getErrorInfo(ex)
 	finally:
 		# Recupero la lista degli ultimi valori
 		ultimo_valore, _ = managerJson.commercialista()

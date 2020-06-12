@@ -25,6 +25,7 @@ from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
 from utilita import gestoreRapporti as report
 from utilita import log
+from utilita.infoAboutError import getErrorInfo
 from utilita.MyWebSocket import MyWebSocket
 from utilita.Statistics import Statistics
 from utilita.telegramBot import TelegramBot
@@ -76,10 +77,7 @@ def onWSTradeMessage(messageDict):
 			nuovoTrade(messageDict['data'])
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		print(ex, exc_type, fname, exc_tb.tb_lineno)
-		logging.error(ex)
+		getErrorInfo(ex)
 
 
 def onWSOBMessage(messageDict):
@@ -96,10 +94,7 @@ def onWSOBMessage(messageDict):
 			strategiaModulo.gestore(messageDict['data'], MyStat, tg_bot)
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		print(ex, exc_type, fname, exc_tb.tb_lineno)
-		logging.error(ex)
+		getErrorInfo(ex)
 
 
 def onWSOBClose():
@@ -215,10 +210,7 @@ def avvio():
 
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		print(ex, exc_type, fname, exc_tb.tb_lineno)
-		logging.error(ex)
+		getErrorInfo(ex)
 
 	finally:
 		# Comunque sia andata
