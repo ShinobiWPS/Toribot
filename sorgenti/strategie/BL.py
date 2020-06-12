@@ -3,6 +3,7 @@ import logging
 import math
 import os
 import sys
+import time
 from datetime import datetime
 
 import utilita.gestoreRapporti as report
@@ -11,6 +12,7 @@ from costanti.costanti_unico import *
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita import apriFile as managerJson
+from utilita.Statistics import Statistics
 from utilita.telegramBot import TelegramBot
 
 Fattore_Perdita = 0
@@ -20,8 +22,10 @@ force_sell = False
 closing = False
 
 
-def gestore(orderbook: dict):
+def gestore(orderbook: dict, MyStat=Statistics()):
 	global Fattore_Perdita, force_sell, force_buy, closing
+
+	MyStat.strategy_cycle_duration_update(start=time.time())
 
 	# Avvia il il bot di telegram
 	tg_bot = TelegramBot(False)
@@ -139,7 +143,7 @@ def gestore(orderbook: dict):
 
 		# todo- Check se ultimo ultimo_id_ordine() e' stato completato
 		# if YES LOGGA: Ordine [buy|sell] completo al prezzo di N VALUTA_SOLDI per N VALUTA_CRIPTO di N VALUTA_CRIPTO
-		cripto, soldi = managerJson.portafoglio()
+		unused_cripto, soldi = managerJson.portafoglio()
 
 		#primo index:identifica il ORDER
 		#secondo index: identifica se Prezzo o Amount
@@ -157,11 +161,14 @@ def gestore(orderbook: dict):
 		# il secondo valore è l'amount (quantità)
 		asks_amount = float(orderbook['asks'][0][1])
 
+		# Aggiorno le statistiche
+		MyStat.strategy_spread_duration_update(asks_price - bids_price)
+
 		#todo- set minimum soldi of 25
 		#todo- necessario? set minimum cripto of ? (c'e un minimo ma non ricordo quale sia)
 
 		# Se ho abbastanza soldi per fare un'ordine minimo (minimo per la piattaforma)
-		if soldi > MINIMUM_ORDER or force_buy:
+		if soldi > MINIMUM_ORDER_VALUE or force_buy:
 			# Resetto l'acquisto forzato (al momento non utilizzato)
 			force_buy = False
 			## Compro
@@ -197,6 +204,8 @@ def gestore(orderbook: dict):
 					order_id=order_result['id'],
 					bos="buy"
 				)
+				# Aggiorno le statistiche
+				MyStat.strategy_buy_duration_update()
 				# Posso scegliere se i soldi spesi per l'ordine sottrarli calcolando la spesa
 				# o chiedendo direttamente il balance alla piattaforma
 				# _________________________ CALCULATED _________________________
@@ -283,8 +292,8 @@ def gestore(orderbook: dict):
 							str(order_result['id']) + " [" + str(order_result['price']) + "] " +
 							str(soldi) + " -> " + str(order_result['amount'])
 						)
-						# Cancello la variabile con la risposta dell'ordine di acquisto
-						# per ordine e evitare problemi
+						# Aggiorno le statistiche
+						MyStat.strategy_sell_duration_update()
 					elif 'reason' in order_result:
 						# Loggo
 						logging.error("Sell error: " + json.dumps(order_result['reason']))
@@ -293,17 +302,46 @@ def gestore(orderbook: dict):
 						# Loggo
 						logging.error("Sell generic error")
 						print("Sell generic error: ", json.dumps(order_result))
+					# Cancello la variabile con la risposta dell'ordine di acquisto
+					# per ordine e evitare problemi
 					del order_result
 
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
-		exc_type, exc_obj, exc_tb = sys.exc_info()
+		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 		print(ex, exc_type, fname, exc_tb.tb_lineno)
 		logging.error(ex)
 	finally:
-		# Aggiorno l'ultimo valore
-		managerJson.commercialista("ultimo_valore", orderbook)
+		# Recupero la lista degli ultimi valori
+		ultimo_valore, _ = managerJson.commercialista()
+		# Se è una lista
+		if isinstance(ultimo_valore, list):
+			# E se la lista è maggiore o uguale al numero di elementi che voglio
+			if len(ultimo_valore) >= LUNGHEZZA_MEMORIA:
+				# Partendo dall'inizio cancello gli elementi in più
+				for index in range(len(ultimo_valore) - LUNGHEZZA_MEMORIA + 1):
+					# Cancello dalla lista
+					ultimo_valore.pop(0)
+					# Cancello dal mio json
+					managerJson.gestoreValoriJson([ 'ultimo_valore', 0 ], '')
+		# Se non è una lista qualcosa non va
+		else:
+			# Quindi la reinizializzo
+			ultimo_valore = []
+
+		# Clono l'orderbook per ridimensionarlo
+		orderbook_resized = orderbook
+		# Estraggo solo il numero di asks desiderati
+		orderbook_resized['asks'] = orderbook_resized['asks'][:NUMERO_ORDINI_ORDERBOOK]
+		# Estraggo solo il numero di bids desiderati
+		orderbook_resized['bids'] = orderbook_resized['bids'][:NUMERO_ORDINI_ORDERBOOK]
+
+		# Addo il nuovo orderbook ridimensionato al mio json
+		managerJson.commercialista("ultimo_valore", orderbook_resized)
+
+		# Aggiorno le statistiche
+		MyStat.strategy_cycle_duration_update(end=time.time())
 
 
 # def forOrderCheck(data):
