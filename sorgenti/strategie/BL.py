@@ -168,7 +168,7 @@ def gestore(orderbook: dict, MyStat=Statistics(), tg_bot=TelegramBot(False)):
 
 		# dal primo asks (proposta di vendita)
 		# il primo valore è il price (prezzo)
-		asks_price = firstOrderAmount(orderbook['asks'])
+		asks_price = firstOrderPrice(orderbook['asks'])
 		# il secondo valore è l'amount (quantità)
 		asks_amount = firstOrderAmount(orderbook['asks'])
 
