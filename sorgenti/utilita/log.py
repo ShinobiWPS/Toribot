@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 
-from costanti.log_cartella_percorso import LOG_CARTELLA_PERCORSO
+from costanti.costanti_unico import LOG_CARTELLA_PERCORSO
 
 
 def inizializza_log():

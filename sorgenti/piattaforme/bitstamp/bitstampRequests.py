@@ -9,7 +9,7 @@ from urllib.parse import urlencode
 
 import requests
 
-from costanti.coppia_da_usare import (COPPIA_DA_USARE_NOME, VALUTA_CRIPTO, VALUTA_SOLDI)
+from costanti.costanti_unico import (COPPIA_DA_USARE_NOME, VALUTA_CRIPTO, VALUTA_SOLDI)
 from piattaforme.bitstamp.key import API_SECRET, CUSTOMER_ID
 from piattaforme.bitstamp.key import api_key as API_KEY
 from piattaforme.bitstamp.key import client_id as CLIENT_ID
@@ -150,15 +150,15 @@ def makeRequest(
 
 	if api_version == 2:
 		message = 'BITSTAMP ' + API_KEY + \
-                                                                                                                                                                            'POST' + \
-                                                                                                                                                                            'www.bitstamp.net' + \
-                                                                                                                                                                            f'/api/v2/{operation_string}'+(f'{bos}/{COPPIA_DA_USARE_NOME}/' if bos else '') + \
-                                                                                                                                                                            '' + \
-                                                                                                                                                                            (content_type if content_type else "") + \
-                                                                                                                                                                            nonce + \
-                                                                                                                                                                            timestamp + \
-                                                                                                                                                                            'v2' + \
-                                                                                                                                                                            payload_URLencoded
+                                                                                                                                                                                  'POST' + \
+                                                                                                                                                                                  'www.bitstamp.net' + \
+                                                                                                                                                                                  f'/api/v2/{operation_string}'+(f'{bos}/{COPPIA_DA_USARE_NOME}/' if bos else '') + \
+                                                                                                                                                                                  '' + \
+                                                                                                                                                                                  (content_type if content_type else "") + \
+                                                                                                                                                                                  nonce + \
+                                                                                                                                                                                  timestamp + \
+                                                                                                                                                                                  'v2' + \
+                                                                                                                                                                                  payload_URLencoded
 		message = message.encode('utf-8')
 		signature = hmac.new(API_SECRET, msg=message, digestmod=hashlib.sha256).hexdigest().upper()
 	else:
