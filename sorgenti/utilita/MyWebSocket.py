@@ -114,7 +114,8 @@ class MyWebSocket(object):
 		try:
 			# Decodifico i dati ricevuti come json, convertendoli in un oggetto
 			messageDict = json.loads(message)
-			self.callbackOnMessage(messageDict)
+			if self.callbackOnMessage:
+				self.callbackOnMessage(messageDict)
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
 			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
@@ -126,12 +127,15 @@ class MyWebSocket(object):
 	def on_error(self, ws, error: str):
 		try:
 			# Imposto la variabile per sapere che il websocket è chiuso
-			self.isOpen = False
+			# PARE CHE NON SI CHIUDA CON L' ERROR self.isOpen = False
+			# Printo un messaggio per avvertire della chiusura del websocket per il trade
+			print("### WebSocket error ###")
 			# Printo l'errore che ha chiuso il websocket
 			print(error)
 			# Loggo come errore l'errore che ha chiuso il websocket
 			logging.error(error)
-			self.callbackOnError(error)
+			if self.callbackOnError:
+				self.callbackOnError(error)
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
 			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
@@ -145,8 +149,9 @@ class MyWebSocket(object):
 			# Imposto la variabile per sapere che il websocket è chiuso
 			self.isOpen = False
 			# Printo un messaggio per avvertire della chiusura del websocket per il trade
-			print("### WebSocket Trade closed ###")
-			self.callbackOnClose()
+			print("### WebSocket closed ###")
+			if self.callbackOnClose:
+				self.callbackOnClose()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
 			exc_type, unused_exc_obj, exc_tb = sys.exc_info()

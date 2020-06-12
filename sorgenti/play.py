@@ -18,7 +18,8 @@ from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
 from costanti.costanti_unico import (
 	BITSTAMP_WEBSOCKET_CHANNEL_ORDERBOOK, BITSTAMP_WEBSOCKET_CHANNEL_TRADE,
 	BITSTAMP_WEBSOCKET_EVENT, BITSTAMP_WEBSOCKET_URL, COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA,
-	LOG_CARTELLA_PERCORSO, TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI
+	LOG_CARTELLA_PERCORSO, TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI,
+	WEBSOCKET_AUTORECONNECT, WEBSOCKET_AUTORECONNECT_RETRIES
 )
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
@@ -46,17 +47,25 @@ MyStat = Statistics()
 
 # Ora nelle classi (MyWebSocket)
 
+_counterAutoReconnect = 0
+
 
 def onWSTradeClose():
-	global tg_bot
-	# Se il bot telegram è presente
-	if tg_bot:
-		# Invio un messaggio di avvertimento
-		tg_bot.sendMessage(TELEGRAM_ID, "WebSocket Trade closed")
+	global ws_trade, tg_bot
+	try:
+		# Se il bot telegram è presente
+		if tg_bot:
+			# Invio un messaggio di avvertimento
+			tg_bot.sendMessage(tg_bot.Admins_ID, "WebSocket Trade closed")
+	except Exception:
+		pass
+	AutoReconnect(ws_trade)
 
 
 def onWSTradeMessage(messageDict):
 	global MyStat
+	if _counterAutoReconnect:
+		AutoReconnect(None, resetCounter=True)
 	try:
 		# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
 		if messageDict and 'data' in messageDict and messageDict['data']:
@@ -74,7 +83,9 @@ def onWSTradeMessage(messageDict):
 
 
 def onWSOBMessage(messageDict):
-	global MyStat
+	global MyStat, tg_bot
+	if _counterAutoReconnect:
+		AutoReconnect(None, resetCounter=True)
 	try:
 		# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
 		if messageDict and 'data' in messageDict and messageDict['data']:
@@ -82,7 +93,7 @@ def onWSOBMessage(messageDict):
 			# Aggiorno le statistiche
 			MyStat.WSOB_update()
 			# Invio i dati alla funzione che li gestirà (al momento non implementata)
-			strategiaModulo.gestore(messageDict['data'], MyStat)
+			strategiaModulo.gestore(messageDict['data'], MyStat, tg_bot)
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
 		exc_type, unused_exc_obj, exc_tb = sys.exc_info()
@@ -92,11 +103,39 @@ def onWSOBMessage(messageDict):
 
 
 def onWSOBClose():
-	global tg_bot
-	# Se il bot telegram è presente
-	if tg_bot:
-		# Invio un messaggio di avvertimento
-		tg_bot.sendMessage(TELEGRAM_ID, "WebSocket OrderBook closed")
+	global ws_ob, tg_bot
+	try:
+		# Se il bot telegram è presente
+		if tg_bot:
+			# Invio un messaggio di avvertimento
+			tg_bot.sendMessage(tg_bot.Admins_ID, "WebSocket OrderBook closed")
+	except Exception:
+		pass
+	AutoReconnect(ws_ob)
+
+
+def AutoReconnect(ws, resetCounter=False):
+	global _counterAutoReconnect, tg_bot
+
+	if resetCounter:
+		_counterAutoReconnect = 0
+	if WEBSOCKET_AUTORECONNECT and ws:
+		_counterAutoReconnect += 1
+		time.sleep(1)
+		if _counterAutoReconnect <= WEBSOCKET_AUTORECONNECT_RETRIES and not ws.isOpen:
+			print("riconnetto", _counterAutoReconnect)
+			try:
+				ws.close()
+				ws.run_forever()
+			except websocket._exceptions.WebSocketException:
+				pass
+			try:
+				# Se il bot telegram è presente
+				if tg_bot:
+					# Invio un messaggio di avvertimento
+					tg_bot.sendMessage(tg_bot.Admins_ID, "Restarting WebSocket")
+			except Exception:
+				pass
 
 
 # Inizializzo variabili per il funzionamento dello script
@@ -139,8 +178,10 @@ def avvio():
 		# Creo tutte le cartelle necessarie
 		Path(TRADING_REPORT_FILENAME).parent.mkdir(parents=True, exist_ok=True)
 		# Scrivo sul report
-		report.FileAppend(TRADING_REPORT_FILENAME, ('*' * 5) + "STARTED" + ('*' * 5) + "\n")
-		logging.info(('*' * 5) + "STARTED" + ('*' * 5) + "\n")
+		report.FileAppend(
+			TRADING_REPORT_FILENAME, dt_string + " " + ('*' * 5) + "STARTED" + ('*' * 5) + "\n"
+		)
+		logging.info(dt_string + " " + ('*' * 5) + "STARTED" + ('*' * 5) + "")
 
 		# Chiedo alla piattaforma il bilancio
 		balance = json.loads(bitstamp.getBalance())
@@ -169,6 +210,8 @@ def avvio():
 
 		# Starto il websocket dell'orderbook
 		ws_ob.run_forever()
+		# ws_th = threading.Thread(target=ws_ob.run_forever, daemon=True)
+		# ws_th.start()
 
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
@@ -606,10 +649,13 @@ if __name__ == "__main__":
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
 		logging.error(ex)
 		print(ex)
-		# Se il bot telegram è presente
-		if tg_bot:
-			# Invio un messaggio di avvertimento
-			tg_bot.sendMessage(TELEGRAM_ID, "Error, closing")
+		try:
+			# Se il bot telegram è presente
+			if tg_bot:
+				# Invio un messaggio di avvertimento
+				tg_bot.sendMessage(TELEGRAM_ID, "Error, closing")
+		except Exception:
+			pass
 	finally:
 		# Comunico alla strategia che si sta chiudendo
 		strategiaModulo.closing = True

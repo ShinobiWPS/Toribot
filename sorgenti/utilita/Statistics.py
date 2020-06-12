@@ -23,6 +23,10 @@ class Statistics(object):
 
 		if not self.strategy:
 			self.strategy = {
+				'soldi': {
+				'init': {},
+				'gain': {}
+				},
 				'WST': {
 				'duration': {}
 				},
@@ -43,6 +47,13 @@ class Statistics(object):
 				},
 				'spread': {}
 			}
+
+			self.strategy['soldi']["init"]['soldi'] = 0
+			self.strategy['soldi']["init"]['timestamp'] = 0
+			self.strategy['soldi']["current"] = 0
+			self.strategy['soldi']["gain"]["soldi"] = None
+			self.strategy['soldi']["gain"]["percentage"] = None
+			self.strategy['soldi']["gain"]["h"] = None
 
 			self.strategy['WST']["last"] = None
 			self.strategy['WST']["duration"]["avg"] = None
@@ -88,6 +99,35 @@ class Statistics(object):
 
 	def __del__(self):
 		pass
+
+	def strategy_soldi_update(self, soldi):
+
+		try:
+			soldi = float(soldi)
+
+			if self.strategy["soldi"]["init"]['soldi']:
+
+				self.strategy["soldi"]["gain"]['soldi'
+												] = soldi - self.strategy["soldi"]["init"]['soldi']
+				self.strategy["soldi"]["gain"]['percentage'] = (
+					soldi - self.strategy["soldi"]["init"]['soldi']
+				) / self.strategy["soldi"]["init"]['soldi'] * 100
+
+				if self.strategy["soldi"]["init"]['timestamp']:
+					self.strategy["soldi"]["gain"]['h'] = (
+						soldi - self.strategy["soldi"]["init"]['soldi']
+					) / ((time.time() - self.strategy["soldi"]["init"]['timestamp']) / 3600)
+
+			self.strategy["soldi"]["current"] = soldi
+
+			self.update_json()
+
+		except Exception as ex:
+			# In caso di eccezioni printo e loggo tutti i dati disponibili
+			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
+			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+			print(ex, exc_type, fname, exc_tb.tb_lineno)
+			logging.error(ex)
 
 	def WST_update(self, WST_timestamp=None):
 

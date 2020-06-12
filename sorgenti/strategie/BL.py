@@ -22,13 +22,10 @@ force_sell = False
 closing = False
 
 
-def gestore(orderbook: dict, MyStat=Statistics()):
+def gestore(orderbook: dict, MyStat=Statistics(), tg_bot=TelegramBot(False)):
 	global Fattore_Perdita, force_sell, force_buy, closing
 
 	MyStat.strategy_cycle_duration_update(start=time.time())
-
-	# Avvia il il bot di telegram
-	tg_bot = TelegramBot(False)
 
 	#todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
 	try:
@@ -70,10 +67,17 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 							# Cancello l'ID dell'ordine in quanto già easudito
 							managerJson.gestoreValoriJson([ 'orders', index, 'order_id'], 0)
 
-							if tg_bot:
-								tg_bot.sendMessage(
-									tg_bot.Admins_ID, "" + order['bos'].lower() + " success"
-								)
+							try:
+								if tg_bot:
+									tg_bot.sendMessage(
+										tg_bot.Admins_ID, "" + order['bos'].lower() + " success"
+									)
+							except Exception as ex:
+								# In caso di eccezioni printo e loggo tutti i dati disponibili
+								exc_type, unused_exc_obj, exc_tb = sys.exc_info()
+								fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+								print(ex, exc_type, fname, exc_tb.tb_lineno)
+								logging.error(ex)
 
 							# Ottengo il timestamp attuale
 							now = datetime.now()
@@ -114,6 +118,8 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 									soldi_balance = float(
 										balance[f"{VALUTA_SOLDI}_balance"]
 									) if f"{VALUTA_SOLDI}_balance" in balance else None
+									# Aggiorno le statistiche
+									MyStat.strategy_soldi_update(soldi_balance)
 									# Aggiorno il valore dei soldi nel mio json
 									managerJson.portafoglio("soldi", soldi_balance)
 								else:
@@ -128,6 +134,8 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 						if order['order_status'].lower(
 						) != "finished" and 'error' in order_status and order_status[
 							'error'] == "Order not found":
+							# Aggiorno le statistiche
+							MyStat.strategy_soldi_update(order['amount'] * order['price'])
 							# Aggiorno il valore dei soldi nel mio json
 							managerJson.portafoglio("soldi", order['amount'] * order['price'])
 							# Cancello l'ordine
@@ -144,6 +152,7 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 		# todo- Check se ultimo ultimo_id_ordine() e' stato completato
 		# if YES LOGGA: Ordine [buy|sell] completo al prezzo di N VALUTA_SOLDI per N VALUTA_CRIPTO di N VALUTA_CRIPTO
 		unused_cripto, soldi = managerJson.portafoglio()
+		ultimo_valore, _ = managerJson.commercialista()
 
 		#primo index:identifica il ORDER
 		#secondo index: identifica se Prezzo o Amount
@@ -161,14 +170,22 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 		# il secondo valore è l'amount (quantità)
 		asks_amount = float(orderbook['asks'][0][1])
 
+		asks_percentage = getAsksPercentage(asks_price)
+		bids_percentage = getBidsPercentage(bids_price)
+
 		# Aggiorno le statistiche
 		MyStat.strategy_spread_duration_update(asks_price - bids_price)
 
 		#todo- set minimum soldi of 25
 		#todo- necessario? set minimum cripto of ? (c'e un minimo ma non ricordo quale sia)
 
+		# Debug
+		# print("A" + str(asks_percentage) + str('%'))
+		# print("B" + str(bids_percentage) + str('%'))
+
 		# Se ho abbastanza soldi per fare un'ordine minimo (minimo per la piattaforma)
-		if soldi > MINIMUM_ORDER_VALUE or force_buy:
+		if (soldi > MINIMUM_ORDER_VALUE and asks_percentage[0] > 70
+			and asks_percentage[1] > 10) or (soldi > MINIMUM_ORDER_VALUE and force_buy):
 			# Resetto l'acquisto forzato (al momento non utilizzato)
 			force_buy = False
 			## Compro
@@ -256,9 +273,10 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 				# Se (l'ordine in causa è stato esaudito o è senza ID perchè è stato finito)
 				# e (il prezzo d'acquisto è minore del prezzo con cui venderei o sto forzando la vendita)
 				# e le cripto che mi comprerebbero sono maggiori di quelle che ho [quindi me le comprano tutte])
-				if (order['order_status'].lower() == "finished" or not order['order_id']
-					) and (float(order['price']) < float(bids_price) or force_sell
-					or closing) and float(bids_amount) >= float(order['amount']):
+				if (order['order_status'].lower() == "finished" or not order['order_id']) and ((
+					float(order['price']) < float(bids_price) and bids_percentage[0] >= 10
+					and bids_percentage[1] >= 70
+				) or force_sell or closing) and float(bids_amount) >= float(order['amount']):
 					# Resetto la vendita forzata
 					force_sell = False
 					## Vendo
@@ -342,6 +360,38 @@ def gestore(orderbook: dict, MyStat=Statistics()):
 
 		# Aggiorno le statistiche
 		MyStat.strategy_cycle_duration_update(end=time.time())
+
+
+def getAsksMemory():
+	ultimo_valore, _ = managerJson.commercialista()
+	all_asks = []
+	for mem_row in ultimo_valore:
+		for asks in range(len(mem_row['asks'])):
+			all_asks.append(mem_row['asks'][asks][0])
+	return all_asks
+
+
+def getBidsMemory():
+	ultimo_valore, _ = managerJson.commercialista()
+	all_bids = []
+	for mem_row in ultimo_valore:
+		for bids in range(len(mem_row['bids'])):
+			all_bids.append(mem_row['bids'][bids][0])
+	return all_bids
+
+
+def getAsksPercentage(my_value):
+	asks = getAsksMemory()
+	up_len = len([ v for v in asks if float(my_value) < float(v) ])
+	dw_len = len([ v for v in asks if float(my_value) > float(v) ])
+	return [up_len / len(asks) * 100, dw_len / len(asks) * 100]
+
+
+def getBidsPercentage(my_value):
+	bids = getBidsMemory()
+	up_len = len([ v for v in bids if float(my_value) < float(v) ])
+	dw_len = len([ v for v in bids if float(my_value) > float(v) ])
+	return [up_len / len(bids) * 100, dw_len / len(bids) * 100]
 
 
 # def forOrderCheck(data):

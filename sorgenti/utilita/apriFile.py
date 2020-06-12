@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from costanti.costanti_unico import VALORI_PERCORSO, VALORI_TEMPLATE_PERCORSO
+from costanti.costanti_unico import (FORMATO_DATA_ORA, VALORI_PERCORSO, VALORI_TEMPLATE_PERCORSO)
 
 
 def gestoreValoriJson(chiave=None, valore=None):
@@ -120,7 +120,7 @@ def addOrder(amount, price, order_id, bos, timestamp=None, my_datetime=None, ord
 	if not order_status:
 		order_status = "processing"
 	if not my_datetime:
-		my_datetime = timestamp.strftime("%Y/%m/%d %H:%M:%S")
+		my_datetime = timestamp.strftime(FORMATO_DATA_ORA)
 	order = {
 		'amount': amount,
 		'price': price,

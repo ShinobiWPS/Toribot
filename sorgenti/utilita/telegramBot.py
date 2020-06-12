@@ -11,6 +11,8 @@ import telepot
 # gestisce la parte della ricezione di nuovi messaggi
 from telepot.loop import MessageLoop
 
+from costanti.log_cartella_percorso import LOG_CARTELLA_PERCORSO
+
 # è la libreria che gestisce le kaybord del tg_bot
 # from telepot.namedtuple import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -31,6 +33,7 @@ class TelegramBot(object):
 	_offset = 0
 
 	def __init__(self, isLoop=False):
+
 		self.tg_bot = telepot.Bot(self.token)
 		if isLoop:
 			MessageLoop(
