@@ -15,12 +15,7 @@ from flask import Flask, request
 from flask_cors import CORS
 
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import (
-	BITSTAMP_WEBSOCKET_CHANNEL_ORDERBOOK, BITSTAMP_WEBSOCKET_CHANNEL_TRADE,
-	BITSTAMP_WEBSOCKET_EVENT, BITSTAMP_WEBSOCKET_URL, COPPIA_DA_USARE_NOME, FORMATO_DATA_ORA,
-	LOG_CARTELLA_PERCORSO, TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI,
-	WEBSOCKET_AUTORECONNECT, WEBSOCKET_AUTORECONNECT_RETRIES
-)
+from costanti.costanti_unico import *
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
 from utilita import gestoreRapporti as report
@@ -43,12 +38,14 @@ path = f'strategie.{strategiaSigla}'
 strategiaModulo = importlib.import_module(path)
 
 MyStat = Statistics()
+orderbook_history = None
 
 # ______________________________________ WEBSOCKET ______________________________________
 
 # Ora nelle classi (MyWebSocket)
 
 _counterAutoReconnect = 0
+_counterUpdaterJson = 0
 
 
 def onWSTradeClose():
@@ -81,17 +78,71 @@ def onWSTradeMessage(messageDict):
 
 
 def onWSOBMessage(messageDict):
-	global MyStat, tg_bot
+	global MyStat, tg_bot, orderbook_history, _counterUpdaterJson
 	if _counterAutoReconnect:
 		AutoReconnect(None, resetCounter=True)
 	try:
 		# Verifico che nel messaggio ricevuto ci siano i dati che mi aspetto
 		if messageDict and 'data' in messageDict and messageDict['data']:
+			# Aggiorno le statistiche
+			MyStat.strategy_cycle_duration_update(start=time.time())
+
+			if not orderbook_history:
+				# Recupero la lista degli ultimi valori
+				orderbook_history = managerJson.commercialista()[0]
+			if not orderbook_history:
+				orderbook_history = []
 
 			# Aggiorno le statistiche
 			MyStat.WSOB_update()
+
 			# Invio i dati alla funzione che li gestirà (al momento non implementata)
-			strategiaModulo.gestore(messageDict['data'], MyStat, tg_bot)
+			strategiaModulo.gestore(messageDict['data'], orderbook_history, MyStat, tg_bot)
+
+			# Se è una lista
+			if isinstance(orderbook_history, list):
+				# E se la lista è maggiore o uguale al numero di elementi che voglio
+				if len(orderbook_history) >= LUNGHEZZA_MEMORIA:
+					# Se c'è un solo elemento
+					if len(orderbook_history) - LUNGHEZZA_MEMORIA == 0:
+						# Cancello dalla lista
+						orderbook_history.pop(0)
+						# Cancello dal mio json
+						# managerJson.gestoreValoriJson([ 'ultimo_valore', 0 ], '')
+					else:
+						# Partendo dall'inizio cancello gli elementi in più
+						for _ in range(len(orderbook_history) - LUNGHEZZA_MEMORIA + 1):
+							# Cancello dalla lista
+							orderbook_history.pop(0)
+							# Cancello dal mio json
+							# managerJson.gestoreValoriJson([ 'ultimo_valore', 0 ], '')
+			# Se non è una lista qualcosa non va
+			else:
+				# Quindi la reinizializzo
+				orderbook_history = []
+
+			# Clono l'orderbook per ridimensionarlo
+			orderbook_resized = messageDict['data']
+			# Estraggo solo il numero di asks desiderati
+			orderbook_resized['asks'] = orderbook_resized['asks'][:NUMERO_ORDINI_ORDERBOOK]
+			# Estraggo solo il numero di bids desiderati
+			orderbook_resized['bids'] = orderbook_resized['bids'][:NUMERO_ORDINI_ORDERBOOK]
+
+			# Addo il nuovo orderbook ridimensionato al mio json
+			# managerJson.commercialista("ultimo_valore", orderbook_resized)
+
+			# Addo il nuovo orderbook ridimensionato al mio history in ram
+			orderbook_history.append(orderbook_resized)
+
+			if _counterUpdaterJson > 5:
+				_counterUpdaterJson = 0
+				updateJson()
+			else:
+				_counterUpdaterJson += 1
+
+			# Aggiorno le statistiche
+			MyStat.strategy_cycle_duration_update(end=time.time())
+
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
 		getErrorInfo(ex)
@@ -158,6 +209,15 @@ ws_ob = MyWebSocket(
 )
 
 
+def updateJson():
+	global MyStat, tg_bot, orderbook_history
+	# threading.Timer(1.0, updateJson).start()
+	MyStat.update_json()
+	if orderbook_history:
+		managerJson.gestoreValoriJson(['ultimo_valore'], '')
+		managerJson.commercialista("ultimo_valore", orderbook_history)
+
+
 def avvio():
 	global ws_trade, ws_ob
 	try:
@@ -202,6 +262,10 @@ def avvio():
 			)
 		# Forzo il print a console
 		sys.stdout.flush()
+
+		# jsonUpdater = threading.Thread(target=updateJson, daemon=True)
+		# jsonUpdater.start()
+		# threading.Timer(1.0, updateJson).start()
 
 		# Starto il websocket dell'orderbook
 		ws_ob.run_forever()

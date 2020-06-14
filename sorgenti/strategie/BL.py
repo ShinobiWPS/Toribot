@@ -24,10 +24,13 @@ force_sell = False
 closing = False
 
 
-def gestore(orderbook: dict, MyStat=Statistics(), tg_bot=TelegramBot(False)):
+def gestore(
+	orderbook: dict,
+	orderbook_history=managerJson.commercialista()[0],
+	MyStat=Statistics(),
+	tg_bot=TelegramBot(False)
+):
 	global Fattore_Perdita, force_sell, force_buy, closing
-
-	MyStat.strategy_cycle_duration_update(start=time.time())
 
 	#todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
 	try:
@@ -154,7 +157,6 @@ def gestore(orderbook: dict, MyStat=Statistics(), tg_bot=TelegramBot(False)):
 		# todo- Check se ultimo ultimo_id_ordine() e' stato completato
 		# if YES LOGGA: Ordine [buy|sell] completo al prezzo di N VALUTA_SOLDI per N VALUTA_CRIPTO di N VALUTA_CRIPTO
 		unused_cripto, soldi = managerJson.portafoglio()
-		ultimo_valore, _ = managerJson.commercialista()
 
 		#primo index:identifica il ORDER
 		#secondo index: identifica se Prezzo o Amount
@@ -172,8 +174,11 @@ def gestore(orderbook: dict, MyStat=Statistics(), tg_bot=TelegramBot(False)):
 		# il secondo valore è l'amount (quantità)
 		asks_amount = firstOrderAmount(orderbook['asks'])
 
-		asks_percentage = getAsksPercentage(asks_price)
-		bids_percentage = getBidsPercentage(bids_price)
+		asks_history = getAsksMemory(orderbook_history)
+		bids_history = getBidsMemory(orderbook_history)
+
+		asks_percentage = getAsksPercentage(asks_history, asks_price)
+		bids_percentage = getBidsPercentage(bids_history, bids_price)
 
 		# Aggiorno le statistiche
 		MyStat.strategy_spread_duration_update(asks_price - bids_price)
@@ -329,68 +334,42 @@ def gestore(orderbook: dict, MyStat=Statistics(), tg_bot=TelegramBot(False)):
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
 		getErrorInfo(ex)
-	finally:
-		# Recupero la lista degli ultimi valori
-		ultimo_valore, _ = managerJson.commercialista()
-		# Se è una lista
-		if isinstance(ultimo_valore, list):
-			# E se la lista è maggiore o uguale al numero di elementi che voglio
-			if len(ultimo_valore) >= LUNGHEZZA_MEMORIA:
-				# Partendo dall'inizio cancello gli elementi in più
-				for index in range(len(ultimo_valore) - LUNGHEZZA_MEMORIA + 1):
-					# Cancello dalla lista
-					ultimo_valore.pop(0)
-					# Cancello dal mio json
-					managerJson.gestoreValoriJson([ 'ultimo_valore', 0 ], '')
-		# Se non è una lista qualcosa non va
-		else:
-			# Quindi la reinizializzo
-			ultimo_valore = []
-
-		# Clono l'orderbook per ridimensionarlo
-		orderbook_resized = orderbook
-		# Estraggo solo il numero di asks desiderati
-		orderbook_resized['asks'] = orderbook_resized['asks'][:NUMERO_ORDINI_ORDERBOOK]
-		# Estraggo solo il numero di bids desiderati
-		orderbook_resized['bids'] = orderbook_resized['bids'][:NUMERO_ORDINI_ORDERBOOK]
-
-		# Addo il nuovo orderbook ridimensionato al mio json
-		managerJson.commercialista("ultimo_valore", orderbook_resized)
-
-		# Aggiorno le statistiche
-		MyStat.strategy_cycle_duration_update(end=time.time())
 
 
-def getAsksMemory():
-	ultimo_valore, _ = managerJson.commercialista()
+def getAsksMemory(orderbook_history=managerJson.commercialista()[0]):
 	all_asks = []
-	for mem_row in ultimo_valore:
-		for asks in range(len(mem_row['asks'])):
-			all_asks.append(mem_row['asks'][asks][0])
-	return all_asks
+	if orderbook_history:
+		for mem_row in orderbook_history:
+			for asks in range(len(mem_row['asks'])):
+				all_asks.append(mem_row['asks'][asks][0])
+		return all_asks
+	return None
 
 
-def getBidsMemory():
-	ultimo_valore, _ = managerJson.commercialista()
+def getBidsMemory(orderbook_history=managerJson.commercialista()[0]):
 	all_bids = []
-	for mem_row in ultimo_valore:
-		for bids in range(len(mem_row['bids'])):
-			all_bids.append(mem_row['bids'][bids][0])
-	return all_bids
+	if orderbook_history:
+		for mem_row in orderbook_history:
+			for bids in range(len(mem_row['bids'])):
+				all_bids.append(mem_row['bids'][bids][0])
+		return all_bids
+	return None
 
 
-def getAsksPercentage(my_value):
-	asks = getAsksMemory()
-	up_len = len([ v for v in asks if float(my_value) < float(v) ])
-	dw_len = len([ v for v in asks if float(my_value) > float(v) ])
-	return [up_len / len(asks) * 100, dw_len / len(asks) * 100]
+def getAsksPercentage(asks=getAsksMemory(managerJson.commercialista()[0]), my_value=0):
+	if asks:
+		up_len = len([ v for v in asks if float(my_value) < float(v) ])
+		dw_len = len([ v for v in asks if float(my_value) > float(v) ])
+		return [up_len / len(asks) * 100, dw_len / len(asks) * 100]
+	return None
 
 
-def getBidsPercentage(my_value):
-	bids = getBidsMemory()
-	up_len = len([ v for v in bids if float(my_value) < float(v) ])
-	dw_len = len([ v for v in bids if float(my_value) > float(v) ])
-	return [up_len / len(bids) * 100, dw_len / len(bids) * 100]
+def getBidsPercentage(bids=getBidsMemory(managerJson.commercialista()[0]), my_value=0):
+	if bids:
+		up_len = len([ v for v in bids if float(my_value) < float(v) ])
+		dw_len = len([ v for v in bids if float(my_value) > float(v) ])
+		return [up_len / len(bids) * 100, dw_len / len(bids) * 100]
+	return None
 
 
 # def forOrderCheck(data):

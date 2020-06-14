@@ -22,7 +22,7 @@ def gestoreValoriJson(chiave=None, valore=None):
 	with open(VALORI_PERCORSO, 'r+') as jsonFile:
 		if chiave is not None and valore is not None:
 			# try:
-			valori_json = json.loads(jsonFile.read())
+			valori_json = json.loads(jsonFile.read().strip())
 
 			jsonFile.seek(0)
 
@@ -40,7 +40,9 @@ def gestoreValoriJson(chiave=None, valore=None):
 						tmp_config[key] = {}
 						tmp_config = tmp_config[key]
 				if isinstance(chiave, list) or isinstance(chiave, dict):
-					if isinstance(tmp_config[chiave[-1]], list):
+					if chiave[-1] in tmp_config and isinstance(
+						tmp_config[chiave[-1]], list
+					) and valore:
 						tmp_config[chiave[-1]].append(valore)
 					else:
 						tmp_config[chiave[-1]] = valore
@@ -60,7 +62,7 @@ def gestoreValoriJson(chiave=None, valore=None):
 					del tmp_config[chiave[-1]]
 
 			else:
-				if isinstance(valori_json[chiave], list):
+				if chiave in valori_json and isinstance(valori_json[chiave], list) and valore:
 					valori_json[chiave].append(valore)
 				else:
 					valori_json[chiave] = valore

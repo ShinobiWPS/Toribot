@@ -249,7 +249,7 @@ class Statistics(object):
 
 			self.strategy["cycle"]["duration"]["last"] = current_duration
 
-			self.update_json()
+			# self.update_json()
 
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
@@ -291,7 +291,7 @@ class Statistics(object):
 
 			self.strategy["trade"]["last"] = trade_timestamp
 
-			self.update_json()
+			# self.update_json()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
 			getErrorInfo(ex)
@@ -334,7 +334,7 @@ class Statistics(object):
 
 			self.strategy["buy"]["last"] = buy_timestamp
 
-			self.update_json()
+			# self.update_json()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
 			getErrorInfo(ex)
@@ -377,7 +377,7 @@ class Statistics(object):
 
 			self.strategy["sell"]["last"] = sell_timestamp
 
-			self.update_json()
+			# self.update_json()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
 			getErrorInfo(ex)
@@ -406,7 +406,7 @@ class Statistics(object):
 
 			self.strategy["spread"]["last"] = spread
 
-			self.update_json()
+			# self.update_json()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
 			getErrorInfo(ex)
