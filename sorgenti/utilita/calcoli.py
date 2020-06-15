@@ -5,6 +5,10 @@ def percentageOf(percent: float, whole: float):
 	return (percent * whole) / 100.0
 
 
+def diffPercentage(starting_number: float, ending_number: float):
+	return round(((abs(ending_number - starting_number) / starting_number) * 100.0), 3)
+
+
 def calcolaSpread(primo_prezzo: float, secondo_prezzo: float):
 	# do we need to round() ?
 	return abs(primo_prezzo - secondo_prezzo)
@@ -51,7 +55,7 @@ def priceChange(prezzo_float: float, bid_or_ask: str):
 	prezzo = str(prezzo_float)
 
 	if bid_or_ask == 'bid':
-		operator = '-'
+		operator = '+'
 		if VALUTA_CRIPTO == 'btc':
 			num2 = '0.01'
 		elif VALUTA_CRIPTO == 'xrp':
@@ -59,7 +63,7 @@ def priceChange(prezzo_float: float, bid_or_ask: str):
 		else:
 			raise Exception('Cripto not listed in priceChange() for MINUS operator')
 	elif bid_or_ask == 'ask':
-		operator = '+'
+		operator = '-'
 		if VALUTA_CRIPTO == 'btc':
 			num2 = '0.01'
 		elif VALUTA_CRIPTO == 'xrp':
@@ -93,3 +97,8 @@ def sumOf_AmountOrValue(arrayOfOrders: list, valueOrAmount: str = 'amount'):
 		return totalSum
 	else:
 		raise Exception("per ora calcolo soltanto l'amount")
+
+
+def isSbalzo(parameter_list):
+	#minPercentageDelta
+	pass

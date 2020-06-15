@@ -33,7 +33,7 @@ CORS(app)
 log.inizializza_log()
 
 # Importo libreria in base all'argomento passato
-strategiaSigla = 'BL'  #sys.argv[1]
+strategiaSigla = 'BL-L'  #sys.argv[1]
 path = f'strategie.{strategiaSigla}'
 strategiaModulo = importlib.import_module(path)
 
