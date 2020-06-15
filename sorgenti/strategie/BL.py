@@ -183,7 +183,6 @@ def gestore(
 		# Aggiorno le statistiche
 		MyStat.strategy_spread_duration_update(asks_price - bids_price)
 
-		#todo- set minimum soldi of 25
 		#todo- necessario? set minimum cripto of ? (c'e un minimo ma non ricordo quale sia)
 
 		# Debug
