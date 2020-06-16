@@ -33,7 +33,7 @@ CORS(app)
 log.inizializza_log()
 
 # Importo libreria in base all'argomento passato
-strategiaSigla = 'BL'  #sys.argv[1]
+strategiaSigla = 'BL-L'  #sys.argv[1]
 path = f'strategie.{strategiaSigla}'
 strategiaModulo = importlib.import_module(path)
 
@@ -97,7 +97,12 @@ def onWSOBMessage(messageDict):
 			MyStat.WSOB_update()
 
 			# Invio i dati alla funzione che li gestirà (al momento non implementata)
-			strategiaModulo.gestore(messageDict['data'], orderbook_history, MyStat, tg_bot)
+			strategiaModulo.gestore(
+				messageDict['data'],
+				orderbook_history,
+				MyStat,
+				tg_bot,
+			)
 
 			# Se è una lista
 			if isinstance(orderbook_history, list):
@@ -696,7 +701,7 @@ if __name__ == "__main__":
 			mybot.start()
 
 		# Avvia il il bot di telegram
-		tg_bot = TelegramBot(True)
+		tg_bot = TelegramBot(False)
 
 		# Avvia le API
 		app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False, threaded=True)

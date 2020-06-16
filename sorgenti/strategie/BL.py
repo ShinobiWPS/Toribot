@@ -2,6 +2,7 @@ import json
 import logging
 import math
 import os
+import sched
 import sys
 import time
 from datetime import datetime
@@ -12,7 +13,7 @@ from costanti.costanti_unico import *
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita import apriFile as managerJson
-from utilita.calcoli import firstOrderAmount, firstOrderPrice
+from utilita.calcoli import (firstOrderAmount, firstOrderPrice, prezzoInPrimaFila)
 from utilita.infoAboutError import getErrorInfo
 from utilita.Statistics import Statistics
 from utilita.telegramBot import TelegramBot
@@ -23,12 +24,14 @@ force_buy = False
 force_sell = False
 closing = False
 
+GOOD_PRICE_BID, GOOD_PRICE_ASK = 0, 0
 
-def gestore(
+
+def core(
 	orderbook: dict,
 	orderbook_history=managerJson.commercialista()[0],
 	MyStat=Statistics(),
-	tg_bot=TelegramBot(False)
+	tg_bot=TelegramBot(False),
 ):
 	global Fattore_Perdita, force_sell, force_buy, closing
 
@@ -203,7 +206,7 @@ def gestore(
 				my_amount = truncate(float(asks_amount), 8)
 
 			# Faccio l'ordine
-			order_result = json.loads(bitstamp.buyLimit(my_amount, asks_price, fok=True))
+			order_result = json.loads(bitstamp.buyLimit(my_amount, asks_price))
 			# Se l'ordine è andato bene, perchè ha una delle chiavi corrette
 			if 'id' in order_result:
 				# Salvo la risposta dell'ordine di acquisto in un file per debug
@@ -329,10 +332,40 @@ def gestore(
 					# Cancello la variabile con la risposta dell'ordine di acquisto
 					# per ordine e evitare problemi
 					del order_result
-
+		print("Doing stuff...")
+		s.enter(TIMER, 1, core, ( sc, ))
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
 		getErrorInfo(ex)
+
+
+s = sched.scheduler(time.time, time.sleep)
+s.enter(TIMER, 1, core, ( s, ))
+
+
+def gestore(
+	orderbook: dict,
+	orderbook_history=managerJson.commercialista()[0],
+	MyStat=Statistics(),
+	tg_bot=TelegramBot(False)
+):
+	if CORE_IS_NOT_RUNNING:
+		s.run()
+	rivalutaPrezzi(orderbook)
+
+
+def rivalutaPrezzi(orderbook: dict):
+	global GOOD_PRICE_ASK
+	global GOOD_PRICE_BID
+	GOOD_PRICE_BID, GOOD_PRICE_ASK = prezzoInPrimaFila(
+		orderbook['bids'],
+		orderbook['asks'],
+	)
+
+	#todo- place buy order open
+
+	#todo- on buy-order done,
+	# take buy_price, amount and pass to calcoloPrezziByDelta()
 
 
 def getAsksMemory(orderbook_history=managerJson.commercialista()[0]):

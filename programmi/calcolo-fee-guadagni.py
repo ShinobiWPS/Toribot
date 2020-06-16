@@ -4,7 +4,7 @@ amount=float(100.00000000)
 
 #delta for profit
 delta = float(0.00182) #e' circa il 1.05% del buy_price
-# XRPdelta = float(0.00182)
+# XRPdelta = float(0.00182) => 0.18247
 
 #buy/bid
 
