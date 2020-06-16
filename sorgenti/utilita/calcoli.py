@@ -76,7 +76,7 @@ def priceChange(prezzo_float: float, bid_or_ask: str):
 	return eval(prezzo + operator + num2)
 
 
-def ilPrezzoGiusto(bids: list, asks: list):
+def prezzoInPrimaFila(bids: list, asks: list):
 	#todo- criterio che analizza tutti i prezzi della colonna attuale
 	buyOrderPrice = firstOrderPrice(bids)
 	good_price_bid = priceChange(buyOrderPrice, 'bid')
