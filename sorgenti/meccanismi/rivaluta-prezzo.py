@@ -12,7 +12,7 @@ from utilita.calcoli import depthChartAnalyzer, ilPrezzoGiusto
 #DELTA = 0  # %
 
 
-def rivalutaPrezzo(orderbook: dict):
+def rivalutaPrezzi(orderbook: dict):
 
 	good_price_bid, good_price_ask = ilPrezzoGiusto(orderbook['bids'], orderbook['asks'])
 	return [ good_price_bid, good_price_ask ]
@@ -22,4 +22,4 @@ def rivalutaPrezzo(orderbook: dict):
 
 
 if __name__ == "__main__":
-	startWebSocketOrderBook(rivalutaPrezzo)
+	startWebSocketOrderBook(rivalutaPrezzi)

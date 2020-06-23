@@ -2,11 +2,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Play BL ",
+      "name": "Play (BL) ",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/sorgenti/play.py",
-      "args": ["BL", "", "dev"],
+      "args": [""],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },
