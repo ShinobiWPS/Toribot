@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Grafico</title>
+
+	<script type="text/javascript" src="jquery-3.5.1.min.js"></script>
+	<script type="text/javascript" src="Chart.bundle.js"></script>
+</head>
+<body>
+
+<canvas id="myChart" width="400" height="130"></canvas>
+<canvas id="myChart2" width="400" height="130"></canvas>
+<canvas id="myChart3" width="400" height="130"></canvas>
+<script>
+
+// $.get('../sorgenti/valori.json', function(data) {
+//    alert(data)
+// }, 'text');
+
+memories_filename = "../sorgenti/valori.json";
+// memories_filename = "valori.json";
+
+datetimes = [];
+asks = [];
+bids = [];
+
+
+function addData(chart, label, data) {
+    chart.data.labels.push(label);
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(data);
+    });
+    chart.update();
+}
+
+function removeData(chart) {
+    chart.data.labels.pop();
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.pop();
+    });
+    chart.update();
+}
+
+function getDateFormat(date) {
+	var d = new Date(date),
+			month = '' + (d.getMonth() + 1),
+			day = '' + d.getDate(),
+			year = d.getFullYear(),
+			hour = d.getHours(),
+			minute = d.getMinutes(),
+			second = d.getSeconds();
+	
+	if (month.toString().length < 2)
+		month = '0' + month;
+	if (day.toString().length < 2)
+		day = '0' + day;
+
+	if (hour.toString().length < 2)
+		hour = '0' + hour;
+	if (minute.toString().length < 2)
+		minute = '0' + minute;
+	if (second.toString().length < 2)
+		second = '0' + second;
+
+	var date = new Date();
+	date.toLocaleDateString();
+	
+	return [hour, minute, second].join(':');
+};
+
+
+var ctx = document.getElementById('myChart');
+var ctx2 = document.getElementById('myChart2');
+var ctx3 = document.getElementById('myChart3');
+var myChart = new Chart(ctx, {
+	type: 'line',
+	data: {
+		labels: [],
+		datasets: [{
+			label: 'ASKS',
+			data: [],
+			backgroundColor: 'rgba(255, 0, 0, 0.8)',
+			borderColor: 'rgba(255, 0, 0, 0.8)',
+			fill: false,
+			order:2
+		},{
+			label: 'BIDS',
+			data: [],
+			backgroundColor: 'rgba(0, 255, 0, 0.8)',
+			borderColor: 'rgba(0, 255, 0, 0.8)',
+			fill: false,
+			order:1
+		}]
+	},
+	options: {
+		responsive: true,
+		animation: {
+			duration: 0
+		},
+		title: {
+			display: true,
+			text: 'Orderbook'
+		},
+		tooltips: {
+			mode: 'index',
+			intersect: false,
+		},
+		scales: {
+			yAxes: [{
+				ticks: {
+					// beginAtZero:true,
+					// max: 120
+				}
+			}]
+		},
+	}
+});
+
+var myChart2 = new Chart(ctx2, {
+	type: 'line',
+	data: {
+		labels: [],
+		datasets: [{
+			label: 'Spread',
+			data: [],
+			backgroundColor: 'rgba(0, 99, 132, 0.8)',
+			borderColor: 'rgba(0, 99, 132, 0.8)',
+			fill: 'rgba(0, 99, 132, 0.8)'
+		}]
+	},
+	options: {
+		responsive: true,
+		animation: {
+			duration: 0
+		},
+		// title: {
+		// 	display: true,
+		// 	text: 'Orderbook'
+		// },
+		tooltips: {
+			mode: 'index',
+			intersect: false,
+		},
+		scales: {
+			yAxes: [{
+				ticks: {
+					// beginAtZero:true,
+					// max: 120
+				}
+			}]
+		},
+	}
+});
+
+
+var myChart3 = new Chart(ctx3, {
+	type: 'line',
+	data: {
+		labels: [],
+		datasets: [{
+			label: 'RSI',
+			data: [],
+			backgroundColor: 'rgba(0, 99, 132, 0.8)',
+			borderColor: 'rgba(0, 99, 132, 0.8)',
+			fill: 'rgba(0, 99, 132, 0.8)'
+		}]
+	},
+	options: {
+		responsive: true,
+		animation: {
+			duration: 0
+		},
+		title: {
+			display: true,
+			text: 'Indicator'
+		},
+		tooltips: {
+			mode: 'index',
+			intersect: false,
+		},
+		scales: {
+			yAxes: [{
+				ticks: {
+					// beginAtZero:true,
+					// max: 120
+				}
+			}]
+		},
+	}
+});
+
+function updateGraphs() {
+
+	$.getJSON(memories_filename, function( data ) {
+		datetimes = [];
+		asks = [];
+		bids = [];
+		spread = [];
+
+		if(Boolean(data))
+		$.each( data['ultimo_valore'], function( key, val ) {
+			datetimes.push(getDateFormat(parseInt(val['timestamp'])*1000));
+			asks.push(val['asks'][0][0]);
+			bids.push(val['bids'][0][0]);
+			spread.push(parseFloat(val['asks'][0][0])-parseFloat(val['bids'][0][0]));
+			// items.push( "<li id='" + key + "'>" + val + "</li>" );
+		});
+		if(Array.isArray(datetimes) && datetimes.length) {
+			myChart.data.labels = datetimes;
+			myChart.data.datasets[0].data = asks;
+			myChart.data.datasets[1].data = bids;
+			myChart.update();
+	
+			myChart2.data.labels = datetimes;
+			myChart2.data.datasets[0].data = spread;
+			myChart2.update();
+		}
+		// $( "<ul/>", {"class": "my-new-list",html: items.join( "" )}).appendTo( "body" );
+	});
+
+}
+
+updateGraphs();
+update_interval = setInterval(updateGraphs, 1000);
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Grafico</title>
+
+	<script type="text/javascript" src="Chart.bundle.js"></script>
+</head>
+<body>
+
+<canvas id="myChart" width="400" height="130"></canvas>
+<canvas id="myChart2" width="400" height="130"></canvas>
+<script>
+
+var my_data = [
+	{'x':1, 'y':18},
+	{'x':7, 'y':12},
+];
+
+var ctx = document.getElementById('myChart');
+var ctx2 = document.getElementById('myChart2');
+var myChart = new Chart(ctx, {
+	type: 'line',
+	data: {
+		labels: [0,1,2,3,4,5,6,7,8,9],
+		datasets: [{
+			label: 'ASKS',
+			data: [11, 18, 2, 4, 1, 2,0,12,11,4],
+			backgroundColor: 'rgba(255, 0, 0, 0.8)',
+			borderColor: 'rgba(255, 0, 0, 0.8)',
+			fill: false,
+			order:3
+		},{
+			label: 'BIDS',
+			data: [12, 19, 3, 5, 2, 3,0.5,13,12,5],
+			backgroundColor: 'rgba(0, 255, 0, 0.8)',
+			borderColor: 'rgba(0, 255, 0, 0.8)',
+			fill: false,
+			order:2
+		},{
+			label: 'Buy',
+			data: my_data,
+			backgroundColor: 'rgba(0, 0, 0, 0.8)',
+			borderColor: 'rgba(0, 0, 0, 0.8)',
+			fill: false,
+			order: 1,
+			showLine: false,
+			xAxisID: 'x-axis-2'
+		}]
+	},
+	options: {
+		responsive: true,
+		title: {
+			display: true,
+			text: 'Chart.js - Line Chart With Multiple X Scales (X Axes)'
+		},
+		tooltips: {
+			mode: 'nearest',
+			intersect: true,
+		},
+		scales: {
+			xAxes: [{
+				gridLines: {
+					offsetGridLines: false,
+				}
+			}, {
+				id: 'x-axis-2',
+				type: 'linear',
+				position: 'bottom',
+				display: false,
+				ticks: {
+					min: 0,
+					max: 9,
+					stepSize: 1
+				}
+			}]
+		}
+	}
+});
+var myChart2 = new Chart(ctx2, {
+	type: 'line',
+	data: {
+		labels: [0,1,2,3,4,5,6,7,8,9],
+		datasets: [{
+			label: 'RSI',
+			data: [100,50,25,100,80,0,25,90,90,80],
+			backgroundColor: 'rgba(0, 99, 132, 0.8)',
+			borderColor: 'rgba(0, 99, 132, 0.8)',
+			fill: 'rgba(0, 99, 132, 0.8)'
+		}]
+	},
+	options: {
+		scales: {
+			yAxes: [{
+				ticks: {
+					beginAtZero: true
+				}
+			}]
+		}
+	}
+});
+</script>
+
+</body>
+</html>
