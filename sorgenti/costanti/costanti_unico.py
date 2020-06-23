@@ -4,7 +4,7 @@ COPPIA_DA_USARE_NOME = f'{VALUTA_CRIPTO}{VALUTA_SOLDI}'
 FEE = 0.0
 MINIMUM_ORDER_VALUE = 25
 
-LUNGHEZZA_MEMORIA = 5000
+LUNGHEZZA_MEMORIA = 10000
 NUMERO_ORDINI_ORDERBOOK = 1
 
 FORMATO_DATA_ORA = "%d-%m-%Y %H:%M:%S"
@@ -15,6 +15,12 @@ STATISTICA_PERCORSO = "log/stats.json"
 PORTAFOGLIO_PERCORSO = "sorgenti/portafoglio.json"
 VALORI_PERCORSO = "sorgenti/valori.json"
 VALORI_TEMPLATE_PERCORSO = "sorgenti/valori_template.json"
+
+MEMORIA_PERCORSO = "sorgenti/memoria/"
+MEMORIA_ORDERBOOK_PERCORSO = "sorgenti/memoria/orderbook.json"
+MEMORIA_ORDERBOOK_SIMPLIFIED_PERCORSO = "sorgenti/memoria/orderbook_simplified.json"
+MEMORIA_SPREAD_PERCORSO = "sorgenti/memoria/spread.json"
+MEMORIA_RSI_PERCORSO = "sorgenti/memoria/rsi.json"
 
 BITSTAMP_WEBSOCKET_URL = "wss://ws.bitstamp.net"
 BITSTAMP_WEBSOCKET_EVENT = "bts:subscribe"

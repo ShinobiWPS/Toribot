@@ -17,7 +17,7 @@
 //    alert(data)
 // }, 'text');
 
-memories_filename = "../sorgenti/valori.json";
+memories_filename = "../sorgenti/memoria/orderbook.json";
 // memories_filename = "valori.json";
 
 datetimes = [];
@@ -198,7 +198,7 @@ function updateGraphs() {
 		spread = [];
 
 		if(Boolean(data))
-		$.each( data['ultimo_valore'], function( key, val ) {
+		$.each( data, function( key, val ) {
 			datetimes.push(getDateFormat(parseInt(val['timestamp'])*1000));
 			asks.push(val['asks'][0][0]);
 			bids.push(val['bids'][0][0]);
@@ -221,7 +221,7 @@ function updateGraphs() {
 }
 
 updateGraphs();
-update_interval = setInterval(updateGraphs, 1000);
+update_interval = setInterval(updateGraphs, 500);
 
 
 </script>

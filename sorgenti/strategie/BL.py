@@ -12,6 +12,8 @@ from costanti.costanti_unico import *
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita import apriFile as managerJson
+from utilita import fileManager
+from utilita import gestoreRapporti as report
 from utilita.calcoli import firstOrderAmount, firstOrderPrice
 from utilita.infoAboutError import getErrorInfo
 from utilita.Statistics import Statistics
@@ -26,7 +28,8 @@ closing = False
 
 def gestore(
 	orderbook: dict,
-	orderbook_history=managerJson.commercialista()[0],
+	orderbook_history=fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO),
+	simplified_orderbook_history=fileManager.JsonReads(MEMORIA_ORDERBOOK_SIMPLIFIED_PERCORSO),
 	MyStat=Statistics(),
 	tg_bot=TelegramBot(False)
 ):
@@ -174,8 +177,10 @@ def gestore(
 		# il secondo valore è l'amount (quantità)
 		asks_amount = firstOrderAmount(orderbook['asks'])
 
-		asks_history = getAsksMemory(orderbook_history)
-		bids_history = getBidsMemory(orderbook_history)
+		# asks_history = getAsksMemory(orderbook_history)
+		# bids_history = getBidsMemory(orderbook_history)
+		asks_history = simplified_orderbook_history['asks']
+		bids_history = simplified_orderbook_history['bids']
 
 		asks_percentage = getAsksPercentage(asks_history, asks_price)
 		bids_percentage = getBidsPercentage(bids_history, bids_price)
@@ -335,7 +340,7 @@ def gestore(
 		getErrorInfo(ex)
 
 
-def getAsksMemory(orderbook_history=managerJson.commercialista()[0]):
+def getAsksMemory(orderbook_history=fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)):
 	all_asks = []
 	if orderbook_history:
 		for mem_row in orderbook_history:
@@ -345,7 +350,7 @@ def getAsksMemory(orderbook_history=managerJson.commercialista()[0]):
 	return None
 
 
-def getBidsMemory(orderbook_history=managerJson.commercialista()[0]):
+def getBidsMemory(orderbook_history=fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)):
 	all_bids = []
 	if orderbook_history:
 		for mem_row in orderbook_history:
@@ -355,7 +360,10 @@ def getBidsMemory(orderbook_history=managerJson.commercialista()[0]):
 	return None
 
 
-def getAsksPercentage(asks=getAsksMemory(managerJson.commercialista()[0]), my_value=0):
+def getAsksPercentage(
+	asks=getAsksMemory(fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)),
+	my_value=0,
+):
 	if asks:
 		up_len = len([ v for v in asks if float(my_value) < float(v) ])
 		dw_len = len([ v for v in asks if float(my_value) > float(v) ])
@@ -363,7 +371,10 @@ def getAsksPercentage(asks=getAsksMemory(managerJson.commercialista()[0]), my_va
 	return None
 
 
-def getBidsPercentage(bids=getBidsMemory(managerJson.commercialista()[0]), my_value=0):
+def getBidsPercentage(
+	bids=getBidsMemory(fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)),
+	my_value=0,
+):
 	if bids:
 		up_len = len([ v for v in bids if float(my_value) < float(v) ])
 		dw_len = len([ v for v in bids if float(my_value) > float(v) ])

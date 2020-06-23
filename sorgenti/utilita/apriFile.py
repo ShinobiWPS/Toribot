@@ -94,11 +94,18 @@ def portafoglio(chiave=None, valore=None):
 	return [ None, None ]
 
 
-def commercialista(chiave=None, valore=None):
-	valori_json = gestoreValoriJson(chiave, valore)
-	if valori_json and "ultimo_valore" in valori_json and "orders" in valori_json:
-		return [valori_json["ultimo_valore"], valori_json["orders"]]
-	return [ None, None ]
+# def commercialista(chiave=None, valore=None):
+# 	valori_json = gestoreValoriJson(chiave, valore)
+# 	if valori_json and "ultimo_valore" in valori_json and "orders" in valori_json:
+# 		return [valori_json["ultimo_valore"], valori_json["orders"]]
+# 	return [ None, None ]
+
+
+def getMemory():
+	return None
+
+def getSimplifiedMemory():
+	return None
 
 
 def getOrders(chiave='order_id', valore=None):

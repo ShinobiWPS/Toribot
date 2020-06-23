@@ -13,11 +13,13 @@ from pathlib import Path
 import websocket
 from flask import Flask, request
 from flask_cors import CORS
+from pyti import relative_strength_index
 
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
 from costanti.costanti_unico import *
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
+from utilita import fileManager
 from utilita import gestoreRapporti as report
 from utilita import log
 from utilita.infoAboutError import getErrorInfo
@@ -39,7 +41,8 @@ strategiaModulo = importlib.import_module(path)
 
 MyStat = Statistics()
 orderbook_history = None
-
+simplified_orderbook_history = None
+rsi = None
 # ______________________________________ WEBSOCKET ______________________________________
 
 # Ora nelle classi (MyWebSocket)
@@ -78,7 +81,7 @@ def onWSTradeMessage(messageDict):
 
 
 def onWSOBMessage(messageDict):
-	global MyStat, tg_bot, orderbook_history, _counterUpdaterJson
+	global MyStat, tg_bot, orderbook_history, simplified_orderbook_history, _counterUpdaterJson, rsi
 	if _counterAutoReconnect:
 		AutoReconnect(None, resetCounter=True)
 	try:
@@ -87,17 +90,35 @@ def onWSOBMessage(messageDict):
 			# Aggiorno le statistiche
 			MyStat.strategy_cycle_duration_update(start=time.time())
 
-			if not orderbook_history:
-				# Recupero la lista degli ultimi valori
-				orderbook_history = managerJson.commercialista()[0]
-			if not orderbook_history:
-				orderbook_history = []
+			# if not orderbook_history:
+			# 	simplified_orderbook_history = {
+			# 		'asks': [],
+			# 		'bids': []
+			# 	}
+			# 	# Recupero la lista degli ultimi valori
+			# 	orderbook_history = fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)
+			# 	if orderbook_history:
+			# 		for row in orderbook_history:
+			# 			simplified_orderbook_history['asks'].append(row['asks'][0][0])
+			# 			simplified_orderbook_history['bids'].append(row['bids'][0][0])
+			# if not orderbook_history:
+			# 	orderbook_history = []
+			# 	simplified_orderbook_history = {
+			# 		'asks': [],
+			# 		'bids': []
+			# 	}
 
 			# Aggiorno le statistiche
 			MyStat.WSOB_update()
 
-			# Invio i dati alla funzione che li gestirà (al momento non implementata)
-			strategiaModulo.gestore(messageDict['data'], orderbook_history, MyStat, tg_bot)
+			# Invio i dati alla funzione che li gestirà
+			strategiaModulo.gestore(
+				orderbook=messageDict['data'],
+				orderbook_history=orderbook_history,
+				simplified_orderbook_history=simplified_orderbook_history,
+				MyStat=MyStat,
+				tg_bot=tg_bot,
+			)
 
 			# Se è una lista
 			if isinstance(orderbook_history, list):
@@ -107,6 +128,10 @@ def onWSOBMessage(messageDict):
 					if len(orderbook_history) - LUNGHEZZA_MEMORIA == 0:
 						# Cancello dalla lista
 						orderbook_history.pop(0)
+						simplified_orderbook_history['asks'].pop(0)
+						simplified_orderbook_history['bids'].pop(0)
+						# rsi['asks'].pop(0)
+						# rsi['bids'].pop(0)
 						# Cancello dal mio json
 						# managerJson.gestoreValoriJson([ 'ultimo_valore', 0 ], '')
 					else:
@@ -114,12 +139,24 @@ def onWSOBMessage(messageDict):
 						for _ in range(len(orderbook_history) - LUNGHEZZA_MEMORIA + 1):
 							# Cancello dalla lista
 							orderbook_history.pop(0)
+							simplified_orderbook_history['asks'].pop(0)
+							simplified_orderbook_history['bids'].pop(0)
+							# rsi['asks'].pop(0)
+							# rsi['bids'].pop(0)
 							# Cancello dal mio json
 							# managerJson.gestoreValoriJson([ 'ultimo_valore', 0 ], '')
 			# Se non è una lista qualcosa non va
 			else:
 				# Quindi la reinizializzo
 				orderbook_history = []
+				simplified_orderbook_history = {
+					'asks': [],
+					'bids': []
+				}
+				# rsi = {
+				# 	'asks': [],
+				# 	'bids': []
+				# }
 
 			# Clono l'orderbook per ridimensionarlo
 			orderbook_resized = messageDict['data']
@@ -131,15 +168,25 @@ def onWSOBMessage(messageDict):
 			# Addo il nuovo orderbook ridimensionato al mio json
 			# managerJson.commercialista("ultimo_valore", orderbook_resized)
 
+			simplified_orderbook_history['asks'].append(float(orderbook_resized['asks'][0][0]))
+			simplified_orderbook_history['bids'].append(float(orderbook_resized['bids'][0][0]))
+
 			# Addo il nuovo orderbook ridimensionato al mio history in ram
 			orderbook_history.append(orderbook_resized)
 
+			# rsi['asks'] = relative_strength_index.relative_strength_index(
+			# 	simplified_orderbook_history['asks'], 14
+			# )
+			# rsi['bids'] = relative_strength_index.relative_strength_index(
+			# 	simplified_orderbook_history['bids'], 14
+			# )
+			"""
 			if _counterUpdaterJson > 5:
 				_counterUpdaterJson = 0
 				updateJson()
 			else:
 				_counterUpdaterJson += 1
-
+			"""
 			# Aggiorno le statistiche
 			MyStat.strategy_cycle_duration_update(end=time.time())
 
@@ -210,16 +257,21 @@ ws_ob = MyWebSocket(
 
 
 def updateJson():
-	global MyStat, tg_bot, orderbook_history
-	# threading.Timer(1.0, updateJson).start()
+	global MyStat, tg_bot, orderbook_history, simplified_orderbook_history, rsi
 	MyStat.update_json()
 	if orderbook_history:
-		managerJson.gestoreValoriJson(['ultimo_valore'], '')
-		managerJson.commercialista("ultimo_valore", orderbook_history)
+		fileManager.JsonWrites(MEMORIA_ORDERBOOK_PERCORSO, 'w', orderbook_history)
+	if simplified_orderbook_history:
+		fileManager.JsonWrites(
+			MEMORIA_ORDERBOOK_SIMPLIFIED_PERCORSO, 'w', simplified_orderbook_history
+		)
+	# if rsi:
+	# 	fileManager.JsonWrites(MEMORIA_RSI_PERCORSO, 'w', rsi)
+	threading.Timer(10.0, updateJson).start()
 
 
 def avvio():
-	global ws_trade, ws_ob
+	global ws_trade, ws_ob, orderbook_history, simplified_orderbook_history, rsi
 	try:
 		# argv:  gli argomenti tranne il primo perche e' il nome del file
 		# argv = sys.argv[1:]
@@ -260,12 +312,51 @@ def avvio():
 				TRADING_REPORT_FILENAME,
 				dt_string + " Inizio con " + str(round(soldi, 2)) + " " + str(VALUTA_SOLDI.upper())
 			)
+
+		if not orderbook_history:
+			simplified_orderbook_history = {
+				'asks': [],
+				'bids': []
+			}
+			# rsi = {
+			# 	'asks': [],
+			# 	'bids': []
+			# }
+
+			# Recupero la lista degli ultimi valori
+			orderbook_history = fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)
+			if orderbook_history:
+				for row in orderbook_history:
+					simplified_orderbook_history['asks'].append(float(row['asks'][0][0]))
+					simplified_orderbook_history['bids'].append(float(row['bids'][0][0]))
+
+					# if len(simplified_orderbook_history['asks']) >= 14:
+					# 	rsi['asks'] = relative_strength_index.relative_strength_index(
+					# 		simplified_orderbook_history['asks'], 14
+					# 	)
+
+					# if len(simplified_orderbook_history['bids']) >= 14:
+					# 	rsi['bids'] = relative_strength_index.relative_strength_index(
+					# 		simplified_orderbook_history['bids'], 14
+					# 	)
+
+		if not orderbook_history:
+			orderbook_history = []
+			simplified_orderbook_history = {
+				'asks': [],
+				'bids': []
+			}
+			# rsi = {
+			# 	'asks': [],
+			# 	'bids': []
+			# }
+
 		# Forzo il print a console
 		sys.stdout.flush()
 
 		# jsonUpdater = threading.Thread(target=updateJson, daemon=True)
 		# jsonUpdater.start()
-		# threading.Timer(1.0, updateJson).start()
+		threading.Timer(1.0, updateJson).start()
 
 		# Starto il websocket dell'orderbook
 		ws_ob.run_forever()
@@ -299,6 +390,36 @@ def encrypt_string(hash_string):
 	return sha_signature
 
 
+# resetto cycle max on stats
+@app.route('/reset_max', methods=['GET'])
+def reset_max():
+	# Verifico che il token passato via GET sia corretto
+	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
+		MyStat.strategy['WST']["duration"]["max"] = None
+		MyStat.strategy['WSOB']["duration"]["max"] = None
+		MyStat.strategy["cycle"]["duration"]["max"] = None
+		MyStat.strategy["trade"]["duration"]["max"] = None
+		MyStat.strategy["buy"]["duration"]["max"] = None
+		MyStat.strategy["sell"]["duration"]["max"] = None
+		MyStat.strategy["spread"]["max"] = None
+		# Ritorno una stringa e un codice stato
+		return 'Resetted', 200
+	# Ritorno 404
+	return '', 404
+
+
+# aggiorno json
+@app.route('/update_json', methods=['GET'])
+def update_json():
+	# Verifico che il token passato via GET sia corretto
+	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
+		updateJson()
+		# Ritorno una stringa e un codice stato
+		return 'Updated', 200
+	# Ritorno 404
+	return '', 404
+
+
 # Creo un api con endpoint /ping
 @app.route('/ping', methods=['GET'])
 def ping():
@@ -315,7 +436,7 @@ def ultimo_valore():
 	# Verifico che il token passato via GET sia corretto
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		# Leggo dal mio json l'ultimo valore
-		ultimo_valore = managerJson.commercialista()[0]
+		ultimo_valore = fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)
 		# Ritorno l'ultimo valore
 		return str(ultimo_valore[-1]['bids'][0]), 200
 	# Ritorno 404
@@ -384,7 +505,8 @@ def forza_bilancio():
 		# Se ho delle cripto
 		if cripto_balance:
 			# Ottengo gli ordini dal mio json
-			ultimo_valore, orders = managerJson.commercialista()
+			ultimo_valore = fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)
+			orders = managerJson.getOrders()
 			# Estraggo l'ultimo ultimo valore
 			ultimo_valore = ultimo_valore[-1]
 			# Inizializzo la variabile per la stima delle cripto
@@ -444,7 +566,7 @@ def forza_bilancio():
 						orderbook['asks'] = [orderbook['asks'][0]]
 						orderbook['bids'] = [orderbook['bids'][0]]
 						# Aggiorno l'ultimo valore con il nuovo orderbook
-						managerJson.commercialista("ultimo_valore", [orderbook])
+						fileManager.JsonWrites(MEMORIA_ORDERBOOK_PERCORSO, 'w', [orderbook])
 						# Recupero l'ultimo ASKS price
 						my_price = float(orderbook['asks'][0][0])
 
@@ -475,7 +597,7 @@ def forza_bilancio():
 					orderbook['asks'] = [orderbook['asks'][0]]
 					orderbook['bids'] = [orderbook['bids'][0]]
 					# Aggiorno l'ultimo valore con il nuovo orderbook
-					managerJson.commercialista("ultimo_valore", [orderbook])
+					fileManager.JsonWrites(MEMORIA_ORDERBOOK_PERCORSO, 'w', [orderbook])
 					# Recupero l'ultimo ASKS price
 					my_price = float(orderbook['asks'][0][0])
 
@@ -523,7 +645,8 @@ def bilancio_stimato():
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		# Ottengo gli ordini dal mio json
 		unused_cripto, soldi = managerJson.portafoglio()
-		ultimo_valore, orders = managerJson.commercialista()
+		ultimo_valore = fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)
+		orders = managerJson.getOrders()
 		# Inizializzo la variabile per la stima
 		soldi_stimati = 0
 		# Per tutti gli ordini
@@ -586,8 +709,13 @@ def send_stop():
 
 @app.route('/ask_buy', methods=['GET'])
 def send_buy():
+	global tg_bot
 	# Verifico che il token passato via GET sia corretto
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
+		# Se il bot telegram è presente
+		if tg_bot:
+			# Invio un messaggio di avvertimento
+			tg_bot.sendMessage(TELEGRAM_ID, "Forcing buy")
 		# Comunica alla strategie di comprare il prima possibile
 		strategiaModulo.force_buy = True
 		# Ritorna una stringa di conferma
@@ -598,8 +726,13 @@ def send_buy():
 
 @app.route('/ask_sell', methods=['GET'])
 def send_sell():
+	global tg_bot
 	# Verifico che il token passato via GET sia corretto
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
+		# Se il bot telegram è presente
+		if tg_bot:
+			# Invio un messaggio di avvertimento
+			tg_bot.sendMessage(TELEGRAM_ID, "Forcing sell")
 		# Comunica alla strategie di vendere il prima possibile
 		strategiaModulo.force_sell = True
 		# Ritorna una stringa di conferma
