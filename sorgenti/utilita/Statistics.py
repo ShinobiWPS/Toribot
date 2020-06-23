@@ -206,7 +206,7 @@ class Statistics(object):
 
 			self.strategy["WSOB"]["last"] = WSOB_timestamp
 
-			self.update_json()
+			# self.update_json()
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
 			getErrorInfo(ex)
@@ -247,7 +247,7 @@ class Statistics(object):
 				else:
 					self.strategy["cycle"]["duration"]["avg"] = current_duration
 
-			self.strategy["cycle"]["duration"]["last"] = current_duration
+				self.strategy["cycle"]["duration"]["last"] = current_duration
 
 			# self.update_json()
 
