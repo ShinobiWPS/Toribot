@@ -357,3 +357,4 @@ valori.json
 # completely ignore
 **/*copia*.csv
 **/nohup.out
+sorgenti/memoria/*
