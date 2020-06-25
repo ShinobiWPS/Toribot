@@ -1,5 +1,4 @@
 import logging
-import os
 from pathlib import Path
 
 from costanti.costanti_unico import LOG_CARTELLA_PERCORSO

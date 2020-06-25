@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import sys
 
 
 def FileWrites(fname, mode, string):

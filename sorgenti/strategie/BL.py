@@ -1,13 +1,8 @@
 import json
 import logging
-import math
-import os
-import sys
-import time
 from datetime import datetime
 
 import utilita.gestoreRapporti as report
-from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
 from costanti.costanti_unico import (
 	CLOSING, FORCE_BUY, FORCE_SELL, FORMATO_DATA_ORA, LOG_CARTELLA_PERCORSO,
 	MEMORIA_ORDERBOOK_PERCORSO, MEMORIA_ORDERBOOK_SIMPLIFIED_PERCORSO, MINIMUM_ORDER_VALUE,
