@@ -1,6 +1,8 @@
-import math as m
+import math
+from datetime import datetime
 
-from costanti.costanti_unico import MEMORIA_ORDERBOOK_PERCORSO, VALUTA_CRIPTO
+from costanti.costanti_unico import (FORMATO_DATA_ORA,
+                                     MEMORIA_ORDERBOOK_PERCORSO, VALUTA_CRIPTO)
 from utilita import fileManager
 
 
@@ -229,4 +231,12 @@ def truncate(number, digits) -> float:
 		float: [description]
 	"""
 	stepper = 10.0**digits
-	return m.trunc(stepper * number) / stepper
+	return math.trunc(stepper * number) / stepper
+
+
+def dt_string():
+	# Ottengo il timestamp attuale
+	now = datetime.now()
+	# Converto il timestamp attuale in un datetime in formato umano
+	dt_string = now.strftime(FORMATO_DATA_ORA)
+	return dt_string

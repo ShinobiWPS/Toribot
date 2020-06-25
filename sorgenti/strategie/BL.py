@@ -1,12 +1,11 @@
 import json
 import logging
-from datetime import datetime
 
 import utilita.gestoreRapporti as report
 from costanti.costanti_unico import (
-	CLOSING, FORCE_BUY, FORCE_SELL, FORMATO_DATA_ORA, LOG_CARTELLA_PERCORSO,
-	MEMORIA_ORDERBOOK_PERCORSO, MEMORIA_ORDERBOOK_SIMPLIFIED_PERCORSO, MINIMUM_ORDER_VALUE,
-	TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI
+	CLOSING, FORCE_BUY, FORCE_SELL, LOG_CARTELLA_PERCORSO, MEMORIA_ORDERBOOK_PERCORSO,
+	MEMORIA_ORDERBOOK_SIMPLIFIED_PERCORSO, MINIMUM_ORDER_VALUE, TRADING_REPORT_FILENAME,
+	VALUTA_CRIPTO, VALUTA_SOLDI
 )
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
@@ -15,7 +14,7 @@ from utilita import fileManager
 from utilita import gestoreRapporti as report
 from utilita.infoAboutError import getErrorInfo
 from utilita.operazioni import (
-	firstOrderAmount, firstOrderPrice, getAsksPercentage, getBidsPercentage, truncate
+	dt_string, firstOrderAmount, firstOrderPrice, getAsksPercentage, getBidsPercentage, truncate
 )
 from utilita.Statistics import Statistics
 from utilita.telegramBot import TelegramBot
@@ -77,15 +76,10 @@ def gestore(
 							except Exception as ex:
 								getErrorInfo(ex)
 
-							# Ottengo il timestamp attuale
-							now = datetime.now()
-							# Converto il timestamp attuale in un datetime in formato umano
-							dt_string = now.strftime(FORMATO_DATA_ORA)
-
 							# Aggiungo al report la chiusura dell'ordine
 							report.FileAppend(
 								TRADING_REPORT_FILENAME,
-								f"{dt_string} CLOSE {str(order['bos']).upper()} {str(order['order_id'])} [{str(order['price'])}] {str(order['amount'])} {VALUTA_SOLDI.upper() if order['bos'].lower() == 'sell' else VALUTA_CRIPTO.upper()}"
+								f"{dt_string()} CLOSE {str(order['bos']).upper()} {str(order['order_id'])} [{str(order['price'])}] {str(order['amount'])} {VALUTA_SOLDI.upper() if order['bos'].lower() == 'sell' else VALUTA_CRIPTO.upper()}"
 							)
 							# Se è un ordine di vendita
 							if order['bos'] == "sell":
@@ -198,17 +192,14 @@ def gestore(
 			# Se l'ordine è andato bene, perchè ha una delle chiavi corrette
 			if 'id' in order_result:
 				# Salvo la risposta dell'ordine di acquisto in un file per debug
-				# Ottengo il timestamp attuale
-				now = datetime.now()
-				# Converto il timestamp in un datetime in formato umano
-				dt_string = now.strftime(FORMATO_DATA_ORA)
+
 				report.JsonWrites(
 					f"{LOG_CARTELLA_PERCORSO}/buy_{str(order_result['id'])}.json", "w+",
 					order_result
 				)
 				report.FileAppend(
 					TRADING_REPORT_FILENAME,
-					f"{dt_string} OPEN BUY {str(order_result['id'])} [{str(order_result['price'])}] {str(soldi)} -> {str(my_amount)}=={str(order_result['amount'])}"
+					f"{dt_string()} OPEN BUY {str(order_result['id'])} [{str(order_result['price'])}] {str(soldi)} -> {str(my_amount)}=={str(order_result['amount'])}"
 				)
 				# Aggiungo l'apertura dell'ordine al mio json
 				managerJson.addOrder(
@@ -293,17 +284,14 @@ def gestore(
 							bos="sell"
 						)
 						# Salvo la risposta dell'ordine di acquisto in un file per debug
-						# Ottengo il timestamp attuale
-						now = datetime.now()
-						# Converto il timestamp in un datetime in formato umano
-						dt_string = now.strftime(FORMATO_DATA_ORA)
+
 						report.JsonWrites(
 							f"{LOG_CARTELLA_PERCORSO}/sell_{str(order_result['id'])}.json", "w+",
 							order_result
 						)
 						report.FileAppend(
 							TRADING_REPORT_FILENAME,
-							f"{dt_string} OPEN SELL {str(order_result['id'])} [{str(order_result['price'])}] {str(soldi)} -> {str(order_result['amount'])}"
+							f"{dt_string()} OPEN SELL {str(order_result['id'])} [{str(order_result['price'])}] {str(soldi)} -> {str(order_result['amount'])}"
 						)
 						# Aggiorno le statistiche
 						MyStat.strategy_sell_duration_update()

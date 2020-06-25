@@ -5,7 +5,6 @@ import logging
 import sys
 import threading
 import time
-from datetime import datetime
 from pathlib import Path
 
 import websocket
@@ -16,10 +15,10 @@ from pyti import relative_strength_index
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
 from costanti.costanti_unico import (
 	BITSTAMP_WEBSOCKET_CHANNEL_ORDERBOOK, BITSTAMP_WEBSOCKET_CHANNEL_TRADE,
-	BITSTAMP_WEBSOCKET_EVENT, BITSTAMP_WEBSOCKET_URL, FORMATO_DATA_ORA, LOG_CARTELLA_PERCORSO,
-	LUNGHEZZA_MEMORIA, MEMORIA_ORDERBOOK_PERCORSO, MEMORIA_ORDERBOOK_SIMPLIFIED_PERCORSO,
-	NUMERO_ORDINI_ORDERBOOK, TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI,
-	WEBSOCKET_AUTORECONNECT, WEBSOCKET_AUTORECONNECT_RETRIES
+	BITSTAMP_WEBSOCKET_EVENT, BITSTAMP_WEBSOCKET_URL, LOG_CARTELLA_PERCORSO, LUNGHEZZA_MEMORIA,
+	MEMORIA_ORDERBOOK_PERCORSO, MEMORIA_ORDERBOOK_SIMPLIFIED_PERCORSO, NUMERO_ORDINI_ORDERBOOK,
+	TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI, WEBSOCKET_AUTORECONNECT,
+	WEBSOCKET_AUTORECONNECT_RETRIES
 )
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
@@ -28,6 +27,7 @@ from utilita import gestoreRapporti as report
 from utilita import log
 from utilita.infoAboutError import getErrorInfo
 from utilita.MyWebSocket import MyWebSocket
+from utilita.operazioni import dt_string
 from utilita.Statistics import Statistics
 from utilita.telegramBot import TelegramBot
 
@@ -281,16 +281,12 @@ def avvio():
 		# argv = sys.argv[1:]
 		#todo- crea cartella log se non esiste
 
-		# Ottengo il timestamp attuale
-		now = datetime.now()
-		# Converto il timestamp in un datetime in formato umano
-		dt_string = now.strftime(FORMATO_DATA_ORA)
-
 		# Creo tutte le cartelle necessarie
 		Path(TRADING_REPORT_FILENAME).parent.mkdir(parents=True, exist_ok=True)
 		# Scrivo sul report
 		report.FileAppend(
-			TRADING_REPORT_FILENAME, dt_string + " " + ('*' * 5) + "STARTED" + ('*' * 5) + "\n"
+			TRADING_REPORT_FILENAME,
+			dt_string() + " " + ('*' * 5) + "STARTED" + ('*' * 5) + "\n"
 		)
 		logging.info(dt_string + " " + ('*' * 5) + "STARTED" + ('*' * 5) + "")
 
@@ -472,14 +468,11 @@ def forza_bilancio():
 	# Verifico che il token passato via GET sia corretto
 	if 'token' in request.args and encrypt_string(request.args['token']) == API_TOKEN_HASH:
 		# balance
-		# Ottengo il timestamp attuale
-		now = datetime.now()
-		# Converto il timestamp in un datetime in formato umano
-		dt_string = now.strftime(FORMATO_DATA_ORA)
+
 		# Leggo dal mio json il valore di soldi e cripto
 		unused_cripto, soldi = managerJson.portafoglio()
 		# Scrivo sul report
-		report.FileAppend(TRADING_REPORT_FILENAME, dt_string + " Sincronizzo bilancio")
+		report.FileAppend(TRADING_REPORT_FILENAME, dt_string() + " Sincronizzo bilancio")
 		# Chiedo il bilancio alla piattaforma
 		balance = json.loads(bitstamp.getBalance())
 		# Scrivo su un json la risposta del bilancio per Debug
@@ -862,20 +855,17 @@ if __name__ == "__main__":
 			# Chiudo il websocket per l'orderbook
 			ws_ob.close()
 
-		# Ottengo il timestamp attuale
-		now = datetime.now()
-		# Converto il timestamp in un datetime in formato umano
-		dt_string = now.strftime(FORMATO_DATA_ORA)
 		# Leggo dal mio json il valore di soldi e cripto
 		cripto, soldi = managerJson.portafoglio()
 		# Se ho soldi
 		if soldi:
 			# Scrivo sul report il valore dei soldi
 			report.FileAppend(
-				TRADING_REPORT_FILENAME, dt_string + " Finisco con " + str(round(soldi, 2)) + " " +
+				TRADING_REPORT_FILENAME,
+				dt_string() + " Finisco con " + str(round(soldi, 2)) + " " +
 				str(VALUTA_SOLDI.upper())
 			)
 			# Scrivo sulla console il valore dei soldi
 			print("Finisco con " + str(round(soldi, 2)) + " " + VALUTA_SOLDI.upper())
 			# Loggo come info la chiusura
-			logging.info(dt_string + " closing")
+			logging.info(dt_string() + " closing")
