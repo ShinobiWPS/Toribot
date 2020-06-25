@@ -5,12 +5,33 @@ from utilita import fileManager
 
 
 def percentageOf(percent: float, whole: float):
+	"""Restituisce quanto equivale la % dell'intero
+
+	Args:
+
+		percent (float): [description]
+		whole (float): [description]
+
+	Returns:
+
+		float: [description]
+	"""
 	return (percent * whole) / 100.0
 
 
 def calcolaSpread(primo_prezzo: float, secondo_prezzo: float):
-	# do we need to round() ?
-	return abs(primo_prezzo - secondo_prezzo)
+	"""Restituisce il delta in punti del prezzo tra i due prezzi
+
+	Args:
+
+		primo_prezzo (float): [description]
+		secondo_prezzo (float): [description]
+
+	Returns:
+
+		float: [description]
+	"""
+	return abs(float(primo_prezzo - secondo_prezzo))
 
 
 def calcoloPrezziByDelta(buy_price, amount):
@@ -18,18 +39,18 @@ def calcoloPrezziByDelta(buy_price, amount):
 	amount = float(amount)
 
 	#delta for profit
-	delta = percentageOf(1.007, buy_price)  #e' circa il 1.05 OR 1.007% del buy_price
+	delta = percentageOf(1.007, buy_price)  #e' circa il 1.007% del buy_price
 	# XRPdelta = float(0.00182)
 
 	#buy/bid
 
-	cost = buy_price * amount
-	buy_fee = (cost / 100) * 0.5
-	buy_expanse = cost + buy_fee
+	#cost = buy_price * amount
+	#buy_fee = (cost / 100) * 0.5
+	#buy_expanse = cost + buy_fee
 
 	#sell/ask
-	sell_price = buy_price + delta
-	income = sell_price * amount
+	#sell_price = buy_price + delta
+	#income = sell_price * amount
 	#sell_fee = (income / 100) * 0.5
 	#sell_expanse = income - sell_fee
 	#profit = round(sell_expanse - buy_expanse, 5)
@@ -37,12 +58,39 @@ def calcoloPrezziByDelta(buy_price, amount):
 
 
 def depthChartAnalyzer(bids: list, asks: list):
+	"""Rappresentazione testuale/numerica del Depth Chart
+
+	Args:
+
+		bids (list): [description]
+		asks (list): [description]
+
+	Returns:
+
+		list: [description]
+	"""
 	totalBidsSumCriptoAmount = sumOf_AmountOrValue(bids)
 	totalAsksSumCriptoAmount = sumOf_AmountOrValue(asks)
 	return [ totalBidsSumCriptoAmount, totalAsksSumCriptoAmount ]
 
 
 def priceChange(prezzo_float: float, bid_or_ask: str):
+	"""Ti suggerisce un prezzo cambiato di 1 punto
+
+	Args:
+
+		prezzo_float (float): [description]
+		bid_or_ask (str): [description]
+
+	Raises:
+
+		Exception: missing cripto for MINUS operator
+		Exception: missing cripto for PLUS operator
+		Exception: wrong argument
+
+	Returns:
+		[type]: [description]
+	"""
 	prezzo = str(prezzo_float)
 
 	if bid_or_ask == 'bid':
@@ -68,6 +116,17 @@ def priceChange(prezzo_float: float, bid_or_ask: str):
 
 
 def ilPrezzoGiusto(bids: list, asks: list):
+	"""Restituisce un array con un migliore prezzo di BID e ASK
+
+	Args:
+
+		bids (list): [description]
+		asks (list): [description]
+
+	Returns:
+
+		list: [description]
+	"""
 	#todo- criterio che analizza tutti i prezzi della colonna attuale
 	buyOrderPrice = firstOrderPrice(bids)
 	good_price_bid = priceChange(buyOrderPrice, 'bid')
@@ -158,5 +217,16 @@ def firstOrderAmount(bids_or_asks: list):
 
 
 def truncate(number, digits) -> float:
+	"""che cazzo fa?
+
+	Args:
+
+		number ([type]): [description]
+		digits ([type]): [description]
+
+	Returns:
+
+		float: [description]
+	"""
 	stepper = 10.0**digits
 	return m.trunc(stepper * number) / stepper

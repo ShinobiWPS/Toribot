@@ -3,9 +3,9 @@ import logging
 import os
 
 
-def FileWrites(fname, mode, string):
+def FileWrites(filename, mode, string):
 	try:
-		with open(str(fname).strip(), str(mode).strip()) as file:
+		with open(str(filename).strip(), str(mode).strip()) as file:
 			if bool(str(string).strip()):
 				file.write(str(string).strip() + "\n")
 			else:
@@ -15,11 +15,11 @@ def FileWrites(fname, mode, string):
 		raise e
 
 
-def FileReads(fname):
-	if os.path.isfile(str(fname).strip()):
+def FileReads(filename):
+	if os.path.isfile(str(filename).strip()):
 		res = None
 		try:
-			with open(str(fname).strip(), "r") as file:
+			with open(str(filename).strip(), "r") as file:
 				res = file.read().strip()
 		except Exception as e:
 			raise e
@@ -28,17 +28,17 @@ def FileReads(fname):
 	return None
 
 
-def JsonWrites(fname, mode, json_object):
-	FileWrites(fname, mode, json.dumps(json_object, sort_keys=True, indent=4))
+def JsonWrites(filename, mode, json_object):
+	FileWrites(filename, mode, json.dumps(json_object, sort_keys=True, indent=4))
 
 
-def JsonReads(fname):
-	return json.loads(FileReads(fname))
+def JsonReads(filename):
+	return json.loads(FileReads(filename))
 
 
-def JsonEdit(fname, chiave=None, valore=None):
+def JsonEdit(filename, chiave=None, valore=None):
 	try:
-		with open(fname, 'r+') as jsonFile:
+		with open(filename, 'r+') as jsonFile:
 			if chiave is not None and valore is not None:
 				try:
 					valori_json = json.loads(jsonFile.read())
@@ -55,9 +55,9 @@ def JsonEdit(fname, chiave=None, valore=None):
 		raise e
 
 
-def FileWrite(fname, string):
-	FileWrites(fname, "w+", string)
+def FileWrite(filename, string):
+	FileWrites(filename, "w+", string)
 
 
-def FileAppend(fname, string):
-	FileWrites(fname, "a+", string)
+def FileAppend(filename, string):
+	FileWrites(filename, "a+", string)

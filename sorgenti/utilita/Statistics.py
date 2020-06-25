@@ -1,14 +1,12 @@
 import json
-import logging
 import os
-import sys
 import time
 
 from costanti.costanti_unico import STATISTICA_PERCORSO
 from utilita.infoAboutError import getErrorInfo
 
 
-class Statistics(object):
+class Statistics():
 	def __init__(self):
 		self.strategy = None
 		if os.path.exists(STATISTICA_PERCORSO):

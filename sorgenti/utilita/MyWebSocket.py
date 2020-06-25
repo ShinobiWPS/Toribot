@@ -1,14 +1,31 @@
 import json
 import logging
-import os
-import sys
 
 import websocket
 
 from utilita.infoAboutError import getErrorInfo
 
 
-class MyWebSocket(object):
+class MyWebSocket():
+	"""Istanza un WebSocket
+
+	Arguments:
+
+		run=True,
+		WS_URL: str
+		WS_EVENT: str
+		WS_CHANNEL: str
+		trace: bool - for debugging purposes about websocket
+		callbackOnMessage: None,
+		callbackOnClose: None,
+		callbackOnError: None
+
+	Raises:
+
+		Exception: [description]
+		Exception: [description]
+		Exception: [description]
+	"""
 
 	ws = None
 	WS_URL = None  # "wss://ws.bitstamp.net"

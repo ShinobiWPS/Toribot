@@ -5,7 +5,8 @@ from costanti.costanti_unico import LOG_CARTELLA_PERCORSO
 
 
 def inizializza_log():
-
+	"""Configura parametri ella librearie 'log'
+	"""
 	Path(LOG_CARTELLA_PERCORSO).mkdir(parents=True, exist_ok=True)
 
 	# Main logger ___________________________________________

@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import sys
 import time
 from pprint import pprint
 
@@ -11,13 +9,11 @@ import telepot
 # gestisce la parte della ricezione di nuovi messaggi
 from telepot.loop import MessageLoop
 
-from costanti.costanti_unico import LOG_CARTELLA_PERCORSO
-
 # è la libreria che gestisce le kaybord del tg_bot
 # from telepot.namedtuple import InlineKeyboardButton, InlineKeyboardMarkup
 
 
-class TelegramBot(object):
+class TelegramBot():
 
 	Admins_ID = [ '42219043', '33223598']
 	Current_Admin_ID = 0
