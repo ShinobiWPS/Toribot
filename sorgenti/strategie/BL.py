@@ -66,8 +66,8 @@ def gestore(
 							order_status['status'])
 						# Salvo la risposta del checkOrder in un json per Debug
 						report.JsonWrites(
-							LOG_CARTELLA_PERCORSO + "/check" + str(order['bos']) + "_" +
-							str(order['order_id']) + ".json", "w+", order_status
+							f"{LOG_CARTELLA_PERCORSO}/check{str(order['bos'])}_{str(order['order_id'])}.json",
+							"w+", order_status
 						)
 						# Se lo stato è finished
 						if order_status['status'].lower() == "finished":
@@ -77,14 +77,10 @@ def gestore(
 							try:
 								if tg_bot:
 									tg_bot.sendMessage(
-										tg_bot.Admins_ID, "" + order['bos'].lower() + " success"
+										tg_bot.Admins_ID, f"{order['bos'].lower()} success"
 									)
 							except Exception as ex:
-								# In caso di eccezioni printo e loggo tutti i dati disponibili
-								exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-								fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-								print(ex, exc_type, fname, exc_tb.tb_lineno)
-								logging.error(ex)
+								getErrorInfo(ex)
 
 							# Ottengo il timestamp attuale
 							now = datetime.now()
@@ -93,12 +89,8 @@ def gestore(
 
 							# Aggiungo al report la chiusura dell'ordine
 							report.FileAppend(
-								TRADING_REPORT_FILENAME, dt_string + " CLOSE " +
-								str(order['bos']).upper() + " " + str(order['order_id']) + " [" +
-								str(order['price']) + "] " + str(order['amount']) + " " + (
-								VALUTA_SOLDI.upper()
-								if order['bos'].lower() == "sell" else VALUTA_CRIPTO.upper()
-								)
+								TRADING_REPORT_FILENAME,
+								f"{dt_string} CLOSE {str(order['bos']).upper()} {str(order['order_id'])} [{str(order['price'])}] {str(order['amount'])} {VALUTA_SOLDI.upper() if order['bos'].lower() == 'sell' else VALUTA_CRIPTO.upper()}"
 							)
 							# Se è un ordine di vendita
 							if order['bos'] == "sell":
@@ -116,8 +108,8 @@ def gestore(
 								if balance and f"{VALUTA_SOLDI}_balance" in balance:
 									# Salvo la risposta in un file per debug
 									report.JsonWrites(
-										LOG_CARTELLA_PERCORSO + "/check" + str(order['bos']) + "_" +
-										str(order['order_id']) + "_balance.json", "w+", balance
+										f"{LOG_CARTELLA_PERCORSO}/check{str(order['bos'])}_{str(order['order_id'])}_balance.json",
+										"w+", balance
 									)
 									#cripto_balance = float(balance[f"{VALUTA_CRIPTO}_balance"]) if f"{VALUTA_CRIPTO}_balance" in balance else None
 									# fee = float( balance[ f"{COPPIA_DA_USARE_NOME}_fee" ] ) if f"{COPPIA_DA_USARE_NOME}_fee" in balance else None
@@ -132,7 +124,7 @@ def gestore(
 								else:
 									# Se non c'è quello che mi aspetto nella risposta,
 									# c'è stato un errore e quindi lo loggo
-									logging.error("Balance error: " + order['order_id'])
+									logging.error(f"Balance error: {order['order_id']}")
 								# Cancello l'ordine dal mio json
 								managerJson.gestoreValoriJson([ 'orders', index ], '')
 
@@ -216,13 +208,12 @@ def gestore(
 				# Converto il timestamp in un datetime in formato umano
 				dt_string = now.strftime(FORMATO_DATA_ORA)
 				report.JsonWrites(
-					LOG_CARTELLA_PERCORSO + "/buy_" + str(order_result['id']) + ".json", "w+",
+					f"{LOG_CARTELLA_PERCORSO}/buy_{str(order_result['id'])}.json", "w+",
 					order_result
 				)
 				report.FileAppend(
-					TRADING_REPORT_FILENAME, dt_string + " OPEN BUY " + str(order_result['id']) +
-					" [" + str(order_result['price']) + "] " + str(soldi) + " -> " +
-					str(my_amount) + "==" + str(order_result['amount'])
+					TRADING_REPORT_FILENAME,
+					f"{dt_string} OPEN BUY {str(order_result['id'])} [{str(order_result['price'])}] {str(soldi)} -> {str(my_amount)}=={str(order_result['amount'])}"
 				)
 				# Aggiungo l'apertura dell'ordine al mio json
 				managerJson.addOrder(
@@ -246,8 +237,8 @@ def gestore(
 				if balance and f"{VALUTA_SOLDI}_balance" in balance:
 					# Salvo la risposta in un file per debug
 					report.JsonWrites(
-						LOG_CARTELLA_PERCORSO + "/buy_" + str(order_result['id']) + "_balance.json",
-						"w+", balance
+						f"{LOG_CARTELLA_PERCORSO}/buy_{str(order_result['id'])}_balance.json", "w+",
+						balance
 					)
 					# cripto_balance = float(balance[f"{VALUTA_SOLDI}_balance"]) if f"{VALUTA_CRIPTO}_balance" in balance else None
 					# fee = float( balance[ f"{COPPIA_DA_USARE_NOME}_fee" ] ) if f"{COPPIA_DA_USARE_NOME}_fee" in balance else None
@@ -260,19 +251,19 @@ def gestore(
 				else:
 					# Se non c'è quello che mi aspetto nella risposta,
 					# c'è stato un errore e quindi lo loggo
-					logging.error("Balance error: " + order_result['id'])
+					logging.error(f"Balance error: {order_result['id']}")
 
 				# Cancello la variabile con la risposta dell'ordine di acquisto
 				# per evitare problemi
 			# Se c'è un errore con l'ordine
 			elif 'reason' in order_result:
 				# Loggo
-				logging.error("Buy error: " + json.dumps(order_result['reason']))
-				print("Buy error: ", json.dumps(order_result))
+				logging.error(f"Buy error: {json.dumps(order_result['reason'])}")
+				print(f"Buy error: {json.dumps(order_result)}")
 			else:
 				# Loggo
 				logging.error("Buy error")
-				print("Buy error: ", json.dumps(order_result))
+				print(f"Buy error: {json.dumps(order_result)}")
 			del order_result
 
 		# Se ci sono ordini di acquisto nel mio json
@@ -312,24 +303,23 @@ def gestore(
 						# Converto il timestamp in un datetime in formato umano
 						dt_string = now.strftime(FORMATO_DATA_ORA)
 						report.JsonWrites(
-							LOG_CARTELLA_PERCORSO + "/sell_" + str(order_result['id']) + ".json",
-							"w+", order_result
+							f"{LOG_CARTELLA_PERCORSO}/sell_{str(order_result['id'])}.json", "w+",
+							order_result
 						)
 						report.FileAppend(
-							TRADING_REPORT_FILENAME, dt_string + " OPEN SELL " +
-							str(order_result['id']) + " [" + str(order_result['price']) + "] " +
-							str(soldi) + " -> " + str(order_result['amount'])
+							TRADING_REPORT_FILENAME,
+							f"{dt_string} OPEN SELL {str(order_result['id'])} [{str(order_result['price'])}] {str(soldi)} -> {str(order_result['amount'])}"
 						)
 						# Aggiorno le statistiche
 						MyStat.strategy_sell_duration_update()
 					elif 'reason' in order_result:
 						# Loggo
-						logging.error("Sell error: " + json.dumps(order_result['reason']))
-						print("Sell error: ", json.dumps(order_result))
+						logging.error(f"Sell error: {json.dumps(order_result['reason'])}")
+						print(f"Sell error: {json.dumps(order_result)}")
 					else:
 						# Loggo
 						logging.error("Sell generic error")
-						print("Sell generic error: ", json.dumps(order_result))
+						print(f"Sell generic error: {json.dumps(order_result)}")
 					# Cancello la variabile con la risposta dell'ordine di acquisto
 					# per ordine e evitare problemi
 					del order_result

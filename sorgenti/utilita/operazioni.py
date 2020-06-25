@@ -18,7 +18,7 @@ def calcoloPrezziByDelta(buy_price, amount):
 	amount = float(amount)
 
 	#delta for profit
-	delta = float(1.007)  #e' circa il 1.05% del buy_price
+	delta = percentageOf(1.007, buy_price)  #e' circa il 1.05 OR 1.007% del buy_price
 	# XRPdelta = float(0.00182)
 
 	#buy/bid

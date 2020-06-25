@@ -73,18 +73,10 @@ def gestoreValoriJson(chiave=None, valore=None):
 			return valori_json
 			#except Exception as ex:
 			#	# In caso di eccezioni printo e loggo tutti i dati disponibili
-			#	exc_type, exc_obj, exc_tb = sys.exc_info()
-			#	fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			#	print(ex, exc_type, fname, exc_tb.tb_lineno)
-			#	logging.error(ex)
 		else:
 			return json.loads(jsonFile.read())
 	# except Exception as ex:
 	# 	# In caso di eccezioni printo e loggo tutti i dati disponibili
-	# 	exc_type, exc_obj, exc_tb = sys.exc_info()
-	# 	fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-	# 	print(ex, exc_type, fname, exc_tb.tb_lineno)
-	# 	logging.error(ex)
 
 
 def portafoglio(chiave=None, valore=None):
@@ -103,6 +95,7 @@ def portafoglio(chiave=None, valore=None):
 
 def getMemory():
 	return None
+
 
 def getSimplifiedMemory():
 	return None

@@ -125,10 +125,7 @@ class Statistics(object):
 
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
-			exc_type, unused_exc_obj, exc_tb = sys.exc_info()
-			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print(ex, exc_type, fname, exc_tb.tb_lineno)
-			logging.error(ex)
+			getErrorInfo(ex)
 
 	def WST_update(self, WST_timestamp=None):
 
@@ -416,7 +413,7 @@ class Statistics(object):
 			pass
 			with open(str(STATISTICA_PERCORSO).strip(), "w") as file:
 				file.write(json.dumps(self.strategy, sort_keys=True, indent=4).strip())
-			# NON VA MOLTO BENE, DA RIPENSARE
+			# todo-NON VA MOLTO BENE, DA RIPENSARE
 		except Exception as ex:
 			# In caso di eccezioni printo e loggo tutti i dati disponibili
 			getErrorInfo(ex)
