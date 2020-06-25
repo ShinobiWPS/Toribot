@@ -6,7 +6,7 @@
 
 from costanti.costanti_unico import *
 from piattaforme.bitstamp.websocketOrderbook import startWebSocketOrderBook
-from utilita.calcoli import depthChartAnalyzer, ilPrezzoGiusto
+from utilita.operazioni import depthChartAnalyzer, ilPrezzoGiusto
 
 # FEE
 #DELTA = 0  # %

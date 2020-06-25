@@ -16,9 +16,9 @@
   },
   "todo-tree.filtering.useBuiltInExcludes": "file and search excludes",
   "todo-tree.filtering.excludeGlobs": ["**/env"],
-"python.formatting.provider": "yapf",
-"python.linting.pylintArgs": [
-	"--disable=all ",
-	"--enable=F,E,unreachable,duplicate-key,unnecessary-semicolon,global-variable-not-assigned,unused-variable,binary-op-exception,bad-format-string,anomalous-backslash-in-string,bad-open-mode"
-]
+  "python.formatting.provider": "yapf"
+  "python.linting.pylintArgs": [
+    "--disable=all ",
+    "--enable=F,E,unreachable,duplicate-key,unnecessary-semicolon,global-variable-not-assigned,unused-variable,binary-op-exception,bad-format-string,anomalous-backslash-in-string,bad-open-mode,wildcard-import,unused-import"
+  ]
 }

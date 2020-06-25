@@ -77,7 +77,7 @@ def makeRequest(
 
 	if operation.lower() == "instant":
 
-		operation_string = operation.lower() + "/"
+		operation_string = f"{operation.lower()}/"
 
 		if not amount:
 			raise Exception("Parameter missing")
@@ -150,15 +150,15 @@ def makeRequest(
 
 	if api_version == 2:
 		message = 'BITSTAMP ' + API_KEY + \
-                                                                                                                                                                                  'POST' + \
-                                                                                                                                                                                  'www.bitstamp.net' + \
-                                                                                                                                                                                  f'/api/v2/{operation_string}'+(f'{bos}/{COPPIA_DA_USARE_NOME}/' if bos else '') + \
-                                                                                                                                                                                  '' + \
-                                                                                                                                                                                  (content_type if content_type else "") + \
-                                                                                                                                                                                  nonce + \
-                                                                                                                                                                                  timestamp + \
-                                                                                                                                                                                  'v2' + \
-                                                                                                                                                                                  payload_URLencoded
+            'POST' + \
+            'www.bitstamp.net' + \
+            f'/api/v2/{operation_string}'+(f'{bos}/{COPPIA_DA_USARE_NOME}/' if bos else '') + \
+            '' + \
+            (content_type if content_type else "") + \
+            nonce + \
+            timestamp + \
+            'v2' + \
+            payload_URLencoded
 		message = message.encode('utf-8')
 		signature = hmac.new(API_SECRET, msg=message, digestmod=hashlib.sha256).hexdigest().upper()
 	else:
