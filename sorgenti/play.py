@@ -1,9 +1,7 @@
-import csv
 import hashlib
 import importlib
 import json
 import logging
-import os
 import sys
 import threading
 import time
@@ -16,7 +14,13 @@ from flask_cors import CORS
 from pyti import relative_strength_index
 
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import *
+from costanti.costanti_unico import (
+	BITSTAMP_WEBSOCKET_CHANNEL_ORDERBOOK, BITSTAMP_WEBSOCKET_CHANNEL_TRADE,
+	BITSTAMP_WEBSOCKET_EVENT, BITSTAMP_WEBSOCKET_URL, FORMATO_DATA_ORA, LOG_CARTELLA_PERCORSO,
+	LUNGHEZZA_MEMORIA, MEMORIA_ORDERBOOK_PERCORSO, MEMORIA_ORDERBOOK_SIMPLIFIED_PERCORSO,
+	NUMERO_ORDINI_ORDERBOOK, TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI,
+	WEBSOCKET_AUTORECONNECT, WEBSOCKET_AUTORECONNECT_RETRIES
+)
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 from utilita import apriFile as managerJson
 from utilita import fileManager

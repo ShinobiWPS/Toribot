@@ -8,22 +8,22 @@ from datetime import datetime
 
 import utilita.gestoreRapporti as report
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
-from costanti.costanti_unico import *
+from costanti.costanti_unico import (
+	CLOSING, FORCE_BUY, FORCE_SELL, FORMATO_DATA_ORA, LOG_CARTELLA_PERCORSO,
+	MEMORIA_ORDERBOOK_PERCORSO, MEMORIA_ORDERBOOK_SIMPLIFIED_PERCORSO, MINIMUM_ORDER_VALUE,
+	TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI
+)
 from piattaforme.bitstamp import bitstampRequests as bitstamp
 # from utilita.apriFile import commercialista, portafoglio, ultimo_id_ordine
 from utilita import apriFile as managerJson
 from utilita import fileManager
 from utilita import gestoreRapporti as report
-from utilita.calcoli import firstOrderAmount, firstOrderPrice
 from utilita.infoAboutError import getErrorInfo
+from utilita.operazioni import (
+	firstOrderAmount, firstOrderPrice, getAsksPercentage, getBidsPercentage, truncate
+)
 from utilita.Statistics import Statistics
 from utilita.telegramBot import TelegramBot
-
-Fattore_Perdita = 0
-
-force_buy = False
-force_sell = False
-closing = False
 
 
 def gestore(
@@ -33,7 +33,6 @@ def gestore(
 	MyStat=Statistics(),
 	tg_bot=TelegramBot(False)
 ):
-	global Fattore_Perdita, force_sell, force_buy, closing
 
 	#todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
 	try:
@@ -196,9 +195,9 @@ def gestore(
 
 		# Se ho abbastanza soldi per fare un'ordine minimo (minimo per la piattaforma)
 		if (soldi > MINIMUM_ORDER_VALUE and asks_percentage[0] > 70
-			and asks_percentage[1] > 10) or (soldi > MINIMUM_ORDER_VALUE and force_buy):
+			and asks_percentage[1] > 10) or (soldi > MINIMUM_ORDER_VALUE and FORCE_BUY):
 			# Resetto l'acquisto forzato (al momento non utilizzato)
-			force_buy = False
+			FORCE_BUY = False
 			## Compro
 			# Calcolo quanta cripto posso comprare coi miei soldi a questo prezzo (asks price)
 			my_amount = truncate(soldi / asks_price, 8)
@@ -287,9 +286,9 @@ def gestore(
 				if (order['order_status'].lower() == "finished" or not order['order_id']) and ((
 					float(order['price']) < float(bids_price) and bids_percentage[0] >= 10
 					and bids_percentage[1] >= 70
-				) or force_sell or closing) and float(bids_amount) >= float(order['amount']):
+				) or FORCE_SELL or CLOSING) and float(bids_amount) >= float(order['amount']):
 					# Resetto la vendita forzata
-					force_sell = False
+					FORCE_SELL = False
 					## Vendo
 					# Faccio l'ordine
 					order_result = json.loads(
@@ -338,67 +337,3 @@ def gestore(
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
 		getErrorInfo(ex)
-
-
-def getAsksMemory(orderbook_history=fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)):
-	all_asks = []
-	if orderbook_history:
-		for mem_row in orderbook_history:
-			for asks in range(len(mem_row['asks'])):
-				all_asks.append(mem_row['asks'][asks][0])
-		return all_asks
-	return None
-
-
-def getBidsMemory(orderbook_history=fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)):
-	all_bids = []
-	if orderbook_history:
-		for mem_row in orderbook_history:
-			for bids in range(len(mem_row['bids'])):
-				all_bids.append(mem_row['bids'][bids][0])
-		return all_bids
-	return None
-
-
-def getAsksPercentage(
-	asks=getAsksMemory(fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)),
-	my_value=0,
-):
-	if asks:
-		up_len = len([ v for v in asks if float(my_value) < float(v) ])
-		dw_len = len([ v for v in asks if float(my_value) > float(v) ])
-		return [up_len / len(asks) * 100, dw_len / len(asks) * 100]
-	return None
-
-
-def getBidsPercentage(
-	bids=getBidsMemory(fileManager.JsonReads(MEMORIA_ORDERBOOK_PERCORSO)),
-	my_value=0,
-):
-	if bids:
-		up_len = len([ v for v in bids if float(my_value) < float(v) ])
-		dw_len = len([ v for v in bids if float(my_value) > float(v) ])
-		return [up_len / len(bids) * 100, dw_len / len(bids) * 100]
-	return None
-
-
-# def forOrderCheck(data):
-# 	buy_order_id = data['buy_order_id']
-# 	sell_order_id = data['sell_order_id']
-# 	amount = data['amount']
-#
-# 	#todo- if ultimo_id_ordine() NOT presente entrambi gli ID,allora non e' stato completato
-# 	#else:
-# 	# aggiorna valori.json togliendo l ID
-# 	# synca l amount per creare la frazione di order
-# 	pass
-
-#if tg_bot:
-#todo- printa tutti i reason
-
-#	tg_bot.sendMessage(TELEGRAM_ID, result['reason']['__all__'][0])
-
-
-def truncate(number, digits) -> float:
-	stepper = 10.0**digits
-	return math.trunc(stepper * number) / stepper
