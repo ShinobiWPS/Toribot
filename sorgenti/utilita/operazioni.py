@@ -1,8 +1,7 @@
 import math
 from datetime import datetime
 
-from costanti.costanti_unico import (FORMATO_DATA_ORA,
-                                     MEMORIA_ORDERBOOK_PERCORSO, VALUTA_CRIPTO)
+from costanti.costanti_unico import (FORMATO_DATA_ORA, MEMORIA_ORDERBOOK_PERCORSO, VALUTA_CRIPTO)
 from utilita import fileManager
 
 

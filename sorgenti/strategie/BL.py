@@ -28,7 +28,7 @@ def gestore(
 	tg_bot=TelegramBot(False)
 ):
 
-	#todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
+	# todo- check if Order is pending? we use IOC/FOK so it shouldn't exist (credo ignori le flag!)
 	try:
 		# todo -SE NON USI IOC/FOK calcola con un criterio se necessario riassestare il prezzo del 'attuale ordine e quindi magari cancellarlo
 
