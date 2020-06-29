@@ -7,7 +7,7 @@ from utilita.infoAboutError import getErrorInfo
 
 
 class MyWebSocket():
-	"""Istanza un WebSocket
+	"""Istanzia un WebSocket
 
 	Arguments:
 
@@ -22,9 +22,9 @@ class MyWebSocket():
 
 	Raises:
 
-		Exception: [description]
-		Exception: [description]
-		Exception: [description]
+		Exception: Missing WS URL
+		Exception: Missing WS EVENT
+		Exception: Missing WS CHANNEL
 	"""
 
 	ws = None
