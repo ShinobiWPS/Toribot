@@ -288,7 +288,7 @@ def avvio():
 			TRADING_REPORT_FILENAME,
 			dt_string() + " " + ('*' * 5) + "STARTED" + ('*' * 5) + "\n"
 		)
-		logging.info(dt_string + " " + ('*' * 5) + "STARTED" + ('*' * 5) + "")
+		logging.info(dt_string() + " " + ('*' * 5) + "STARTED" + ('*' * 5) + "")
 
 		# Chiedo alla piattaforma il bilancio
 		balance = json.loads(bitstamp.getBalance())
