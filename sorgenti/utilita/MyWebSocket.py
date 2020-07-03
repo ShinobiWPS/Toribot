@@ -94,7 +94,7 @@ class MyWebSocket():
 	def run_forever(self):
 		# Eseguo il websocket come demone (~ in background)
 		try:
-			self.ws.run_forever()
+			self.ws.run_forever(ping_interval=10)
 		except Exception as ex:
 			getErrorInfo(ex)
 
