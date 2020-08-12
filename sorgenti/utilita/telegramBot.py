@@ -19,9 +19,10 @@ class TelegramBot():
 	Current_Admin_ID = 0
 
 	toribot_API_Domain = "127.0.0.1"
-	toribot_API_Port = 5000
+	toribot_API_Port = '5000'
 	toribot_API_Token = ""
-	toribot_API_URL = "http://" + toribot_API_Domain + ":" + str(toribot_API_Port) + "/"
+	#toribot_API_URL = "http://" + toribot_API_Domain + ":" + str(toribot_API_Port) + "/"
+	toribot_API_URL = f"http://{toribot_API_Domain}:{toribot_API_Port}/"
 
 	token = "1143795394:AAEYBmf6nBH0wt_9B9ANUmzPsYIMLvu1x7c"
 	tg_bot = None
