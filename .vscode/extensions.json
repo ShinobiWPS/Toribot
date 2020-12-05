@@ -7,7 +7,9 @@
 		"editorconfig.editorconfig",
 		"ms-python.python",
 		"njpwerner.autodocstring",
-		"visualstudioexptteam.vscodeintellicode"
+		"visualstudioexptteam.vscodeintellicode",
+		"alefragnani.bookmarks",
+		"gruntfuggly.todo-tree"
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": []
