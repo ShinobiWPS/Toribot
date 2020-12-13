@@ -1,32 +1,33 @@
 {
-  "python.linting.pylintEnabled": true,
-  "python.linting.enabled": true,
-  "python.linting.flake8Enabled": false,
-  "python.envFile": "${workspaceFolder}/.env",
-  "editor.insertSpaces": false,
-
-  "todo-tree.highlights.customHighlight": {
-    "TODO": {
-      "foreground": "statusBar.foreground",
-      "background": "#0062ff",
-      "type": "tag",
-      "borderRadius": "5px"
-    }
-  },
-  "editor.detectIndentation": false,
-  "editor.formatOnSave": true,
-  "files.exclude": {
-    "**/__pycache__": true,
-    "**/env": true
-  },
-  "editor.codeActionsOnSave": {
-    "source.organizeImports": true
-  },
-  "todo-tree.filtering.useBuiltInExcludes": "file and search excludes",
-  "todo-tree.filtering.excludeGlobs": ["**/env"],
-  "python.formatting.provider": "yapf",
-  "python.linting.pylintArgs": [
-    "--disable=all ",
-    "--enable=F,E,unreachable,duplicate-key,unnecessary-semicolon,global-variable-not-assigned,unused-variable,binary-op-exception,bad-format-string,anomalous-backslash-in-string,bad-open-mode,wildcard-import,unused-import"
-  ]
+	"python.linting.pylintEnabled": true,
+	"python.linting.enabled": true,
+	"python.linting.flake8Enabled": false,
+	"python.envFile": "${workspaceFolder}/.env",
+	"editor.insertSpaces": false,
+	"todo-tree.highlights.customHighlight": {
+		"TODO": {
+			"foreground": "statusBar.foreground",
+			"background": "#0062ff",
+			"type": "tag",
+			"borderRadius": "5px"
+		}
+	},
+	"editor.detectIndentation": false,
+	"editor.formatOnSave": true,
+	"files.exclude": {
+		"**/__pycache__": true,
+		"**/env": true
+	},
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": true
+	},
+	"todo-tree.filtering.useBuiltInExcludes": "file and search excludes",
+	"todo-tree.filtering.excludeGlobs": [
+		"**/env"
+	],
+	"python.formatting.provider": "yapf",
+	"python.linting.pylintArgs": [
+		"--disable=all ",
+		"--enable=F,E,unreachable,duplicate-key,unnecessary-semicolon,global-variable-not-assigned,unused-variable,binary-op-exception,bad-format-string,anomalous-backslash-in-string,bad-open-mode,wildcard-import,unused-import"
+	]
 }

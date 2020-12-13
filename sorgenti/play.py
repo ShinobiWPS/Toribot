@@ -8,10 +8,6 @@ import time
 from pathlib import Path
 
 import websocket
-from flask import Flask, request
-from flask_cors import CORS
-from pyti import relative_strength_index
-
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
 from costanti.costanti_unico import (
 	BITSTAMP_WEBSOCKET_CHANNEL_ORDERBOOK, BITSTAMP_WEBSOCKET_CHANNEL_TRADE,
@@ -20,7 +16,10 @@ from costanti.costanti_unico import (
 	TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI, WEBSOCKET_AUTORECONNECT,
 	WEBSOCKET_AUTORECONNECT_RETRIES
 )
+from flask import Flask, request
+from flask_cors import CORS
 from piattaforme.bitstamp import bitstampRequests as bitstamp
+from pyti import relative_strength_index
 from utilita import apriFile as managerJson
 from utilita import fileManager
 from utilita import gestoreRapporti as report
