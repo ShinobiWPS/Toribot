@@ -2,28 +2,19 @@
 
 ## Requirements
 
-- python 3.9
-- pipenv
+- python 3.8.2+
 - VS Code / Codium
 
-## Suggested
-- pyenv (to manage different version of python on windows)
 
 ## Install
 
-- `pipenv sync`
+- `pip install -r requirements.txt`
 - crea un file chiamato `key.py` affianco a `bitstampRequests.py` e dentro inserisci i valori necessari
 - inserire l'ID del proprio user di telegram nell apposito file `api.py`
 - al momento non e' previsto avere un bot di telegram personale,quindi lo avviamo con `False` affinche le notifiche di eventi giungano lo stesso ma con la pecca di non poter usare i comandi
 
-# Usage
-## inside VsCode
-- use the Launch menu
-## in CLI
-- ??
-
-
 ---
+
 ## Variabili principali
 
 - **valore_acquisto** = prezzo di acquisto ripple
