@@ -8,10 +8,6 @@ import time
 from pathlib import Path
 
 import websocket
-from flask import Flask, request
-from flask_cors import CORS
-from pyti import relative_strength_index
-
 from costanti.api import API_TOKEN_HASH, TELEGRAM_ID
 from costanti.costanti_unico import (
 	BITSTAMP_WEBSOCKET_CHANNEL_ORDERBOOK, BITSTAMP_WEBSOCKET_CHANNEL_TRADE,
@@ -20,7 +16,10 @@ from costanti.costanti_unico import (
 	TRADING_REPORT_FILENAME, VALUTA_CRIPTO, VALUTA_SOLDI, WEBSOCKET_AUTORECONNECT,
 	WEBSOCKET_AUTORECONNECT_RETRIES
 )
-from piattaforme.bitstamp import bitstampRequests as bitstamp
+from flask import Flask, request
+from flask_cors import CORS
+#from piattaforme.bitstamp import bitstampRequests as bitstamp
+from pyti import relative_strength_index
 from utilita import apriFile as managerJson
 from utilita import fileManager
 from utilita import gestoreRapporti as report
@@ -77,6 +76,7 @@ def onWSTradeMessage(messageDict):
 
 			# Aggiorno le statistiche
 			MyStat.WST_update()
+			pass
 			# Invio i dati alla funzione che li gestirà (al momento non implementata)
 			nuovoTrade(messageDict['data'])
 	except Exception as ex:
@@ -116,13 +116,13 @@ def onWSOBMessage(messageDict):
 			MyStat.WSOB_update()
 
 			# Invio i dati alla funzione che li gestirà
-			strategiaModulo.gestore(
+			""" strategiaModulo.gestore(
 				orderbook=messageDict['data'],
 				orderbook_history=orderbook_history,
 				simplified_orderbook_history=simplified_orderbook_history,
 				MyStat=MyStat,
 				tg_bot=tg_bot,
-			)
+			) """
 
 			# Se è una lista
 			if isinstance(orderbook_history, list):
@@ -193,6 +193,7 @@ def onWSOBMessage(messageDict):
 			"""
 			# Aggiorno le statistiche
 			MyStat.strategy_cycle_duration_update(end=time.time())
+			pass
 
 	except Exception as ex:
 		# In caso di eccezioni printo e loggo tutti i dati disponibili
